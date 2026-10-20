@@ -1,0 +1,23 @@
+.vscode
+.php-cs-fixer.cache
+.phpunit.cache
+
+vendor/*
+!/vendor/theframework
+.env
+.env.local
+.env.prod
+.env.test
+.env.dev
+/config/*.prod.*
+/config/*.test.*
+/config/*.dev.*
+/db/*.prod.*
+/db/*.test.*
+/db/*.dev.*
+# storage: ignore generated cache/logs but keep the folder skeleton
+storage/**/*
+!storage/**/
+!storage/**/.gitkeep
+# BD SQLite local (se genera con make migrate)
+database/*.sqlite*

@@ -1,0 +1,18 @@
+[
+  {
+    "id":"c1",
+    "alias":"db-task-cruds",
+    "description":"Main db for task-cruds",
+    "type":"mysql",
+    "server":"cont-mariadb-univ",
+    "port":"3306",
+    "schemas":[
+      {
+        "alias": "db-task-cruds",
+        "database":"db_task_cruds",
+        "user":"root",
+        "password":"change-me"
+      }
+    ]
+  }
+]

@@ -1,0 +1,46 @@
+# docker/docker-compose.yml -- stack local minimo: php-fpm + nginx (alpine). Sin contenedor de BD: SQLite.
+# Lanzar desde task-php/ con el makefile (make up). Variables opcionales en docker/.env (ver .env.example).
+name: task-php
+
+services:
+  task-php-fpm:
+    container_name: cont-task-php-fpm
+    build:
+      context: fpm
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    volumes:
+      - ../:/app
+    networks:
+      - task-php-net
+
+  task-php-nginx:
+    container_name: cont-task-php-nginx
+    image: nginx:1.29-alpine
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${HTTP_PORT:-9100}:80
+    volumes:
+      # solo public/ y en lectura: nginx no puede servir lo que no tiene montado (.env, src, vendor, database...)
+      - ../public:/app/public:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - task-php-fpm
+    networks:
+      - task-php-net
+
+  # buzon local: recoge los emails que envia la app (mail() -> sendmail -> smtp mailpit:1025) y los muestra en
+  # http://localhost:9125. No los entrega a nadie: en local ningun email sale a internet.
+  task-php-mailpit:
+    container_name: cont-task-php-mailpit
+    image: axllent/mailpit:v1.27.0
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${MAILPIT_PORT:-9125}:8025
+    networks:
+      - task-php-net
+
+networks:
+  task-php-net:

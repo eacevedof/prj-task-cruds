@@ -1,0 +1,33 @@
+// Dev Containers: VS Code dentro de task-php-fpm para usar su mismo PHP (8.5.12), no el del host.
+// Reutiliza el compose del proyecto (name: task-php), asi que comparte contenedores con "make up".
+{
+    "name": "task-php",
+    "dockerComposeFile": ["../../task-php/docker/docker-compose.yml"],
+    "service": "task-php-fpm",
+    "runServices": ["task-php-fpm", "task-php-nginx"],
+    "workspaceFolder": "/app",
+    "shutdownAction": "none",
+
+    // www-data: mismo usuario que php-fpm; lo que se cree desde el editor (sqlite, logs) sigue siendo escribible.
+    "remoteUser": "www-data",
+
+    "customizations": {
+        "vscode": {
+            // intelephense y no zobo.php-intellisense: el parser de zobo no conoce las constantes tipadas de 8.3 ("'=' expected").
+            "extensions": [
+                "bmewburn.vscode-intelephense-client"
+            ],
+            "settings": {
+                "php.validate.enable": true,
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "php.validate.run": "onType",
+                "intelephense.environment.phpVersion": "8.5.12",
+                // www-data tiene /sbin/nologin como shell: sin esto la terminal se cierra al abrirla.
+                "terminal.integrated.defaultProfile.linux": "sh",
+                "terminal.integrated.profiles.linux": {
+                    "sh": { "path": "/bin/sh" }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,2 @@
+# configuracion local del contenedor (se crea con make env desde docker/.env.example)
+.env

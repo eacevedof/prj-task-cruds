@@ -1,0 +1,37 @@
+# SPA task-js. Plantilla: el entrypoint de nginx sustituye ${API_BASE_URL} al arrancar el contenedor.
+server {
+  listen       80;
+  server_name _;
+
+  root /usr/share/nginx/html;
+  index index.html;
+  autoindex off;
+  server_tokens off;
+  charset utf-8;
+
+  # CSP estricta: solo scripts/estilos propios (nada inline) y fetch solo a la propia web y a la API
+  add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' ${API_BASE_URL}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header Referrer-Policy "no-referrer" always;
+
+  # configuracion de la SPA desde el entorno del contenedor: la url de la API no se hardcodea en el js
+  location = /config.json {
+    default_type application/json;
+    add_header Cache-Control "no-store" always;
+    add_header Content-Security-Policy "default-src 'none'" always;
+    return 200 '{"apiBaseUrl":"${API_BASE_URL}"}';
+  }
+
+  # ficheros ocultos nunca
+  location ~ /\. {
+    return 404;
+  }
+
+  # SPA: cualquier ruta que no sea un fichero cae en index.html
+  location / {
+    try_files $uri /index.html;
+  }
+
+  error_log /var/log/nginx/task-js-error.log;
+  access_log /var/log/nginx/task-js-access.log main;
+}

@@ -1,0 +1,18 @@
+# docker/docker-compose.yml -- SPA estatica (html + js modules) servida por nginx alpine. Sin build: ES modules.
+# Lanzar desde task-js/ con el makefile (make up). Variables opcionales en docker/.env (ver .env.example).
+name: task-js
+
+services:
+  task-js-web:
+    container_name: cont-task-js-web
+    image: nginx:1.29-alpine
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+      # el entrypoint de nginx sustituye las variables en /etc/nginx/templates/*.template al arrancar
+      API_BASE_URL: ${API_BASE_URL:-http://localhost:9100}
+    ports:
+      - ${HTTP_PORT:-9200}:80
+    volumes:
+      # solo public/ y en lectura: nginx no puede servir nada mas del proyecto
+      - ../public:/usr/share/nginx/html:ro
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
