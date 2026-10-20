@@ -1,0 +1,33 @@
+# docker/docker-compose.yml -- stack local minimo: php-fpm + nginx (alpine). Sin contenedor de BD: SQLite.
+# Lanzar desde task-php/ con el makefile (make up). Variables opcionales en docker/.env (ver .env.example).
+name: task-php
+
+services:
+  task-php-fpm:
+    container_name: task-php-fpm
+    build:
+      context: fpm
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    volumes:
+      - ../:/app
+    networks:
+      - task-php-net
+
+  task-php-nginx:
+    container_name: task-php-nginx
+    image: nginx:1.29-alpine
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${HTTP_PORT:-9100}:80
+    volumes:
+      - ../:/app
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - task-php-fpm
+    networks:
+      - task-php-net
+
+networks:
+  task-php-net:

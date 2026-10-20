@@ -1,0 +1,8 @@
+[
+  {
+    "domain": "localhost:900",
+    "sslenc_method":"AES-256-CBC",
+    "sslenc_key":"change-me-local-key",
+    "sslsalt":"change-me-local-salt"
+  }
+]
