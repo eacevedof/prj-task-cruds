@@ -1,4 +1,8 @@
 {
+    "name": "eacevedof/task-php",
+    "description": "task-cruds: to-do list CRUD en DDD, solo API, SQLite (implementacion maestra en PHP)",
+    "type": "project",
+    "license": "proprietary",
     "autoload":{
         "psr-4": {
             "App\\" : "src/"
@@ -13,13 +17,14 @@
         }
     },
     "require": {
-        "php": "^8.4"
+        "php": "^8.4",
+        "ext-pdo": "*",
+        "ext-pdo_sqlite": "*"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.2",
         "phpunit/phpunit": "^13.3"
     },
-    "license": "proprietary",
     "minimum-stability": "stable",
     "prefer-stable": true,
     "config": {
