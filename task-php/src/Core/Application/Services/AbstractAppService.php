@@ -36,6 +36,14 @@ abstract class AbstractAppService
         throw new Exception($message, $code);
     }
 
+    /**
+     * created_at / updated_at: siempre UTC, formato "Y-m-d H:i:s" (el de CURRENT_TIMESTAMP de SQLite).
+     */
+    protected function getUtcNow(): string
+    {
+        return gmdate("Y-m-d H:i:s");
+    }
+
     protected function getEncDecryptInstance(): ComponentEncDecrypt
     {
         $environmentReaderRawRepository = EnvironmentReaderRawRepository::getInstance();

@@ -4,6 +4,9 @@ FROM php:8.4.23-fpm-alpine
 
 RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
+# libstdc++: lo exige el VS Code Server en alpine (Dev Containers, .devcontainer/task-php).
+RUN apk add --no-cache libstdc++
+
 # Composer con version fijada desde la imagen oficial: reproducible y sin descarga insegura.
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
 

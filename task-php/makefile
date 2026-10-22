@@ -2,6 +2,7 @@
 # Stack local (php-fpm + nginx). Se lanza desde task-php/. docker/.env es opcional (defaults en el compose).
 DC := docker compose $(if $(wildcard ./docker/.env),--env-file ./docker/.env,) -f docker/docker-compose.yml
 FPM := task-php-fpm
+# console/migrate corren como www-data (el usuario de php-fpm): si no, la .sqlite que crea root queda 644 y fpm no puede escribir
 HTTP_PORT ?= 9100
 
 help: ## Show this help message
@@ -50,13 +51,13 @@ composer-install: ## composer install dentro de php-fpm
 	docker exec $(FPM) composer install --no-interaction
 
 console: ## comando de consola: make console c="help"
-	docker exec -it -w /app/console $(FPM) php console.php $(c)
+	docker exec -it -u www-data -w /app/console $(FPM) php console.php $(c)
 
 migrate: ## ejecuta las migraciones .sql pendientes (database/migrations)
-	docker exec -w /app/console $(FPM) php console.php run-migrations
+	docker exec -u www-data -w /app/console $(FPM) php console.php run-migrations
 
 health: ## health-check del front controller
-	curl -s http://localhost:$(HTTP_PORT)/
+	curl -s http://localhost:$(HTTP_PORT)/health
 
 gitpush: ## git push
 	clear;

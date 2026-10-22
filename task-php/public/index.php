@@ -1,6 +1,7 @@
 <?php
 
 use App\Core\Boot\BootPathsEnum;
+use App\Core\Boot\IndexMain;
 
 date_default_timezone_set("UTC");
 
@@ -13,15 +14,10 @@ appboot_loadenv();
 include_once "../vendor/theframework/bootstrap.php";
 include_once BootPathsEnum::PATH_SRC."/Core/config/event_bus.php";
 
-// Front controller provisional: solo health-check hasta que exista el router/IndexMain del primer modulo.
-header("Content-Type: application/json");
-echo json_encode([
-    "code" => 200,
-    "status" => true,
-    "errors" => [],
-    "data" => [
-        "app" => "task-php",
-        "php" => PHP_VERSION,
-        "pdo_drivers" => PDO::getAvailableDrivers(),
-    ],
-]);
+try {
+    IndexMain::getInstance()->exec();
+}
+catch (Throwable $ex) {
+    IndexMain::debug($ex);
+    IndexMain::onError($ex);
+}
