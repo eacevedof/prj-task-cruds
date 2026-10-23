@@ -4,7 +4,7 @@ name: task-php
 
 services:
   task-php-fpm:
-    container_name: task-php-fpm
+    container_name: cont-task-php-fpm
     build:
       context: fpm
     environment:
@@ -15,7 +15,7 @@ services:
       - task-php-net
 
   task-php-nginx:
-    container_name: task-php-nginx
+    container_name: cont-task-php-nginx
     image: nginx:1.29-alpine
     environment:
       TZ: ${TIME_ZONE:-UTC}
