@@ -61,6 +61,9 @@ console: ## comando de consola · make console c="help"
 migrate: ## migraciones .sql pendientes a mano (database/migrations) · make migrate
 	docker exec -u www-data -w /app/console $(FPM) php console.php run-migrations
 
+test: ## tests phpunit contra su propia BD (database/task_cruds_test.sqlite) · make test  |  make test f="UpdateUser"
+	docker exec -u www-data $(FPM) vendor/bin/phpunit $(if $(f),--filter $(f),)
+
 health: ## health-check del front controller · make health
 	curl -s http://localhost:$(HTTP_PORT)/health
 
