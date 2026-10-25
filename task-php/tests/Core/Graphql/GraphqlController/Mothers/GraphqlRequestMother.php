@@ -12,6 +12,11 @@ use Tests\Modules\Shared\Infrastructure\Repositories\UsersRawRepositoryMock;
 
 final class GraphqlRequestMother
 {
+    private const string MUTATION_CREATE_USER = "mutation(\$userName: String!, \$userEmail: String!, \$password: String!) { createUser(user_name: \$userName, user_email: \$userEmail, password: \$password) { user_uuid } }";
+    private const string MUTATION_UPDATE_USER = "mutation(\$userUuid: ID!, \$userName: String!, \$userEmail: String!) { updateUser(user_uuid: \$userUuid, user_name: \$userName, user_email: \$userEmail) { user_uuid user_name user_email } }";
+    private const string MUTATION_REGENERATE_API_TOKEN = "mutation(\$userUuid: ID!) { regenerateApiToken(user_uuid: \$userUuid) { user_uuid api_token } }";
+    private const string MUTATION_UPDATE_TASK = "mutation(\$taskUuid: ID!, \$taskTitle: String!, \$taskStatus: String, \$taskType: String) { updateTask(task_uuid: \$taskUuid, task_title: \$taskTitle, task_status: \$taskStatus, task_type: \$taskType) { task_uuid task_title task_status } }";
+
     public static function getInstance(): self
     {
         return new self();
@@ -161,6 +166,148 @@ final class GraphqlRequestMother
 
             GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_EMPTY_QUERY =>
                 $this->getGraphqlRequest("   "),
+
+            GraphqlTestCaseEnum::OK_AS_SUCCESS_BY_UPDATE_USER_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_UPDATE_USER,
+                    [
+                        "userUuid" => UsersRawRepositoryMock::USER_UUID_TO_UPDATE,
+                        "userName" => UsersRawRepositoryMock::USER_NAME_UPDATED,
+                        "userEmail" => UsersRawRepositoryMock::USER_EMAIL_UPDATED,
+                    ],
+                    UsersRawRepositoryMock::USER_API_TOKEN_TO_UPDATE
+                ),
+
+            GraphqlTestCaseEnum::OK_AS_SUCCESS_BY_DELETE_USER_MUTATION =>
+                $this->getGraphqlRequest(
+                    "mutation(\$userUuid: ID!) { deleteUser(user_uuid: \$userUuid) { user_uuid affected } }",
+                    ["userUuid" => UsersRawRepositoryMock::USER_UUID_TO_DELETE],
+                    UsersRawRepositoryMock::USER_API_TOKEN_TO_DELETE
+                ),
+
+            GraphqlTestCaseEnum::OK_AS_SUCCESS_BY_REGENERATE_API_TOKEN_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_REGENERATE_API_TOKEN,
+                    ["userUuid" => UsersRawRepositoryMock::USER_UUID_TO_REGENERATE],
+                    UsersRawRepositoryMock::USER_API_TOKEN_TO_REGENERATE
+                ),
+
+            GraphqlTestCaseEnum::OK_AS_SUCCESS_BY_UPDATE_TASK_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_UPDATE_TASK,
+                    [
+                        "taskUuid" => TasksRawRepositoryMock::TASK_UUID_TO_UPDATE,
+                        "taskTitle" => "Task actualizada",
+                        "taskStatus" => TaskStatusEnum::DONE,
+                    ]
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_CONFLICT_BY_EXISTING_USER_NAME_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_CREATE_USER,
+                    [
+                        "userName" => UsersRawRepositoryMock::USER_NAME_OK,
+                        "userEmail" => UsersRawRepositoryMock::USER_EMAIL_NEW,
+                        "password" => UsersRawRepositoryMock::USER_PASSWORD_NEW,
+                    ],
+                    ""
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_INVALID_USER_NAME_AND_SHORT_PASSWORD_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_CREATE_USER,
+                    [
+                        "userName" => UsersRawRepositoryMock::USER_NAME_INVALID,
+                        "userEmail" => UsersRawRepositoryMock::USER_EMAIL_NEW,
+                        "password" => "short",
+                    ],
+                    ""
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_EMPTY_USER_NAME_UPDATE_USER_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_UPDATE_USER,
+                    [
+                        "userUuid" => UsersRawRepositoryMock::USER_UUID_TO_UPDATE,
+                        "userName" => "  ",
+                        "userEmail" => UsersRawRepositoryMock::USER_EMAIL_UPDATED,
+                    ],
+                    UsersRawRepositoryMock::USER_API_TOKEN_TO_UPDATE
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_CONFLICT_BY_EMAIL_OF_OTHER_USER_UPDATE_USER_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_UPDATE_USER,
+                    [
+                        "userUuid" => UsersRawRepositoryMock::USER_UUID_TO_UPDATE,
+                        "userName" => UsersRawRepositoryMock::USER_NAME_UPDATED,
+                        "userEmail" => UsersRawRepositoryMock::USER_EMAIL_OK,
+                    ],
+                    UsersRawRepositoryMock::USER_API_TOKEN_TO_UPDATE
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_OTHER_USER_UUID_UPDATE_USER_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_UPDATE_USER,
+                    [
+                        "userUuid" => UsersRawRepositoryMock::USER_UUID_TO_UPDATE,
+                        "userName" => UsersRawRepositoryMock::USER_NAME_OTHER,
+                        "userEmail" => UsersRawRepositoryMock::USER_EMAIL_NEW,
+                    ]
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_OTHER_USER_UUID_REGENERATE_API_TOKEN_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_REGENERATE_API_TOKEN,
+                    ["userUuid" => UsersRawRepositoryMock::USER_UUID_TO_REGENERATE]
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_OTHER_USER_UUID =>
+                $this->getGraphqlRequest(
+                    "query(\$userUuid: ID!) { user(user_uuid: \$userUuid) { user_uuid } }",
+                    ["userUuid" => UsersRawRepositoryMock::USER_UUID_TO_UPDATE]
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_OTHER_USER_UUID_USER_TASKS_QUERY =>
+                $this->getGraphqlRequest(
+                    "query(\$userUuid: ID!) { userTasks(user_uuid: \$userUuid) { total_items } }",
+                    ["userUuid" => UsersRawRepositoryMock::USER_UUID_TO_UPDATE]
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_FAKE_TASK_UUID =>
+                $this->getGraphqlRequest(
+                    "query(\$taskUuid: ID!) { task(task_uuid: \$taskUuid) { task_uuid } }",
+                    ["taskUuid" => TasksRawRepositoryMock::TASK_UUID_NOK]
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_INVALID_TARGET_DATE_MUTATION =>
+                $this->getGraphqlRequest(
+                    "mutation(\$targetDate: String) { createTask(task_title: \"Task GraphQL\", target_date: \$targetDate) { task_uuid } }",
+                    ["targetDate" => TasksRawRepositoryMock::TARGET_DATE_INVALID]
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_INVALID_TASK_TYPE_UPDATE_TASK_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_UPDATE_TASK,
+                    [
+                        "taskUuid" => TasksRawRepositoryMock::TASK_UUID_TO_UPDATE,
+                        "taskTitle" => "Task actualizada",
+                        "taskType" => TasksRawRepositoryMock::TASK_TYPE_INVALID,
+                    ]
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_TASK_OF_OTHER_USER_UPDATE_TASK_MUTATION =>
+                $this->getGraphqlRequest(
+                    self::MUTATION_UPDATE_TASK,
+                    [
+                        "taskUuid" => TasksRawRepositoryMock::TASK_UUID_TO_UPDATE,
+                        "taskTitle" => "Task de otro",
+                    ],
+                    UsersRawRepositoryMock::USER_API_TOKEN_TO_UPDATE
+                ),
+
+            GraphqlTestCaseEnum::NOK_AS_UNAUTHORIZED_BY_INVALID_TOKEN =>
+                $this->getGraphqlRequest("{ users { user_uuid } }", [], UsersRawRepositoryMock::USER_API_TOKEN_NOK),
         };
     }
 

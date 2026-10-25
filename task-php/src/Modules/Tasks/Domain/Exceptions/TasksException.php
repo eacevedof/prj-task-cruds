@@ -9,6 +9,11 @@ use App\Modules\Shared\Domain\Enums\ExceptionEnum;
 
 final class TasksException extends Exception
 {
+    public static function unauthorizedCustom(string $message): self
+    {
+        throw new self($message, ExceptionEnum::CODE_UNAUTHORIZED);
+    }
+
     public static function notFoundCustom(string $message): self
     {
         throw new self($message, ExceptionEnum::CODE_NOT_FOUND);

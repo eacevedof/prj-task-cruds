@@ -8,6 +8,8 @@ use App\Modules\Shared\Infrastructure\Components\Date\DateTimer;
 use App\Modules\Shared\Infrastructure\Traits\ErrorStackTrait;
 use App\Modules\Shared\Infrastructure\Exceptions\FieldsException;
 
+use App\Modules\Users\Domain\Entities\UserEntity;
+use App\Modules\Users\Domain\Enums\UsersKeyEnum;
 use App\Modules\Users\Domain\Enums\UsersMessageEnum;
 use App\Modules\Users\Domain\Services\UserFieldsValidator;
 use App\Modules\Users\Infrastructure\Repositories\UsersReaderSqliteRepository;
@@ -21,9 +23,12 @@ final class UpdateUserService
 {
     use ErrorStackTrait;
 
-    private DateTimer $dateTimer;
-    private UsersReaderSqliteRepository $usersReaderSqliteRepository;
-    private UsersWriterSqliteRepository $usersWriterSqliteRepository;
+    private readonly DateTimer $dateTimer;
+    private readonly UsersReaderSqliteRepository $usersReaderSqliteRepository;
+    private readonly UsersWriterSqliteRepository $usersWriterSqliteRepository;
+
+    private UpdateUserDto $updateUserDto;
+    private UserEntity $userEntity;
 
     public function __construct()
     {
@@ -43,35 +48,74 @@ final class UpdateUserService
      */
     public function __invoke(UpdateUserDto $updateUserDto): UpdateUserResultDto
     {
-        $userUuid = $updateUserDto->getUserUuid();
-        // solo el propio usuario: otro uuid responde igual que si no existiera (no se revela quien existe)
-        if ($userUuid !== $updateUserDto->getAuthUserUuid()) {
-            UsersException::notFoundCustom(__(UsersMessageEnum::USER_X_NOT_FOUND, $userUuid));
-        }
+        $this->updateUserDto = $updateUserDto;
+        $this->failIfWrongInput();
+        $this->failIfWrongFields();
+
         // autenticado = existe: su id ya viene resuelto
-        $userId = $updateUserDto->getAuthUserId();
+        $this->userEntity = UserEntity::fromPrimitives([
+            UsersKeyEnum::ID => $updateUserDto->getAuthUserId(),
+            UsersKeyEnum::USER_UUID => $updateUserDto->getAuthUserUuid(),
+            UsersKeyEnum::USER_NAME => $updateUserDto->getUserName(),
+            UsersKeyEnum::USER_EMAIL => $updateUserDto->getUserEmail(),
+            UsersKeyEnum::UPDATED_AT => $this->dateTimer->getNowDtIntoTargetTz(),
+        ]);
+        $this->failIfUserNameOrEmailExistsInOtherUser();
 
-        $userName = $updateUserDto->getUserName();
-        $userEmail = $updateUserDto->getUserEmail();
-        if ($errors = UserFieldsValidator::getInstance()->getErrors($userName, $userEmail)) {
-            FieldsException::badRequestCustom(
-                $this->getErrorStackMessage(
-                    __(SharedMessageEnum::FIELDS_VALIDATION_ERRORS), $errors
-                ));
-        }
-
-        if ($this->usersReaderSqliteRepository->doesUserNameExistInOtherUser($userName, $userId)) {
-            UsersException::conflictCustom(__(UsersMessageEnum::USER_NAME_X_ALREADY_EXISTS, $userName));
-        }
-
-        if ($this->usersReaderSqliteRepository->doesUserEmailExistInOtherUser($userEmail, $userId)) {
-            UsersException::conflictCustom(__(UsersMessageEnum::EMAIL_X_ALREADY_EXISTS, $userEmail));
-        }
-
-        $this->usersWriterSqliteRepository->updateUserById($userId, $userName, $userEmail, $this->dateTimer->getNowDtIntoTargetTz());
+        $this->usersWriterSqliteRepository->updateUserById($this->userEntity);
 
         return UpdateUserResultDto::fromPrimitives([
-            "user" => $this->usersReaderSqliteRepository->getUserById($userId)?->toPrimitives() ?? [],
+            "user" => $this->usersReaderSqliteRepository->getUserById($this->userEntity->getId())?->toPrimitives() ?? [],
         ]);
+    }
+
+    /**
+     * Solo el propio usuario: otro uuid responde igual que si no existiera (no se revela quien existe).
+     * @throws UsersException
+     */
+    private function failIfWrongInput(): void
+    {
+        if ($this->updateUserDto->getAuthUserId() < 1) {
+            UsersException::unauthorizedCustom(__(UsersMessageEnum::MISSING_OR_INVALID_API_TOKEN));
+        }
+        $userUuid = $this->updateUserDto->getUserUuid();
+        if ($userUuid !== $this->updateUserDto->getAuthUserUuid()) {
+            UsersException::notFoundCustom(__(UsersMessageEnum::USER_X_NOT_FOUND, $userUuid));
+        }
+    }
+
+    /**
+     * @throws FieldsException
+     */
+    private function failIfWrongFields(): void
+    {
+        $errors = UserFieldsValidator::getInstance()->getErrors(
+            $this->updateUserDto->getUserName(),
+            $this->updateUserDto->getUserEmail()
+        );
+        if (!$errors) return;
+
+        FieldsException::badRequestCustom(
+            $this->getErrorStackMessage(
+                __(SharedMessageEnum::FIELDS_VALIDATION_ERRORS), $errors
+            ));
+    }
+
+    /**
+     * @throws UsersException
+     */
+    private function failIfUserNameOrEmailExistsInOtherUser(): void
+    {
+        if ($this->usersReaderSqliteRepository->doesUserNameExistInOtherUser($this->userEntity)) {
+            UsersException::conflictCustom(
+                __(UsersMessageEnum::USER_NAME_X_ALREADY_EXISTS, $this->userEntity->getUserName())
+            );
+        }
+
+        if ($this->usersReaderSqliteRepository->doesUserEmailExistInOtherUser($this->userEntity)) {
+            UsersException::conflictCustom(
+                __(UsersMessageEnum::EMAIL_X_ALREADY_EXISTS, $this->userEntity->getUserEmail())
+            );
+        }
     }
 }

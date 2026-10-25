@@ -68,13 +68,13 @@ final class TasksWriterSqliteRepository extends AbstractSqliteRepository
         ]);
     }
 
-    public function deleteTaskById(int $taskId): int
+    public function deleteTaskById(TaskEntity $taskEntity): int
     {
         $sql = "
         -- deleteTaskById
         DELETE FROM `tasks`
         WHERE 1=1
-        AND id = {$taskId}
+        AND id = {$taskEntity->getId()}
         ";
         return $this->execute($sql);
     }

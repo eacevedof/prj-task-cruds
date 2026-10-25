@@ -9,7 +9,9 @@ use App\Modules\Users\Domain\Exceptions\UsersException;
 
 final class GetUserService
 {
-    private UsersReaderSqliteRepository $usersReaderSqliteRepository;
+    private readonly UsersReaderSqliteRepository $usersReaderSqliteRepository;
+
+    private GetUserDto $getUserDto;
 
     public function __construct()
     {
@@ -26,15 +28,28 @@ final class GetUserService
      */
     public function __invoke(GetUserDto $getUserDto): GetUserResultDto
     {
-        $userUuid = $getUserDto->getUserUuid();
-        // solo el propio usuario: otro uuid responde igual que si no existiera (no se revela quien existe)
-        if ($userUuid !== $getUserDto->getAuthUserUuid()) {
-            UsersException::notFoundCustom(__(UsersMessageEnum::USER_X_NOT_FOUND, $userUuid));
-        }
+        $this->getUserDto = $getUserDto;
+        $this->failIfWrongInput();
+
         if (!$userEntity = $this->usersReaderSqliteRepository->getUserById($getUserDto->getAuthUserId())) {
-            UsersException::notFoundCustom(__(UsersMessageEnum::USER_X_NOT_FOUND, $userUuid));
+            UsersException::notFoundCustom(__(UsersMessageEnum::USER_X_NOT_FOUND, $getUserDto->getUserUuid()));
         }
 
         return GetUserResultDto::fromPrimitives(["user" => $userEntity->toPrimitives()]);
+    }
+
+    /**
+     * Solo el propio usuario: otro uuid responde igual que si no existiera (no se revela quien existe).
+     * @throws UsersException
+     */
+    private function failIfWrongInput(): void
+    {
+        if (!$this->getUserDto->getAuthUserId()) {
+            UsersException::unauthorizedCustom(__(UsersMessageEnum::MISSING_OR_INVALID_API_TOKEN));
+        }
+        $userUuid = $this->getUserDto->getUserUuid();
+        if ($userUuid !== $this->getUserDto->getAuthUserUuid()) {
+            UsersException::notFoundCustom(__(UsersMessageEnum::USER_X_NOT_FOUND, $userUuid));
+        }
     }
 }

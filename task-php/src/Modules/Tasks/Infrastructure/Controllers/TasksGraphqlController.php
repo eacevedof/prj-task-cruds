@@ -108,7 +108,7 @@ final class TasksGraphqlController extends AbstractGraphqlController
                 ])
             )->toArray();
         }
-        catch (FieldsException | UsersException $e) {
+        catch (FieldsException | UsersException | TasksException $e) {
             throw $this->getGraphqlDomainError($e);
         }
         catch (Throwable $e) {

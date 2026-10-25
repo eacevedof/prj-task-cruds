@@ -13,7 +13,9 @@ use App\Modules\Tasks\Domain\Exceptions\TasksException;
  */
 final class ListUserTasksService
 {
-    private TasksReaderSqliteRepository $tasksReaderSqliteRepository;
+    private readonly TasksReaderSqliteRepository $tasksReaderSqliteRepository;
+
+    private ListUserTasksDto $listUserTasksDto;
 
     public function __construct()
     {
@@ -30,11 +32,8 @@ final class ListUserTasksService
      */
     public function __invoke(ListUserTasksDto $listUserTasksDto): ListUserTasksResultDto
     {
-        $userUuid = $listUserTasksDto->getUserUuid();
-        // solo el propio usuario: otro uuid responde igual que si no existiera (no se revela quien existe)
-        if ($userUuid !== $listUserTasksDto->getAuthUserUuid()) {
-            TasksException::notFoundCustom(__(TasksMessageEnum::USER_X_NOT_FOUND, $userUuid));
-        }
+        $this->listUserTasksDto = $listUserTasksDto;
+        $this->failIfWrongInput();
 
         return ListUserTasksResultDto::fromPrimitives([
             "tasks" => array_map(
@@ -42,5 +41,20 @@ final class ListUserTasksService
                 $this->tasksReaderSqliteRepository->getTasksByUserId($listUserTasksDto->getAuthUserId())
             ),
         ]);
+    }
+
+    /**
+     * Solo el propio usuario: otro uuid responde igual que si no existiera (no se revela quien existe).
+     * @throws TasksException
+     */
+    private function failIfWrongInput(): void
+    {
+        if ($this->listUserTasksDto->getAuthUserId() < 1) {
+            TasksException::unauthorizedCustom(__(TasksMessageEnum::MISSING_OR_INVALID_API_TOKEN));
+        }
+        $userUuid = $this->listUserTasksDto->getUserUuid();
+        if ($userUuid !== $this->listUserTasksDto->getAuthUserUuid()) {
+            TasksException::notFoundCustom(__(TasksMessageEnum::USER_X_NOT_FOUND, $userUuid));
+        }
     }
 }

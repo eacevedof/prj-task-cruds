@@ -19,10 +19,12 @@ use App\Modules\Mailer\Domain\Enums\AlertEmailTypeEnum;
  */
 final class SendAlertEmailService
 {
-    private DateTimer $dateTimer;
-    private FuncMailer $funcMailer;
-    private ServerIdentifier $serverIdentifier;
-    private EnvironmentReaderRawRepository $environmentReaderRawRepository;
+    private readonly DateTimer $dateTimer;
+    private readonly FuncMailer $funcMailer;
+    private readonly ServerIdentifier $serverIdentifier;
+    private readonly EnvironmentReaderRawRepository $environmentReaderRawRepository;
+
+    private SendAlertEmailDto $sendAlertEmailDto;
 
     public function __construct()
     {
@@ -42,6 +44,9 @@ final class SendAlertEmailService
      */
     public function __invoke(SendAlertEmailDto $sendAlertEmailDto): SendAlertEmailResultDto
     {
+        $this->sendAlertEmailDto = $sendAlertEmailDto;
+        $this->failIfWrongInput();
+
         $emailTo = $this->environmentReaderRawRepository->getEmailTo();
         if (!$emailTo) {
             return SendAlertEmailResultDto::fromPrimitives(["isSent" => false, "emailTo" => ""]);
@@ -53,29 +58,44 @@ final class SendAlertEmailService
             ->setFrom($this->environmentReaderRawRepository->getEmailFrom() ?: $emailTo)
             ->setTitleFrom("$appName ($environment)")
             ->addTo($emailTo)
-            ->setSubject($this->getSubject($sendAlertEmailDto, $environment))
-            ->setContent($this->getHtmlBody($sendAlertEmailDto))
+            ->setSubject($this->getSubject($environment))
+            ->setContent($this->getHtmlBody())
             ->send();
 
         return SendAlertEmailResultDto::fromPrimitives(["isSent" => true, "emailTo" => $emailTo]);
     }
 
-    private function getSubject(SendAlertEmailDto $sendAlertEmailDto, string $environment): string
+    /**
+     * La alerta la genera el codigo (MailTrait), no un usuario: un dato mal formado es un fallo de programacion.
+     * @throws RuntimeException
+     */
+    private function failIfWrongInput(): void
     {
-        $subjectTag = AlertEmailTypeEnum::SUBJECT_TAGS[$sendAlertEmailDto->getAlertType()] ?? "[alert]";
-        $serverInfo = $this->serverIdentifier->getServerName()." (".$this->serverIdentifier->getServerIp().")";
-        return "$subjectTag ($environment) $serverInfo - {$sendAlertEmailDto->getSubject()}";
+        $alertType = $this->sendAlertEmailDto->getAlertType();
+        if (!isset(AlertEmailTypeEnum::SUBJECT_TAGS[$alertType])) {
+            throw new RuntimeException("SendAlertEmail: unknown alert type \"{$alertType}\"");
+        }
+        if (!$this->sendAlertEmailDto->getSubject()) {
+            throw new RuntimeException("SendAlertEmail: subject is required");
+        }
     }
 
-    private function getHtmlBody(SendAlertEmailDto $sendAlertEmailDto): string
+    private function getSubject(string $environment): string
     {
-        $alertType = $sendAlertEmailDto->getAlertType();
-        $heading = AlertEmailTypeEnum::HEADINGS[$alertType] ?? "Alert";
-        $color = AlertEmailTypeEnum::COLORS[$alertType] ?? "#D60202";
+        $subjectTag = AlertEmailTypeEnum::SUBJECT_TAGS[$this->sendAlertEmailDto->getAlertType()];
+        $serverInfo = $this->serverIdentifier->getServerName()." (".$this->serverIdentifier->getServerIp().")";
+        return "$subjectTag ($environment) $serverInfo - {$this->sendAlertEmailDto->getSubject()}";
+    }
+
+    private function getHtmlBody(): string
+    {
+        $alertType = $this->sendAlertEmailDto->getAlertType();
+        $heading = AlertEmailTypeEnum::HEADINGS[$alertType];
+        $color = AlertEmailTypeEnum::COLORS[$alertType];
         $now = $this->dateTimer->getNowDtIntoTargetTz();
         $baseUrl = htmlspecialchars($this->environmentReaderRawRepository->getBaseUrl());
-        $subject = htmlspecialchars($sendAlertEmailDto->getSubject());
-        $details = htmlspecialchars($sendAlertEmailDto->getDetails());
+        $subject = htmlspecialchars($this->sendAlertEmailDto->getSubject());
+        $details = htmlspecialchars($this->sendAlertEmailDto->getDetails());
 
         return "
             <h3 style=\"color:$color;\">[$now] $heading: $subject</h3>

@@ -61,7 +61,7 @@ ssh-nginx: ## shell en nginx · make ssh-nginx
 composer-install: ## composer install a mano dentro de php-fpm · make composer-install
 	docker exec $(FPM) composer install --no-interaction
 
-console: ## comando de consola · make console c="help"  |  make console c='user-create --user_name="Ana Lopez" --user_email=ana@example.com'
+console: ## comando de consola · make console c="help"  |  make console c='user-create --user_name=ana.lopez --user_email=ana@example.com --password=Ana.Secret1'
 	docker exec -it -u www-data -w /app/console $(FPM) php console.php $(c)
 
 migrate: ## migraciones .sql pendientes a mano (database/migrations) · make migrate

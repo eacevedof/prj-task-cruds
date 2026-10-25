@@ -18,10 +18,10 @@ final class RunMigrationsService
     private const string MIGRATIONS_TABLE = "migrations";
     private const string CREATE_MIGRATIONS_TABLE_FILE = "0000-create-migrations-table.sql";
 
-    private RunMigrationsDto $runMigrationsDto;
-    private RunMigrationsReaderSqliteRepository $runMigrationsReaderSqliteRepository;
-    private RunMigrationsWriterSqliteRepository $runMigrationsWriterSqliteRepository;
+    private readonly RunMigrationsReaderSqliteRepository $runMigrationsReaderSqliteRepository;
+    private readonly RunMigrationsWriterSqliteRepository $runMigrationsWriterSqliteRepository;
 
+    private RunMigrationsDto $runMigrationsDto;
     private array $sqlMigrationsFiles = [];
     private array $sqlFilesToBeRan = [];
     private array $messages = [];

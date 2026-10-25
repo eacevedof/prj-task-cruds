@@ -5,6 +5,8 @@ namespace App\Modules\Users\Infrastructure\Repositories;
 
 use App\Modules\Shared\Infrastructure\Repositories\AbstractSqliteRepository;
 
+use App\Modules\Users\Domain\Entities\UserEntity;
+
 final class UsersWriterSqliteRepository extends AbstractSqliteRepository
 {
     public static function getInstance(): self
@@ -12,14 +14,10 @@ final class UsersWriterSqliteRepository extends AbstractSqliteRepository
         return new self();
     }
 
-    public function insertUser(
-        string $userUuid,
-        string $userName,
-        string $userEmail,
-        string $passwordHash,
-        string $apiTokenHash,
-        string $now
-    ): int
+    /**
+     * En el alta updated_at = created_at.
+     */
+    public function insertUser(UserEntity $userEntity): int
     {
         $sql = "
         -- insertUser
@@ -28,67 +26,74 @@ final class UsersWriterSqliteRepository extends AbstractSqliteRepository
         VALUES
             (?, ?, ?, ?, ?, ?, ?)
         ";
-        $this->execute($sql, [$userUuid, $userName, $userEmail, $passwordHash, $apiTokenHash, $now, $now]);
+        $this->execute($sql, [
+            $userEntity->getUserUuid(),
+            $userEntity->getUserName(),
+            $userEntity->getUserEmail(),
+            $userEntity->getPasswordHash(),
+            $userEntity->getApiTokenHash(),
+            $userEntity->getCreatedAt(),
+            $userEntity->getCreatedAt(),
+        ]);
         return (int) $this->pdo->lastInsertId();
     }
 
-    public function updateUserById(
-        int $userId,
-        string $userName,
-        string $userEmail,
-        string $now
-    ): int
+    public function updateUserById(UserEntity $userEntity): int
     {
         $sql = "
         -- updateUserById
         UPDATE `users`
         SET user_name = ?, user_email = ?, updated_at = ?
         WHERE 1=1
-        AND id = {$userId}
+        AND id = {$userEntity->getId()}
         ";
-        return $this->execute($sql, [$userName, $userEmail, $now]);
+        return $this->execute($sql, [
+            $userEntity->getUserName(),
+            $userEntity->getUserEmail(),
+            $userEntity->getUpdatedAt(),
+        ]);
     }
 
     /**
      * El token anterior deja de valer en el acto: solo existe el hash nuevo.
      */
-    public function updateApiTokenHashByUserId(int $userId, string $apiTokenHash, string $now): int
+    public function updateApiTokenHashById(UserEntity $userEntity): int
     {
         $sql = "
-        -- updateApiTokenHashByUserId
+        -- updateApiTokenHashById
         UPDATE `users`
         SET api_token_hash = ?, updated_at = ?
         WHERE 1=1
-        AND id = {$userId}
+        AND id = {$userEntity->getId()}
         ";
-        return $this->execute($sql, [$apiTokenHash, $now]);
+        return $this->execute($sql, [$userEntity->getApiTokenHash(), $userEntity->getUpdatedAt()]);
     }
 
     /**
      * Rehash en el login cuando cambia el algoritmo o el coste de password_hash().
      */
-    public function updatePasswordHashByUserId(int $userId, string $passwordHash, string $now): int
+    public function updatePasswordHashById(UserEntity $userEntity): int
     {
         $sql = "
-        -- updatePasswordHashByUserId
+        -- updatePasswordHashById
         UPDATE `users`
         SET password_hash = ?, updated_at = ?
         WHERE 1=1
-        AND id = {$userId}
+        AND id = {$userEntity->getId()}
         ";
-        return $this->execute($sql, [$passwordHash, $now]);
+        return $this->execute($sql, [$userEntity->getPasswordHash(), $userEntity->getUpdatedAt()]);
     }
 
     /**
      * Borra tambien sus tasks (FK ON DELETE CASCADE).
      */
-    public function deleteUserById(int $userId): int
+    public function deleteUserById(UserEntity $userEntity): int
     {
         $sql = "
         -- deleteUserById
         DELETE FROM `users`
         WHERE 1=1
-        AND id = {$userId}
+        AND id = {$userEntity->getId()}
         ";
         return $this->execute($sql);
     }

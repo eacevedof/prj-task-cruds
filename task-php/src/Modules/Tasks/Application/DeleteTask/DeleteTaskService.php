@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Tasks\Application\DeleteTask;
 
+use App\Modules\Tasks\Domain\Entities\TaskEntity;
 use App\Modules\Tasks\Domain\Enums\TasksMessageEnum;
 use App\Modules\Tasks\Infrastructure\Repositories\TasksReaderSqliteRepository;
 use App\Modules\Tasks\Infrastructure\Repositories\TasksWriterSqliteRepository;
@@ -10,8 +11,10 @@ use App\Modules\Tasks\Domain\Exceptions\TasksException;
 
 final class DeleteTaskService
 {
-    private TasksReaderSqliteRepository $tasksReaderSqliteRepository;
-    private TasksWriterSqliteRepository $tasksWriterSqliteRepository;
+    private readonly TasksReaderSqliteRepository $tasksReaderSqliteRepository;
+    private readonly TasksWriterSqliteRepository $tasksWriterSqliteRepository;
+
+    private DeleteTaskDto $deleteTaskDto;
 
     public function __construct()
     {
@@ -29,16 +32,38 @@ final class DeleteTaskService
      */
     public function __invoke(DeleteTaskDto $deleteTaskDto): DeleteTaskResultDto
     {
-        $taskUuid = $deleteTaskDto->getTaskUuid();
-        // una task de otro usuario responde igual que si no existiera (no se revela que existe)
-        $taskEntity = $this->tasksReaderSqliteRepository->getTaskByTaskUuid($taskUuid);
-        if (!$taskEntity || $taskEntity->getUserId() !== $deleteTaskDto->getAuthUserId()) {
-            TasksException::notFoundCustom(__(TasksMessageEnum::TASK_X_NOT_FOUND, $taskUuid));
-        }
+        $this->deleteTaskDto = $deleteTaskDto;
+        $this->failIfWrongInput();
+
+        $taskEntity = $this->tryToGetOwnTaskOrFail();
 
         return DeleteTaskResultDto::fromPrimitives([
-            "taskUuid" => $taskUuid,
-            "affected" => $this->tasksWriterSqliteRepository->deleteTaskById($taskEntity->getId()),
+            "taskUuid" => $taskEntity->getTaskUuid(),
+            "affected" => $this->tasksWriterSqliteRepository->deleteTaskById($taskEntity),
         ]);
+    }
+
+    /**
+     * @throws TasksException
+     */
+    private function failIfWrongInput(): void
+    {
+        if ($this->deleteTaskDto->getAuthUserId() < 1) {
+            TasksException::unauthorizedCustom(__(TasksMessageEnum::MISSING_OR_INVALID_API_TOKEN));
+        }
+    }
+
+    /**
+     * Una task de otro usuario responde igual que si no existiera (no se revela que existe).
+     * @throws TasksException
+     */
+    private function tryToGetOwnTaskOrFail(): TaskEntity
+    {
+        $taskUuid = $this->deleteTaskDto->getTaskUuid();
+        $taskEntity = $this->tasksReaderSqliteRepository->getTaskByTaskUuid($taskUuid);
+        if (!$taskEntity || $taskEntity->getUserId() !== $this->deleteTaskDto->getAuthUserId()) {
+            TasksException::notFoundCustom(__(TasksMessageEnum::TASK_X_NOT_FOUND, $taskUuid));
+        }
+        return $taskEntity;
     }
 }

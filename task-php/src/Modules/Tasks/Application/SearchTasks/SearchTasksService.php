@@ -15,14 +15,15 @@ use App\Modules\Tasks\Domain\Exceptions\TasksException;
 
 /**
  * Busqueda paginada de las tasks del usuario autenticado (mas reciente primero): filtros por texto, estado,
- * tipo y rango de target_date. Es la de GraphQL; REST sigue listando todas (ListTasks / ListUserTasks).
+ * tipo y rango de target_date.
  */
 final class SearchTasksService
 {
     use ErrorStackTrait;
 
-    private TasksSearchValidator $tasksSearchValidator;
-    private TasksReaderSqliteRepository $tasksReaderSqliteRepository;
+    private readonly TasksSearchValidator $tasksSearchValidator;
+    private readonly TasksReaderSqliteRepository $tasksReaderSqliteRepository;
+
     private SearchTasksDto $searchTasksDto;
 
     public function __construct()
@@ -43,9 +44,10 @@ final class SearchTasksService
     public function __invoke(SearchTasksDto $searchTasksDto): SearchTasksResultDto
     {
         $this->searchTasksDto = $searchTasksDto;
-
-        $userId = $this->tryToGetOwnUserIdOrFail();
+        $this->failIfWrongInput();
         $this->failIfWrongSearch();
+
+        $userId = $this->searchTasksDto->getAuthUserId();
 
         $totalItems = $this->tasksReaderSqliteRepository->getTasksCountByUserIdAndFilters(
             $userId,
@@ -81,13 +83,15 @@ final class SearchTasksService
      * Sin user_uuid se busca en las del autenticado; con uno ajeno responde igual que si no existiera.
      * @throws TasksException
      */
-    private function tryToGetOwnUserIdOrFail(): int
+    private function failIfWrongInput(): void
     {
+        if ($this->searchTasksDto->getAuthUserId() < 1) {
+            TasksException::unauthorizedCustom(__(TasksMessageEnum::MISSING_OR_INVALID_API_TOKEN));
+        }
         $userUuid = $this->searchTasksDto->getUserUuid() ?: $this->searchTasksDto->getAuthUserUuid();
         if ($userUuid !== $this->searchTasksDto->getAuthUserUuid()) {
             TasksException::notFoundCustom(__(TasksMessageEnum::USER_X_NOT_FOUND, $userUuid));
         }
-        return $this->searchTasksDto->getAuthUserId();
     }
 
     /**

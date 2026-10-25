@@ -25,9 +25,12 @@ final class UpdateTaskService
 {
     use ErrorStackTrait;
 
-    private DateTimer $dateTimer;
-    private TasksReaderSqliteRepository $tasksReaderSqliteRepository;
-    private TasksWriterSqliteRepository $tasksWriterSqliteRepository;
+    private readonly DateTimer $dateTimer;
+    private readonly TasksReaderSqliteRepository $tasksReaderSqliteRepository;
+    private readonly TasksWriterSqliteRepository $tasksWriterSqliteRepository;
+
+    private UpdateTaskDto $updateTaskDto;
+    private TaskEntity $taskEntity;
 
     public function __construct()
     {
@@ -47,39 +50,68 @@ final class UpdateTaskService
      */
     public function __invoke(UpdateTaskDto $updateTaskDto): UpdateTaskResultDto
     {
-        $taskUuid = $updateTaskDto->getTaskUuid();
-        // una task de otro usuario responde igual que si no existiera (no se revela que existe)
-        $taskEntity = $this->tasksReaderSqliteRepository->getTaskByTaskUuid($taskUuid);
-        if (!$taskEntity || $taskEntity->getUserId() !== $updateTaskDto->getAuthUserId()) {
-            TasksException::notFoundCustom(__(TasksMessageEnum::TASK_X_NOT_FOUND, $taskUuid));
-        }
+        $this->updateTaskDto = $updateTaskDto;
+        $this->failIfWrongInput();
 
+        $currentTaskEntity = $this->tryToGetOwnTaskOrFail();
         // reemplazo completo sobre la task actual: se conservan id, propietario y created_at
-        $taskEntityToUpdate = TaskEntity::fromPrimitives([
-            TasksKeyEnum::ID => $taskEntity->getId(),
-            TasksKeyEnum::USER_ID => $taskEntity->getUserId(),
-            TasksKeyEnum::USER_UUID => $taskEntity->getUserUuid(),
-            TasksKeyEnum::TASK_UUID => $taskUuid,
+        $this->taskEntity = TaskEntity::fromPrimitives([
+            TasksKeyEnum::ID => $currentTaskEntity->getId(),
+            TasksKeyEnum::USER_ID => $currentTaskEntity->getUserId(),
+            TasksKeyEnum::USER_UUID => $currentTaskEntity->getUserUuid(),
+            TasksKeyEnum::TASK_UUID => $currentTaskEntity->getTaskUuid(),
             TasksKeyEnum::TASK_TITLE => $updateTaskDto->getTaskTitle(),
             TasksKeyEnum::TASK_STATUS => $updateTaskDto->getTaskStatus() ?: TaskStatusEnum::DEFAULT,
             TasksKeyEnum::TASK_TYPE => $updateTaskDto->getTaskType() ?: TaskTypeEnum::DEFAULT,
             TasksKeyEnum::TARGET_DATE => $updateTaskDto->getTargetDate(),
             TasksKeyEnum::TASK_DESCRIPTION => $updateTaskDto->getTaskDescription(),
-            TasksKeyEnum::CREATED_AT => $taskEntity->getCreatedAt(),
+            TasksKeyEnum::CREATED_AT => $currentTaskEntity->getCreatedAt(),
             TasksKeyEnum::UPDATED_AT => $this->dateTimer->getNowDtIntoTargetTz(),
         ]);
 
-        if ($errors = TaskFieldsValidator::getInstance()->getErrors($taskEntityToUpdate)) {
+        $this->failIfWrongFields();
+
+        $this->tasksWriterSqliteRepository->updateTaskById($this->taskEntity);
+
+        return UpdateTaskResultDto::fromPrimitives([
+            "task" => $this->tasksReaderSqliteRepository->getTaskById($this->taskEntity->getId())?->toPrimitives() ?? [],
+        ]);
+    }
+
+    /**
+     * @throws TasksException
+     */
+    private function failIfWrongInput(): void
+    {
+        if ($this->updateTaskDto->getAuthUserId() < 1) {
+            TasksException::unauthorizedCustom(__(TasksMessageEnum::MISSING_OR_INVALID_API_TOKEN));
+        }
+    }
+
+    /**
+     * Una task de otro usuario responde igual que si no existiera (no se revela que existe).
+     * @throws TasksException
+     */
+    private function tryToGetOwnTaskOrFail(): TaskEntity
+    {
+        $taskUuid = $this->updateTaskDto->getTaskUuid();
+        $taskEntity = $this->tasksReaderSqliteRepository->getTaskByTaskUuid($taskUuid);
+        if (!$taskEntity || $taskEntity->getUserId() !== $this->updateTaskDto->getAuthUserId()) {
+            TasksException::notFoundCustom(__(TasksMessageEnum::TASK_X_NOT_FOUND, $taskUuid));
+        }
+        return $taskEntity;
+    }
+
+    /**
+     * @throws FieldsException
+     */
+    private function failIfWrongFields(): void
+    {
+        if ($errors = TaskFieldsValidator::getInstance()->getErrors($this->taskEntity)) {
             FieldsException::badRequestCustom(
                 $this->getErrorStackMessage(
                     __(SharedMessageEnum::FIELDS_VALIDATION_ERRORS), $errors
                 ));
         }
-
-        $this->tasksWriterSqliteRepository->updateTaskById($taskEntityToUpdate);
-
-        return UpdateTaskResultDto::fromPrimitives([
-            "task" => $this->tasksReaderSqliteRepository->getTaskById($taskEntity->getId())?->toPrimitives() ?? [],
-        ]);
     }
 }

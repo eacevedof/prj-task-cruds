@@ -114,7 +114,7 @@ final class UsersReaderSqliteRepository extends AbstractSqliteRepository
     /**
      * Unicidad del user_name en la modificacion: el del propio usuario no cuenta como repetido.
      */
-    public function doesUserNameExistInOtherUser(string $userName, int $userId): bool
+    public function doesUserNameExistInOtherUser(UserEntity $userEntity): bool
     {
         $sql = "
         -- doesUserNameExistInOtherUser
@@ -123,9 +123,9 @@ final class UsersReaderSqliteRepository extends AbstractSqliteRepository
         FROM `users`
         WHERE 1=1
         AND user_name = ? COLLATE NOCASE
-        AND id != {$userId}
+        AND id != {$userEntity->getId()}
         ";
-        $rows = $this->query($sql, [$userName]);
+        $rows = $this->query($sql, [$userEntity->getUserName()]);
         return (bool) ($rows[0]["n_rows"] ?? 0);
     }
 
@@ -149,7 +149,7 @@ final class UsersReaderSqliteRepository extends AbstractSqliteRepository
     /**
      * Unicidad del email en la modificacion: el email del propio usuario no cuenta como repetido.
      */
-    public function doesUserEmailExistInOtherUser(string $userEmail, int $userId): bool
+    public function doesUserEmailExistInOtherUser(UserEntity $userEntity): bool
     {
         $sql = "
         -- doesUserEmailExistInOtherUser
@@ -158,9 +158,9 @@ final class UsersReaderSqliteRepository extends AbstractSqliteRepository
         FROM `users`
         WHERE 1=1
         AND user_email = ?
-        AND id != {$userId}
+        AND id != {$userEntity->getId()}
         ";
-        $rows = $this->query($sql, [$userEmail]);
+        $rows = $this->query($sql, [$userEntity->getUserEmail()]);
         return (bool) ($rows[0]["n_rows"] ?? 0);
     }
 }

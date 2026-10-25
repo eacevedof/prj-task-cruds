@@ -2,6 +2,13 @@
 
 ⬅️ [volver a la documentación]({{appBaseUrl}}/api/v1/documentation)
 
+## 2.0.0
+- Fecha: 2026-10-25
+
+**Cambios que rompen compatibilidad:**
+- **Se retira la API REST de usuarios y tareas** (`/api/v1/users…`, `/api/v1/tasks…`): todas sus operaciones siguen disponibles en `POST /graphql` (tabla de equivalencias en la documentación, 1.1).
+- Se mantienen `POST /api/v1/log-in`, la documentación y `GET /health`.
+
 ## 1.2.0
 - Fecha: 2026-10-25
 

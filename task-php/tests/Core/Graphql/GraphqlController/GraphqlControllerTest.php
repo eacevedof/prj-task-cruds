@@ -16,7 +16,7 @@ use Tests\Modules\Shared\Infrastructure\Repositories\TasksRawRepositoryMock;
 use Tests\Modules\Shared\Infrastructure\Repositories\UsersRawRepositoryMock;
 
 /**
- * GraphQL responde 200 tambien con errores de dominio: el codigo REST equivalente va en errors[].extensions.code
+ * GraphQL responde 200 tambien con errores de dominio: el codigo HTTP equivalente va en errors[].extensions.code
  */
 final class GraphqlControllerTest extends AbstractTestCase
 {
@@ -225,6 +225,140 @@ final class GraphqlControllerTest extends AbstractTestCase
 
         $this->assertNotEmpty($graphqlResponseRepositoryMock->getErrors());
         $this->assertEquals(0, $graphqlResponseRepositoryMock->getFirstErrorCode());
+    }
+
+    public function testOkAsSuccessByUpdateUserMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::OK_AS_SUCCESS_BY_UPDATE_USER_MUTATION);
+
+        $this->assertEmpty($graphqlResponseRepositoryMock->getErrors());
+        $updatedUser = $graphqlResponseRepositoryMock->getData()["updateUser"];
+        $this->assertEquals(UsersRawRepositoryMock::USER_NAME_UPDATED, $updatedUser["user_name"]);
+        $this->assertEquals(UsersRawRepositoryMock::USER_EMAIL_UPDATED, $updatedUser["user_email"]);
+    }
+
+    public function testOkAsSuccessByDeleteUserMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::OK_AS_SUCCESS_BY_DELETE_USER_MUTATION);
+
+        $this->assertEmpty($graphqlResponseRepositoryMock->getErrors());
+        $this->assertEquals(1, $graphqlResponseRepositoryMock->getData()["deleteUser"]["affected"]);
+    }
+
+    public function testOkAsSuccessByRegenerateApiTokenMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::OK_AS_SUCCESS_BY_REGENERATE_API_TOKEN_MUTATION);
+
+        $this->assertEmpty($graphqlResponseRepositoryMock->getErrors());
+        $newApiToken = $graphqlResponseRepositoryMock->getData()["regenerateApiToken"]["api_token"];
+        $this->assertNotEmpty($newApiToken);
+        $this->assertNotEquals(UsersRawRepositoryMock::USER_API_TOKEN_TO_REGENERATE, $newApiToken);
+    }
+
+    public function testOkAsSuccessByUpdateTaskMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::OK_AS_SUCCESS_BY_UPDATE_TASK_MUTATION);
+
+        $this->assertEmpty($graphqlResponseRepositoryMock->getErrors());
+        $this->assertEquals(TaskStatusEnum::DONE, $graphqlResponseRepositoryMock->getData()["updateTask"]["task_status"]);
+    }
+
+    public function testNokAsConflictByExistingUserNameMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_CONFLICT_BY_EXISTING_USER_NAME_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_CONFLICT, $graphqlResponseRepositoryMock->getFirstErrorCode());
+    }
+
+    public function testNokAsBadRequestByInvalidUserNameAndShortPasswordMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_INVALID_USER_NAME_AND_SHORT_PASSWORD_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_BAD_REQUEST, $graphqlResponseRepositoryMock->getFirstErrorCode());
+        $errorDetails = implode(" ", $graphqlResponseRepositoryMock->getFirstErrorDetails());
+        $this->assertStringContainsString("user_name:", $errorDetails);
+        $this->assertStringContainsString("password:", $errorDetails);
+    }
+
+    public function testNokAsBadRequestByEmptyUserNameUpdateUserMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_EMPTY_USER_NAME_UPDATE_USER_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_BAD_REQUEST, $graphqlResponseRepositoryMock->getFirstErrorCode());
+    }
+
+    public function testNokAsConflictByEmailOfOtherUserUpdateUserMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_CONFLICT_BY_EMAIL_OF_OTHER_USER_UPDATE_USER_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_CONFLICT, $graphqlResponseRepositoryMock->getFirstErrorCode());
+    }
+
+    public function testNokAsNotFoundByOtherUserUuidUpdateUserMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_OTHER_USER_UUID_UPDATE_USER_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_NOT_FOUND, $graphqlResponseRepositoryMock->getFirstErrorCode());
+        $this->assertNull($graphqlResponseRepositoryMock->getData()["updateUser"]);
+    }
+
+    public function testNokAsNotFoundByOtherUserUuidRegenerateApiTokenMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_OTHER_USER_UUID_REGENERATE_API_TOKEN_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_NOT_FOUND, $graphqlResponseRepositoryMock->getFirstErrorCode());
+    }
+
+    public function testNokAsNotFoundByOtherUserUuid(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_OTHER_USER_UUID);
+
+        $this->assertEquals(ExceptionEnum::CODE_NOT_FOUND, $graphqlResponseRepositoryMock->getFirstErrorCode());
+        $this->assertNull($graphqlResponseRepositoryMock->getData()["user"]);
+    }
+
+    public function testNokAsNotFoundByOtherUserUuidUserTasksQuery(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_OTHER_USER_UUID_USER_TASKS_QUERY);
+
+        $this->assertEquals(ExceptionEnum::CODE_NOT_FOUND, $graphqlResponseRepositoryMock->getFirstErrorCode());
+    }
+
+    public function testNokAsNotFoundByFakeTaskUuid(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_FAKE_TASK_UUID);
+
+        $this->assertEquals(ExceptionEnum::CODE_NOT_FOUND, $graphqlResponseRepositoryMock->getFirstErrorCode());
+        $this->assertNull($graphqlResponseRepositoryMock->getData()["task"]);
+    }
+
+    public function testNokAsBadRequestByInvalidTargetDateMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_INVALID_TARGET_DATE_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_BAD_REQUEST, $graphqlResponseRepositoryMock->getFirstErrorCode());
+    }
+
+    public function testNokAsBadRequestByInvalidTaskTypeUpdateTaskMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_BAD_REQUEST_BY_INVALID_TASK_TYPE_UPDATE_TASK_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_BAD_REQUEST, $graphqlResponseRepositoryMock->getFirstErrorCode());
+    }
+
+    public function testNokAsNotFoundByTaskOfOtherUserUpdateTaskMutation(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_NOT_FOUND_BY_TASK_OF_OTHER_USER_UPDATE_TASK_MUTATION);
+
+        $this->assertEquals(ExceptionEnum::CODE_NOT_FOUND, $graphqlResponseRepositoryMock->getFirstErrorCode());
+        $this->assertNull($graphqlResponseRepositoryMock->getData()["updateTask"]);
+    }
+
+    public function testNokAsUnauthorizedByInvalidToken(): void
+    {
+        $graphqlResponseRepositoryMock = $this->getGraphqlResponseByTestCase(GraphqlTestCaseEnum::NOK_AS_UNAUTHORIZED_BY_INVALID_TOKEN);
+
+        $this->assertEquals(ExceptionEnum::CODE_UNAUTHORIZED, $graphqlResponseRepositoryMock->getFirstErrorCode());
     }
 
     public function testNokAsBadRequestByEmptyQuery(): void

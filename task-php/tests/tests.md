@@ -25,7 +25,7 @@ TOKEN=$(curl -s -X POST 'http://localhost:9100/graphql' --header 'Content-Type: 
 ```
 
 4. Los valores que cambian de una llamada a otra (uuids, textos) van en `variables`: así no hay que escapar comillas dentro de la query.
-5. Un error de dominio responde `200` con `errors[].extensions.code` = el código que daría REST (`400`, `401`, `404`, `409`).
+5. Un error de dominio responde `200` con `errors[].extensions.code` = el código HTTP equivalente (`400`, `401`, `404`, `409`).
 
 ## 2 - Tareas (CRUD)
 
