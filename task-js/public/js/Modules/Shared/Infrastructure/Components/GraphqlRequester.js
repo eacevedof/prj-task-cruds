@@ -1,3 +1,6 @@
+import { SharedEventEnum } from "/js/Modules/Shared/Domain/Enums/SharedEventEnum.js";
+import { Dispatcher } from "/js/Modules/Shared/Infrastructure/Components/Dispatcher.js";
+
 const GRAPHQL_PATH = "/graphql";
 const CODE_OK = 200;
 // error de GraphQL sin extensions.code (consulta mal formada, campo inexistente): es un fallo del cliente
@@ -7,13 +10,19 @@ const CODE_GRAPHQL_ERROR = 400;
  * POST /graphql de la API con {query, variables} y el Bearer. Normaliza la respuesta a la misma forma que
  * usan los servicios: {code, status, errors, data}, donde data es el campo de la operacion pedida.
  * GraphQL responde 200 tambien con errores: el codigo real viaja en errors[0].extensions.code.
+ * Avisa al empezar y al terminar cada llamada (tambien si falla): la interfaz muestra el progreso.
  * No captura: fallo de red o una respuesta que no es JSON propagan. Una sola instancia: la url se fija al arrancar.
  */
 export class GraphqlRequester {
 
     static #instance = null;
 
+    #dispatcher;
     #apiBaseUrl = "";
+
+    constructor() {
+        this.#dispatcher = Dispatcher.getInstance();
+    }
 
     /**
      * @returns {GraphqlRequester}
@@ -43,12 +52,19 @@ export class GraphqlRequester {
             headers["Authorization"] = `Bearer ${apiToken}`;
         }
 
-        const response = await fetch(`${this.#apiBaseUrl}${GRAPHQL_PATH}`, {
-            method: "POST",
-            headers,
-            body: JSON.stringify({ query, variables }),
-        });
-        const json = await response.json();
+        this.#dispatcher.dispatch(SharedEventEnum.API_REQUEST_STARTED);
+        let response, json;
+        try {
+            response = await fetch(`${this.#apiBaseUrl}${GRAPHQL_PATH}`, {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ query, variables }),
+            });
+            json = await response.json();
+        }
+        finally {
+            this.#dispatcher.dispatch(SharedEventEnum.API_REQUEST_FINISHED);
+        }
 
         const firstError = json.errors?.[0];
         if (!firstError) {

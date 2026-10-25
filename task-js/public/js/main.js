@@ -2,8 +2,10 @@ import { Dispatcher } from "/js/Modules/Shared/Infrastructure/Components/Dispatc
 import { GraphqlRequester } from "/js/Modules/Shared/Infrastructure/Components/GraphqlRequester.js";
 import { SessionStorer } from "/js/Modules/Shared/Infrastructure/Components/SessionStorer.js";
 import { ChangeLanguageController } from "/js/Modules/Shared/Infrastructure/Controllers/ChangeLanguageController.js";
+import { ShowRequestProgressController } from "/js/Modules/Shared/Infrastructure/Controllers/ShowRequestProgressController.js";
 import { ConfigReaderJsonRepository } from "/js/Modules/Shared/Infrastructure/Repositories/ConfigReaderJsonRepository.js";
 import { NavigationView } from "/js/Modules/Shared/Infrastructure/Views/NavigationView.js";
+import { RequestProgressView } from "/js/Modules/Shared/Infrastructure/Views/RequestProgressView.js";
 
 import { UsersEventEnum } from "/js/Modules/Users/Domain/Enums/UsersEventEnum.js";
 import { CreateUserController } from "/js/Modules/Users/Infrastructure/Controllers/CreateUserController.js";
@@ -31,9 +33,9 @@ import { TasksView } from "/js/Modules/Tasks/Infrastructure/Views/TasksView.js";
  * -> configuracion -> sesion. Es el punto de entrada: captura lo que no tenga a nadie mas que lo capture.
  */
 const start = async function () {
-    [NavigationView, AuthView, SessionView, AccountView, TasksView].forEach((view) => view.getInstance().init());
+    [NavigationView, RequestProgressView, AuthView, SessionView, AccountView, TasksView].forEach((view) => view.getInstance().init());
     [
-        ChangeLanguageController,
+        ChangeLanguageController, ShowRequestProgressController,
         StartSessionController, RestoreSessionController, LogInController, CreateUserController, LogOutController,
         UpdateAccountController, RegenerateApiTokenController, DeleteAccountController,
         ListTasksController, GetTaskController, CreateTaskController, UpdateTaskController, DeleteTaskController,

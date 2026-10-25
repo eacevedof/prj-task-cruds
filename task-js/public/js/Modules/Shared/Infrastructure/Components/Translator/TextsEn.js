@@ -6,6 +6,7 @@ export const TextsEn = Object.freeze({
     "app.title": "Task JS",
     "app.subtitle": "task CRUD",
     "app.fatal_error": "The application could not start: check that the API is up and reload the page.",
+    "app.request_progress": "Processing your request…",
 
     "nav.tasks": "Tasks",
     "nav.account": "Account",

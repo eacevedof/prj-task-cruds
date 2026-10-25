@@ -444,3 +444,54 @@ a.task-title:hover {
     font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
     font-size: 0.85rem;
 }
+
+/* modal de progreso de una llamada a la API: aparece con retardo para no parpadear si la respuesta es inmediata */
+.dialog-progress {
+    width: min(360px, calc(100vw - 32px));
+    text-align: center;
+    animation: fade-in 150ms ease-out 200ms both;
+}
+
+.dialog-progress::backdrop {
+    animation: fade-in 150ms ease-out 200ms both;
+}
+
+.dialog-progress p {
+    margin: 0 0 16px;
+}
+
+.progress-bar {
+    position: relative;
+    height: 6px;
+    overflow: hidden;
+    border-radius: 3px;
+    background: var(--color-border);
+}
+
+/* sin progreso real (fetch no lo da): barra indeterminada que recorre la pista */
+.progress-bar span {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 40%;
+    border-radius: 3px;
+    background: var(--color-primary);
+    animation: progress-slide 1.1s ease-in-out infinite;
+}
+
+@keyframes progress-slide {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(250%); }
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .progress-bar span {
+        width: 100%;
+        animation: none;
+        opacity: 0.6;
+    }
+}

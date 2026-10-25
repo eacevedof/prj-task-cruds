@@ -5,6 +5,7 @@ export const TextsEs = Object.freeze({
     "app.title": "Task JS",
     "app.subtitle": "CRUD de tareas",
     "app.fatal_error": "No se ha podido arrancar la aplicación: revisa que la API esté levantada y recarga la página.",
+    "app.request_progress": "Procesando tu solicitud…",
 
     "nav.tasks": "Tareas",
     "nav.account": "Cuenta",

@@ -204,6 +204,12 @@
         </div>
     </section>
 
+    <!-- progreso de una llamada a la API: modal mientras haya alguna en curso (RequestProgressView) -->
+    <dialog id="dialog-request-progress" class="dialog dialog-progress" aria-labelledby="p-request-progress">
+        <p id="p-request-progress" data-i18n="app.request_progress">Processing your request…</p>
+        <div class="progress-bar" role="progressbar" aria-labelledby="p-request-progress"><span></span></div>
+    </dialog>
+
 </main>
 </body>
 </html>
