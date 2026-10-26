@@ -5,11 +5,13 @@ name: task-js
 services:
   task-js-web:
     container_name: cont-task-js-web
-    image: nginx:1.29-alpine
+    image: nginx:1.30-alpine
     environment:
       TZ: ${TIME_ZONE:-UTC}
       # el entrypoint de nginx sustituye las variables en /etc/nginx/templates/*.template al arrancar
-      API_BASE_URL: ${API_BASE_URL:-http://localhost:9100}
+      # APIs que se pueden elegir desde la interfaz (selector de back)
+      API_BASE_URL_PHP: ${API_BASE_URL_PHP:-http://localhost:9100}
+      API_BASE_URL_GO: ${API_BASE_URL_GO:-http://localhost:9300}
     ports:
       - ${HTTP_PORT:-9200}:80
     volumes:

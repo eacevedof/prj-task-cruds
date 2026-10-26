@@ -13,7 +13,7 @@ export class ConfigReaderJsonRepository {
     }
 
     /**
-     * @returns {Promise<{apiBaseUrl: string}>}
+     * @returns {Promise<{backends: {code: string, name: string, apiBaseUrl: string}[]}>}
      */
     async getConfig() {
         const response = await fetch(CONFIG_PATH, { headers: { "Accept": "application/json" } });

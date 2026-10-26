@@ -10,7 +10,11 @@
 <body>
 
 <header class="topbar">
-    <h1><span data-i18n="app.title">Task JS</span> <small data-i18n="app.subtitle">task CRUD</small></h1>
+    <div class="topbar-start">
+        <h1><span data-i18n="app.title">Task JS</span> <small data-i18n="app.subtitle">task CRUD</small></h1>
+        <!-- selector de back: un boton con el logo de cada uno de /config.json (NavigationView.renderBackends) -->
+        <div id="div-backends" class="backend-switch" role="radiogroup" data-i18n-aria-label="nav.backend" aria-label="Backend"></div>
+    </div>
 
     <nav id="nav-screens" class="nav-screens hidden">
         <a href="#tasks" data-screen="tasks" data-i18n="nav.tasks">Tasks</a>
@@ -211,5 +215,24 @@
     </dialog>
 
 </main>
+
+<!-- tiempo de respuesta de cada llamada a la API (RequestTimesView): fijo abajo, plegable -->
+<footer class="footer-request-times">
+    <details id="details-request-times" open>
+        <summary>
+            <span data-i18n="request_times.title">Response times</span>
+            <span class="request-times-summary">
+                <span data-i18n="nav.backend">Backend</span> <strong id="span-request-times-backend">-</strong>
+                · <span data-i18n="request_times.count">Requests</span> <strong id="span-request-times-count">0</strong>
+                · <span data-i18n="request_times.average">Average</span> <strong id="span-request-times-average">-</strong>
+                · <span data-i18n="request_times.last">Last</span> <strong id="span-request-times-last">-</strong>
+            </span>
+            <button type="button" id="button-copy-request-times" class="secondary" data-i18n="request_times.copy">Copy to clipboard</button>
+            <button type="button" id="button-clear-request-times" class="secondary" data-i18n="request_times.clear">Clear</button>
+        </summary>
+        <p id="p-request-times-empty" class="hint" data-i18n="request_times.empty">No requests to the API yet.</p>
+        <ol id="ol-request-times" class="request-times"></ol>
+    </details>
+</footer>
 </body>
 </html>

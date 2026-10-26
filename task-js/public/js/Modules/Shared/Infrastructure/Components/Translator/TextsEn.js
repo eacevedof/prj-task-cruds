@@ -11,6 +11,16 @@ export const TextsEn = Object.freeze({
     "nav.tasks": "Tasks",
     "nav.account": "Account",
     "nav.language": "Language",
+    "nav.backend": "Backend",
+
+    "request_times.title": "Response times",
+    "request_times.count": "Requests",
+    "request_times.average": "Average",
+    "request_times.last": "Last",
+    "request_times.copy": "Copy to clipboard",
+    "request_times.copied": "Copied",
+    "request_times.clear": "Clear",
+    "request_times.empty": "No requests to the API yet.",
 
     "session.log_out": "Log out",
 
@@ -48,7 +58,7 @@ export const TextsEn = Object.freeze({
     "account.delete.confirm": "Delete your account and ALL its tasks? It cannot be undone.",
 
     "tasks.form.title_create": "New task",
-    "tasks.form.title_update": "Edit task",
+    "tasks.form.title_update": "Edit task #{taskId}",
     "tasks.form.task_title": "Title",
     "tasks.form.task_status": "Status",
     "tasks.form.task_type": "Type",

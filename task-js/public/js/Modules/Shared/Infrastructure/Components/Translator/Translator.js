@@ -9,7 +9,7 @@ const TEXTS_BY_LANGUAGE_CODE = Object.freeze({
 
 /**
  * Textos de la interfaz en el idioma activo (ingles por defecto). En el html: data-i18n="clave" (texto) y
- * data-i18n-placeholder="clave". Una sola instancia: guarda el idioma activo (quien lo persiste es el controller).
+ * data-i18n-placeholder="clave" / data-i18n-aria-label="clave". Una sola instancia: guarda el idioma activo (quien lo persiste es el controller).
  * Componente autocontenido: sus diccionarios viven en su misma carpeta.
  */
 export class Translator {
@@ -63,6 +63,9 @@ export class Translator {
         });
         root.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
             element.placeholder = this.getText(element.dataset.i18nPlaceholder);
+        });
+        root.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+            element.setAttribute("aria-label", this.getText(element.dataset.i18nAriaLabel));
         });
     }
 }

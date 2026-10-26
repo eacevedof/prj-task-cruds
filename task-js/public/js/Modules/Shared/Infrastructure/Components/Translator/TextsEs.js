@@ -10,6 +10,16 @@ export const TextsEs = Object.freeze({
     "nav.tasks": "Tareas",
     "nav.account": "Cuenta",
     "nav.language": "Idioma",
+    "nav.backend": "Back",
+
+    "request_times.title": "Tiempos de respuesta",
+    "request_times.count": "Peticiones",
+    "request_times.average": "Media",
+    "request_times.last": "Última",
+    "request_times.copy": "Copiar al portapapeles",
+    "request_times.copied": "Copiado",
+    "request_times.clear": "Limpiar",
+    "request_times.empty": "Aún no hay peticiones a la API.",
 
     "session.log_out": "Salir",
 
@@ -47,7 +57,7 @@ export const TextsEs = Object.freeze({
     "account.delete.confirm": "¿Borrar tu cuenta y TODAS sus tareas? No se puede deshacer.",
 
     "tasks.form.title_create": "Nueva tarea",
-    "tasks.form.title_update": "Editar tarea",
+    "tasks.form.title_update": "Editar tarea #{taskId}",
     "tasks.form.task_title": "Título",
     "tasks.form.task_status": "Estado",
     "tasks.form.task_type": "Tipo",

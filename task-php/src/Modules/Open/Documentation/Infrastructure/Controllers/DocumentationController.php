@@ -14,7 +14,7 @@ use App\Modules\Shared\Infrastructure\Repositories\Configuration\EnvironmentRead
 use App\Modules\Shared\Infrastructure\Traits\LogTrait;
 
 /**
- * GET /api/v1/documentation  (publica, HTML generado desde documentation.md)
+ * GET /api/v1  (publica, HTML generado desde documentation.md)
  */
 final class DocumentationController
 {

@@ -1,8 +1,8 @@
 // Boton "Copiar" en los bloques de codigo con un curl (el resto: respuestas de ejemplo, no se copian).
 (function () {
     const CURL_PATTERN = /^\s*curl\s/m;
-    const LABEL_COPY = "Copiar";
-    const LABEL_COPIED = "Copiado";
+    const LABEL_COPY = "Copy";
+    const LABEL_COPIED = "Copied";
     const LABEL_ERROR = "Error";
     const LABEL_RESET_MS = 1500;
 

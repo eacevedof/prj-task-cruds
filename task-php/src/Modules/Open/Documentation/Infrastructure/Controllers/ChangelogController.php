@@ -14,7 +14,7 @@ use App\Modules\Shared\Infrastructure\Repositories\Configuration\EnvironmentRead
 use App\Modules\Shared\Infrastructure\Traits\LogTrait;
 
 /**
- * GET /api/v1/documentation/changelog  (publica, HTML generado desde changelog.md)
+ * GET /api/v1/changelog  (publica, HTML generado desde changelog.md)
  */
 final class ChangelogController
 {

@@ -1,6 +1,6 @@
 #!/bin/bash
 # SPA task-js (nginx). Se lanza desde task-js/. docker/.env es opcional (defaults en el compose).
-# Consume la API de task-php: tiene que estar levantada (cd ../task-php && make up).
+# Consume la API de task-php o de task-go (se elige en la interfaz): la elegida tiene que estar levantada (make up en su carpeta).
 DC := docker compose $(if $(wildcard ./docker/.env),--env-file ./docker/.env,) -f docker/docker-compose.yml
 WEB := cont-task-js-web
 HTTP_PORT ?= 9200
@@ -27,7 +27,7 @@ up: ## levanta el contenedor · make up
 down: ## para y elimina el contenedor · make down
 	$(DC) down
 
-restart: ## reinicia el contenedor (relee la plantilla de nginx y API_BASE_URL) · make restart
+restart: ## reinicia el contenedor (relee la plantilla de nginx y API_BASE_URL_*) · make restart
 	$(DC) restart
 
 ps: ## contenedor del stack · make ps

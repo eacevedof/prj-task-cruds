@@ -1,11 +1,13 @@
 import { Dispatcher } from "/js/Modules/Shared/Infrastructure/Components/Dispatcher.js";
-import { GraphqlRequester } from "/js/Modules/Shared/Infrastructure/Components/GraphqlRequester.js";
 import { SessionStorer } from "/js/Modules/Shared/Infrastructure/Components/SessionStorer.js";
+import { ChangeBackendController } from "/js/Modules/Shared/Infrastructure/Controllers/ChangeBackendController.js";
 import { ChangeLanguageController } from "/js/Modules/Shared/Infrastructure/Controllers/ChangeLanguageController.js";
 import { ShowRequestProgressController } from "/js/Modules/Shared/Infrastructure/Controllers/ShowRequestProgressController.js";
+import { ShowRequestTimesController } from "/js/Modules/Shared/Infrastructure/Controllers/ShowRequestTimesController.js";
 import { ConfigReaderJsonRepository } from "/js/Modules/Shared/Infrastructure/Repositories/ConfigReaderJsonRepository.js";
 import { NavigationView } from "/js/Modules/Shared/Infrastructure/Views/NavigationView.js";
 import { RequestProgressView } from "/js/Modules/Shared/Infrastructure/Views/RequestProgressView.js";
+import { RequestTimesView } from "/js/Modules/Shared/Infrastructure/Views/RequestTimesView.js";
 
 import { UsersEventEnum } from "/js/Modules/Users/Domain/Enums/UsersEventEnum.js";
 import { CreateUserController } from "/js/Modules/Users/Infrastructure/Controllers/CreateUserController.js";
@@ -30,19 +32,19 @@ import { TasksView } from "/js/Modules/Tasks/Infrastructure/Views/TasksView.js";
 
 /**
  * Arranque de la SPA: vistas (DOM) -> controllers (suscritos a sus eventos; el de idioma traduce la pagina)
- * -> configuracion -> sesion. Es el punto de entrada: captura lo que no tenga a nadie mas que lo capture.
+ * -> configuracion (back elegido) -> sesion. Es el punto de entrada: captura lo que no tenga a nadie mas que lo capture.
  */
 const start = async function () {
-    [NavigationView, RequestProgressView, AuthView, SessionView, AccountView, TasksView].forEach((view) => view.getInstance().init());
+    [NavigationView, RequestProgressView, RequestTimesView, AuthView, SessionView, AccountView, TasksView].forEach((view) => view.getInstance().init());
     [
-        ChangeLanguageController, ShowRequestProgressController,
+        ChangeLanguageController, ChangeBackendController, ShowRequestProgressController, ShowRequestTimesController,
         StartSessionController, RestoreSessionController, LogInController, CreateUserController, LogOutController,
         UpdateAccountController, RegenerateApiTokenController, DeleteAccountController,
         ListTasksController, GetTaskController, CreateTaskController, UpdateTaskController, DeleteTaskController,
     ].forEach((controller) => controller.getInstance().init());
 
     const config = await ConfigReaderJsonRepository.getInstance().getConfig();
-    GraphqlRequester.getInstance().setApiBaseUrl(config.apiBaseUrl);
+    ChangeBackendController.getInstance().applySavedBackend(config.backends);
 
     // la sesion guardada se revalida contra la API (el token pudo rotarse o el usuario borrarse)
     const apiToken = SessionStorer.getInstance().getApiToken();

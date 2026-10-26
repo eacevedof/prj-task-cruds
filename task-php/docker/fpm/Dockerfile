@@ -7,8 +7,8 @@ RUN cp "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 # mail(): el sendmail de busybox entrega por smtp al contenedor de Mailpit (docker-compose.yml).
 RUN echo 'sendmail_path = "/usr/sbin/sendmail -t -i -S cont-task-php-mailpit:1025"' > "$PHP_INI_DIR/conf.d/zz-mail.ini"
 
-# libstdc++: lo exige el VS Code Server en alpine (Dev Containers, .devcontainer/task-php).
-RUN apk add --no-cache libstdc++
+# apk upgrade: los parches de seguridad de alpine que la imagen aun no trae. libstdc++: lo exige el VS Code Server en alpine (Dev Containers, .devcontainer/task-php).
+RUN apk upgrade --no-cache && apk add --no-cache libstdc++
 
 # Composer con version fijada desde la imagen oficial: reproducible y sin descarga insegura.
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer

@@ -1,64 +1,67 @@
-# Task PHP CRUD API - [{{appVersion}}]({{appBaseUrl}}/api/v1/documentation/changelog#{{appVersion}})
-- Última actualización: {{appVersionUpdate}}
-- Lista de tareas por usuario: toda la API va por **GraphQL** (`POST /graphql`); el login también está en REST (`POST /api/v1/log-in`).
+# Task PHP CRUD API - [{{appVersion}}]({{appBaseUrl}}/api/v1/changelog#{{appVersion}})
+- Last update: {{appVersionUpdate}}
+- Task list per user: the whole API runs on **GraphQL** (`POST /graphql`); log-in is also available over REST (`POST /api/v1/log-in`).
 
 ---
 
 ## 1 - GraphQL
 
-1. Un único endpoint: **POST** `/graphql` con body `{"query": "...", "variables": {...}}` y la cabecera `Authorization: Bearer <api_token>` (ver 2 - Autenticación).
-2. Sin token solo funcionan las mutaciones `createUser` (el alta) y `logIn` (el login).
-3. Campos y argumentos en `snake_case` (`user_uuid`, `task_title`…).
-4. Los errores siguen el estándar GraphQL: la respuesta es `200` y el error va en `errors[]`, con `extensions.code` = el código HTTP equivalente (ver 1.6) y `extensions.errors` = el mensaje (en una validación, con el detalle de cada campo).
-5. Profundidad máxima de una consulta: 5 niveles.
+1. A single endpoint: **POST** `/graphql` with body `{"query": "...", "variables": {...}}` and the header `Authorization: Bearer <api_token>` (see 2 - Authentication).
+2. Without a token, only the mutations `createUser` (sign-up) and `logIn` (log-in) work.
+3. Fields and arguments in `snake_case` (`user_uuid`, `task_title`…).
+4. Errors follow the GraphQL standard: the response is `200` and the error goes in `errors[]`, with `extensions.code` = the equivalent HTTP code (see 1.6) and `extensions.errors` = the message (in a validation, with the detail of each field).
+5. Maximum query depth: 5 levels.
 
-### 1.1 Operaciones
+### 1.1 Operations
 
-| # | Tipo | Operación | Token | Qué hace |
-|---|---|---|---|---|
-| 1 | query | `users` | sí | Lista con tu usuario (como mucho un elemento) |
-| 2 | query | `user(user_uuid)` | sí | Tu usuario por su uuid |
-| 3 | query | `tasks(filter, page, page_size)` | sí | Tus tareas, paginadas y filtrables (ver 1.2) |
-| 4 | query | `task(task_uuid)` | sí | Una tarea |
-| 5 | query | `userTasks(user_uuid, filter, page, page_size)` | sí | Las tareas de tu usuario, paginadas y filtrables |
-| 6 | mutation | `createUser(user_name, user_email, password)` | no | Alta: devuelve el usuario y su `api_token` (ver 4.1) |
-| 7 | mutation | `logIn(user_name, password)` | no | Login: devuelve el usuario y un `api_token` nuevo (ver 4.2) |
-| 8 | mutation | `updateUser(user_uuid, user_name, user_email)` | sí | Reemplazo completo del usuario (ver 4.3) |
-| 9 | mutation | `deleteUser(user_uuid)` | sí | Borra el usuario y todas sus tareas |
-| 10 | mutation | `regenerateApiToken(user_uuid)` | sí | Token nuevo; el anterior deja de valer |
-| 11 | mutation | `createTask(task_title, ...)` | sí | Alta de una tarea tuya (ver 5.2) |
-| 12 | mutation | `updateTask(task_uuid, task_title, ...)` | sí | Reemplazo completo de la tarea (ver 5.3) |
-| 13 | mutation | `deleteTask(task_uuid)` | sí | Borra la tarea |
+"Requires token" = the header `Authorization: Bearer <api_token>` must be sent. The two public ones are precisely
+the ones that give you the token: sign-up and log-in.
 
-Además, el tipo `User` tiene el campo `tasks(filter, page, page_size)`: usuario y tareas en una sola consulta.
+| # | Module | Type | Operation | Requires token | What it does |
+|---|---|---|---|---|---|
+| 1 | users | mutation | `createUser(user_name, user_email, password)` | no (public) | Sign-up: returns the user and their `api_token` (see 4.1) |
+| 2 | users | mutation | `logIn(user_name, password)` | no (public) | Log-in: returns the user and a new `api_token` (see 4.2) |
+| 3 | users | query | `users` | yes | List with your user (at most one item) |
+| 4 | users | query | `user(user_uuid)` | yes | Your user by its uuid |
+| 5 | users | mutation | `updateUser(user_uuid, user_name, user_email)` | yes | Full replacement of the user (see 4.3) |
+| 6 | users | mutation | `regenerateApiToken(user_uuid)` | yes | New token; the previous one stops working (see 4.4) |
+| 7 | users | mutation | `deleteUser(user_uuid)` | yes | Deletes the user and all their tasks (see 4.5) |
+| 8 | tasks | mutation | `createTask(task_title, ...)` | yes | Creates a task of yours (see 5.2) |
+| 9 | tasks | query | `tasks(filter, page, page_size)` | yes | Your tasks, paginated and filterable (see 1.2) |
+| 10 | tasks | query | `task(task_uuid)` | yes | One task |
+| 11 | tasks | query | `userTasks(user_uuid, filter, page, page_size)` | yes | Your user's tasks, paginated and filterable |
+| 12 | tasks | mutation | `updateTask(task_uuid, task_title, ...)` | yes | Full replacement of the task (see 5.3) |
+| 13 | tasks | mutation | `deleteTask(task_uuid)` | yes | Deletes the task (see 5.4) |
 
-### 1.2 Listados de tareas: paginación y filtros
+Also, the `User` type has the field `tasks(filter, page, page_size)`: user and tasks in a single query.
 
-`tasks`, `userTasks` y `User.tasks` devuelven una página (`TaskPage`), siempre de la más reciente a la más antigua (`task_id` descendente).
+### 1.2 Task lists: pagination and filters
 
-| # | Argumento | Tipo | Qué hace |
+`tasks`, `userTasks` and `User.tasks` return a page (`TaskPage`), always from newest to oldest (`task_id` descending).
+
+| # | Argument | Type | What it does |
 |---|---|---|---|
-| 1 | `filter.task_text` | String | Contenido en el título o la descripción, sin distinguir mayúsculas |
+| 1 | `filter.task_text` | String | Contained in the title or the description, case-insensitive |
 | 2 | `filter.task_status` | String | `pending` · `in_progress` · `done` |
 | 3 | `filter.task_type` | String | `personal` · `work` · `other` |
-| 4 | `filter.target_date_from` | String | `YYYY-MM-DD`, incluido (una tarea sin fecha objetivo no entra) |
-| 5 | `filter.target_date_to` | String | `YYYY-MM-DD`, incluido; no puede ser anterior a `target_date_from` |
-| 6 | `page` | Int | Desde 1 (por defecto 1) |
-| 7 | `page_size` | Int | De 1 a 100 (por defecto 20) |
+| 4 | `filter.target_date_from` | String | `YYYY-MM-DD`, inclusive (a task without a target date is left out) |
+| 5 | `filter.target_date_to` | String | `YYYY-MM-DD`, inclusive; cannot be earlier than `target_date_from` |
+| 6 | `page` | Int | From 1 (default 1) |
+| 7 | `page_size` | Int | From 1 to 100 (default 20) |
 
-La respuesta: `items` (las tareas de la página), `page`, `page_size`, `total_items` (todas las que cumplen los filtros) y `total_pages`. Un argumento fuera de rango responde con `extensions.code: 400` y un mensaje con el detalle de cada campo.
+The response: `items` (the tasks of the page), `page`, `page_size`, `total_items` (all the ones matching the filters) and `total_pages`. An out-of-range argument responds with `extensions.code: 400` and a message with the detail of each field.
 
 ```
 curl -X POST '{{appBaseUrl}}/graphql' --header 'Authorization: Bearer <api_token>' --header 'Content-Type: application/json' --data '{"query": "query($filter: TasksFilter, $page: Int, $pageSize: Int) { tasks(filter: $filter, page: $page, page_size: $pageSize) { items { task_id task_title target_date } page page_size total_items total_pages } }", "variables": {"filter": {"task_text": "demo", "target_date_from": "2026-12-01"}, "page": 1, "pageSize": 10}}'
 ```
 
-#### respuesta:
+#### response:
 ```
 {
     "data": {
         "tasks": {
             "items": [
-                {"task_id": 42, "task_title": "Preparar la demo", "target_date": "2026-12-31"}
+                {"task_id": 42, "task_title": "Prepare the demo", "target_date": "2026-12-31"}
             ],
             "page": 1,
             "page_size": 10,
@@ -69,7 +72,7 @@ curl -X POST '{{appBaseUrl}}/graphql' --header 'Authorization: Bearer <api_token
 }
 ```
 
-### 1.3 Consulta
+### 1.3 Query
 
 ```
 curl -X POST '{{appBaseUrl}}/graphql' \
@@ -78,7 +81,7 @@ curl -X POST '{{appBaseUrl}}/graphql' \
 --data '{"query": "{ users { user_uuid user_name tasks(page_size: 5) { items { task_title task_status } total_items } } }"}'
 ```
 
-#### respuesta:
+#### response:
 ```
 {
     "data": {
@@ -88,7 +91,7 @@ curl -X POST '{{appBaseUrl}}/graphql' \
                 "user_name": "ana.lopez",
                 "tasks": {
                     "items": [
-                        {"task_title": "Preparar la demo", "task_status": "pending"}
+                        {"task_title": "Prepare the demo", "task_status": "pending"}
                     ],
                     "total_items": 1
                 }
@@ -98,13 +101,13 @@ curl -X POST '{{appBaseUrl}}/graphql' \
 }
 ```
 
-### 1.4 Mutación con variables
+### 1.4 Mutation with variables
 
 ```
 curl -X POST '{{appBaseUrl}}/graphql' \
 --header 'Authorization: Bearer <api_token>' \
 --header 'Content-Type: application/json' \
---data '{"query": "mutation($id: ID!) { updateTask(task_uuid: $id, task_title: \"Preparar la demo\", task_status: \"done\") { task_uuid task_status } }", "variables": {"id": "<task_uuid>"}}'
+--data '{"query": "mutation($id: ID!) { updateTask(task_uuid: $id, task_title: \"Prepare the demo\", task_status: \"done\") { task_uuid task_status } }", "variables": {"id": "<task_uuid>"}}'
 ```
 
 ### 1.5 Error
@@ -122,49 +125,49 @@ curl -X POST '{{appBaseUrl}}/graphql' \
 }
 ```
 
-### 1.6 Códigos de error (`extensions.code`)
+### 1.6 Error codes (`extensions.code`)
 
-| # | Código | Cuándo |
+| # | Code | When |
 |---|---|---|
-| 1 | `400` | Validación: un único mensaje con el detalle de cada campo (`"Fields validation errors: user_name: field is required; user_email: invalid email"`) |
-| 2 | `401` | Falta el token o no es válido, o `user_name`/`password` incorrectos en el login (mismo mensaje en los dos casos) |
-| 3 | `404` | El recurso no existe o no es tuyo |
-| 4 | `409` | Conflicto: el `user_name` o el email ya están en uso |
-| 5 | `500` | Error inesperado (se registra en el servidor; el mensaje no da detalles) |
+| 1 | `400` | Validation: a single message with the detail of each field (`"Fields validation errors: user_name: field is required; user_email: invalid email"`) |
+| 2 | `401` | The token is missing or not valid, or wrong `user_name`/`password` in the log-in (same message in both cases) |
+| 3 | `404` | The resource does not exist or is not yours |
+| 4 | `409` | Conflict: the `user_name` or the email is already in use |
+| 5 | `500` | Unexpected error (logged on the server; the message gives no details) |
 
-Un error de sintaxis o un campo que no existe en el esquema no lleva `extensions.code`: es un error de GraphQL, no de la aplicación.
+A syntax error or a field that does not exist in the schema has no `extensions.code`: it is a GraphQL error, not an application one.
 
 ---
 
-## 2 - Autenticación
+## 2 - Authentication
 
-1. Cada usuario tiene su propio **api_token**. Se envía en todas las peticiones con la cabecera `Authorization: Bearer <api_token>`.
-2. El token se obtiene al **darse de alta** (`createUser`) o al **hacer login** con `user_name` y `password` (`logIn` o `POST /api/v1/log-in`), sin token. Se devuelve **una única vez**: el servidor solo guarda su hash y no puede recuperarlo.
-3. **Cada login genera un token nuevo y el anterior deja de valer**: un usuario tiene una sola sesión activa (entrar desde otro sitio cierra la anterior).
-4. Si el token se filtra, se **regenera** con `regenerateApiToken` (o con un login): el anterior deja de valer en el acto.
-5. Cada token solo ve y modifica **su propio usuario y sus tareas**. Un recurso de otro usuario responde `404`, igual que si no existiera.
-6. Usa siempre HTTPS fuera de local: el token y la password viajan en la petición.
+1. Each user has their own **api_token**. It is sent in every request with the header `Authorization: Bearer <api_token>`.
+2. The token is obtained when **signing up** (`createUser`) or when **logging in** with `user_name` and `password` (`logIn` or `POST /api/v1/log-in`), without a token. It is returned **only once**: the server only stores its hash and cannot recover it.
+3. **Every log-in generates a new token and the previous one stops working**: a user has a single active session (logging in from somewhere else closes the previous one).
+4. If the token leaks, it is **regenerated** with `regenerateApiToken` (or with a log-in): the previous one stops working immediately.
+5. Each token only sees and changes **its own user and their tasks**. A resource of another user responds `404`, the same as if it did not exist.
+6. Always use HTTPS outside local: the token and the password travel in the request.
 
-### 2.1 Flujo rápido
+### 2.1 Quick flow
 
 ```
-# 1. login: devuelve el usuario y un api_token nuevo
+# 1. log-in: returns the user and a new api_token
 curl -X POST '{{appBaseUrl}}/api/v1/log-in' \
 --header 'Content-Type: application/json' \
 --data '{"user_name": "ana.lopez", "password": "<password>"}'
 
-# 2. con el token, crear una tarea
+# 2. with the token, create a task
 curl -X POST '{{appBaseUrl}}/graphql' \
 --header 'Authorization: Bearer <api_token>' \
 --header 'Content-Type: application/json' \
---data '{"query": "mutation { createTask(task_title: \"Comprar pan\") { task_uuid task_title } }"}'
+--data '{"query": "mutation { createTask(task_title: \"Buy bread\") { task_uuid task_title } }"}'
 ```
 
-### 2.2 Usuario demo
+### 2.2 Demo user
 
-Para probar sin darse de alta: haz login con él y usa el `api_token` que devuelve.
+To try it without signing up: log in with it and use the `api_token` it returns.
 
-| # | Campo | Valor |
+| # | Field | Value |
 |---|---|---|
 | 1 | `user_uuid` | `6e142a62-5af7-4d43-b786-cec6ac17be62` |
 | 2 | `user_name` | `tasker` |
@@ -177,26 +180,26 @@ curl -X POST '{{appBaseUrl}}/api/v1/log-in' \
 --data '{"user_name": "tasker", "password": "Demo.1234"}'
 ```
 
-Es un usuario compartido: cada login le da un token nuevo, así que el de otra persona deja de valer.
+It is a shared user: every log-in gives it a new token, so someone else's stops working.
 
-### 2.3 Cabeceras opcionales
+### 2.3 Optional headers
 
-Acompañan a cada petición y el servidor las registra como contexto de la operación.
+They come with every request and the server logs them as context of the operation.
 
-| # | Cabecera | Ejemplo | Si no viene o no es válida |
+| # | Header | Example | If missing or not valid |
 |---|---|---|---|
-| 1 | `User-Agent` | `Mozilla/5.0 ... Chrome/141.0.0.0` | Navegador y sistema operativo vacíos |
-| 2 | `Accept-Language` | `es-ES,es;q=0.9` | `en` (idiomas: `es`, `en`) |
-| 3 | `X-Time-Zone` | `Europe/Madrid` (zona IANA) | Vacía |
+| 1 | `User-Agent` | `Mozilla/5.0 ... Chrome/141.0.0.0` | Empty browser and operating system |
+| 2 | `Accept-Language` | `es-ES,es;q=0.9` | `en` (languages: `es`, `en`) |
+| 3 | `X-Time-Zone` | `Europe/Madrid` (IANA zone) | Empty |
 
 ---
 
-## 3 - Login REST
+## 3 - REST log-in
 
-- **POST** `/api/v1/log-in` · sin token. Body: `user_name` (sin distinguir mayúsculas) · `password`.
-- Es el único endpoint REST: hace lo mismo que la mutación `logIn`.
-- Respuesta `200`: el usuario y un `api_token` **nuevo**; el anterior deja de valer.
-- `user_name` inexistente, cuenta sin password o password incorrecta: `401` con el mismo mensaje (`Invalid user name or password`), para no revelar qué usuarios existen.
+- **POST** `/api/v1/log-in` · without a token. Body: `user_name` (case-insensitive) · `password`.
+- It is the only REST endpoint: it does the same as the `logIn` mutation.
+- `200` response: the user and a **new** `api_token`; the previous one stops working.
+- Unknown `user_name`, account without a password or wrong password: `401` with the same message (`Invalid user name or password`), so as not to reveal which users exist.
 
 ```
 curl -X POST '{{appBaseUrl}}/api/v1/log-in' \
@@ -204,7 +207,7 @@ curl -X POST '{{appBaseUrl}}/api/v1/log-in' \
 --data '{"user_name": "ana.lopez", "password": "<password>"}'
 ```
 
-#### respuesta:
+#### response:
 ```
 {
     "code": 200,
@@ -216,22 +219,22 @@ curl -X POST '{{appBaseUrl}}/api/v1/log-in' \
         "user_email": "ana@example.com",
         "created_at": "2026-10-24 10:00:00",
         "updated_at": "2026-10-25 09:30:00",
-        "api_token": "9b1f...64 caracteres hex...c0de"
+        "api_token": "9b1f...64 hex characters...c0de"
     }
 }
 ```
 
-Un error sigue el mismo formato, con `status: false` y el mensaje en `errors`. Un método distinto de `POST` responde `405` con la cabecera `Allow`.
+An error follows the same format, with `status: false` and the message in `errors`. A method other than `POST` responds `405` with the `Allow` header.
 
 ---
 
-## 4 - Usuarios
+## 4 - Users
 
-### 4.1 Alta (`createUser`, sin token)
-- `user_name` (obligatorio) es el login: de 3 a 50 caracteres, solo letras, dígitos, punto, guion bajo y guion; único sin distinguir mayúsculas (`Ana` y `ana` son el mismo).
-- `user_email` (obligatorio, máx. 150, único).
-- `password` (obligatoria): de 8 a 72 caracteres. Se guarda solo su hash (bcrypt).
-- Devuelve el usuario y su `api_token`.
+### 4.1 Sign-up (`createUser`, without a token)
+- `user_name` (required) is the log-in: 3 to 50 characters, only letters, digits, dot, underscore and hyphen; unique case-insensitively (`Ana` and `ana` are the same).
+- `user_email` (required, max. 150, unique).
+- `password` (required): 8 to 72 characters. Only its hash is stored (bcrypt).
+- Returns the user and their `api_token`.
 
 ```
 curl -X POST '{{appBaseUrl}}/graphql' \
@@ -239,39 +242,45 @@ curl -X POST '{{appBaseUrl}}/graphql' \
 --data '{"query": "mutation($n: String!, $e: String!, $p: String!) { createUser(user_name: $n, user_email: $e, password: $p) { user_uuid user_name api_token } }", "variables": {"n": "ana.lopez", "e": "ana@example.com", "p": "<password>"}}'
 ```
 
-### 4.2 Login (`logIn`, sin token)
-- Mismas reglas que el login REST (ver 3): devuelve el usuario con un `api_token` nuevo.
+### 4.2 Log-in (`logIn`, without a token)
+- Same rules as the REST log-in (see 3): returns the user with a new `api_token`.
 
-### 4.3 Modificar (`updateUser`)
-- Reemplazo completo: `user_name` y `user_email` obligatorios, con las mismas reglas que el alta. La password no se cambia aquí.
+### 4.3 Update (`updateUser`)
+- Full replacement: `user_name` and `user_email` required, with the same rules as the sign-up. The password is not changed here.
+
+### 4.4 Regenerate the token (`regenerateApiToken`)
+- Returns `{"user_uuid": "...", "api_token": "..."}` with a new token; the previous one stops working immediately.
+
+### 4.5 Delete (`deleteUser`)
+- Physical deletion of the user and all their tasks. Returns `{"user_uuid": "...", "affected": 1}`.
 
 ---
 
-## 5 - Tareas
+## 5 - Tasks
 
-### 5.1 Campos de una tarea
+### 5.1 Task fields
 
-| # | Campo | Tipo | Reglas |
+| # | Field | Type | Rules |
 |---|---|---|---|
-| 1 | `task_title` | string | Obligatorio, máx. 150 |
-| 2 | `task_status` | string | `pending` · `in_progress` · `done` (por defecto `pending`) |
-| 3 | `task_type` | string | `personal` · `work` · `other` (por defecto `personal`) |
-| 4 | `target_date` | string | Opcional, fecha real `YYYY-MM-DD` |
-| 5 | `task_description` | string | Opcional, máx. 2000 |
+| 1 | `task_title` | string | Required, max. 150 |
+| 2 | `task_status` | string | `pending` · `in_progress` · `done` (default `pending`) |
+| 3 | `task_type` | string | `personal` · `work` · `other` (default `personal`) |
+| 4 | `target_date` | string | Optional, a real date `YYYY-MM-DD` |
+| 5 | `task_description` | string | Optional, max. 2000 |
 
-`task_id` es solo informativo (orden, referencia legible): para leer, modificar o borrar se usa `task_uuid`.
+`task_id` is only informative (ordering, readable reference): to read, update or delete, `task_uuid` is used.
 
-### 5.2 Crear (`createTask`)
-- La tarea es del usuario del `api_token`. El `task_uuid` lo genera la API: `task-` + id único.
+### 5.2 Create (`createTask`)
+- The task belongs to the user of the `api_token`. The `task_uuid` is generated by the API: `task-` + a unique id.
 
 ```
 curl -X POST '{{appBaseUrl}}/graphql' \
 --header 'Authorization: Bearer <api_token>' \
 --header 'Content-Type: application/json' \
---data '{"query": "mutation { createTask(task_title: \"Preparar la demo\", task_type: \"work\", target_date: \"2026-12-31\") { task_id task_uuid user_uuid task_title task_status task_type target_date } }"}'
+--data '{"query": "mutation { createTask(task_title: \"Prepare the demo\", task_type: \"work\", target_date: \"2026-12-31\") { task_id task_uuid user_uuid task_title task_status task_type target_date } }"}'
 ```
 
-#### respuesta:
+#### response:
 ```
 {
     "data": {
@@ -279,7 +288,7 @@ curl -X POST '{{appBaseUrl}}/graphql' \
             "task_id": 42,
             "task_uuid": "task-671b9c4e2a1f3",
             "user_uuid": "0f8c3a52-6c1e-4a57-9a3e-2b7d1c9e4f10",
-            "task_title": "Preparar la demo",
+            "task_title": "Prepare the demo",
             "task_status": "pending",
             "task_type": "work",
             "target_date": "2026-12-31"
@@ -288,8 +297,8 @@ curl -X POST '{{appBaseUrl}}/graphql' \
 }
 ```
 
-### 5.3 Modificar (`updateTask`)
-- Reemplazo completo con los campos de 5.1: lo que no se envía vuelve a su valor por defecto o queda vacío.
+### 5.3 Update (`updateTask`)
+- Full replacement with the fields of 5.1: what is not sent goes back to its default value or is left empty.
 
-### 5.4 Borrar (`deleteTask`)
-- Devuelve `{"task_uuid": "...", "affected": 1}`.
+### 5.4 Delete (`deleteTask`)
+- Returns `{"task_uuid": "...", "affected": 1}`.

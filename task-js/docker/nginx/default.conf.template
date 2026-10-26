@@ -1,4 +1,4 @@
-# SPA task-js. Plantilla: el entrypoint de nginx sustituye ${API_BASE_URL} al arrancar el contenedor.
+# SPA task-js. Plantilla: el entrypoint de nginx sustituye ${API_BASE_URL_PHP} y ${API_BASE_URL_GO} al arrancar el contenedor.
 server {
   listen       80;
   server_name _;
@@ -10,16 +10,17 @@ server {
   charset utf-8;
 
   # CSP estricta: solo scripts/estilos propios (nada inline) y fetch solo a la propia web y a la API
-  add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' ${API_BASE_URL}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+  add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' ${API_BASE_URL_PHP} ${API_BASE_URL_GO}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
   add_header X-Content-Type-Options "nosniff" always;
   add_header Referrer-Policy "no-referrer" always;
 
-  # configuracion de la SPA desde el entorno del contenedor: la url de la API no se hardcodea en el js
+  # configuracion de la SPA desde el entorno del contenedor: las urls de las APIs no se hardcodean en el js.
+  # backends: los que se pueden elegir en la interfaz (el primero es el de por defecto)
   location = /config.json {
     default_type application/json;
     add_header Cache-Control "no-store" always;
     add_header Content-Security-Policy "default-src 'none'" always;
-    return 200 '{"apiBaseUrl":"${API_BASE_URL}"}';
+    return 200 '{"backends":[{"code":"php","name":"PHP","apiBaseUrl":"${API_BASE_URL_PHP}"},{"code":"go","name":"Go","apiBaseUrl":"${API_BASE_URL_GO}"}]}';
   }
 
   # ficheros ocultos nunca

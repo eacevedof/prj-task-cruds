@@ -12,8 +12,8 @@ return [
     ["url" => "/health", "controller" => "App\Modules\Shared\Infrastructure\Controllers\HealthController", "method" => "index", "allowed" => ["get"]],
 
     //@documentation (publica; fuente: los .md de src/Modules/Open/Documentation/Infrastructure/Views)
-    ["url" => "/api/v1/documentation", "controller" => "App\Modules\Open\Documentation\Infrastructure\Controllers\DocumentationController", "method" => "show", "allowed" => ["get"]],
-    ["url" => "/api/v1/documentation/changelog", "controller" => "App\Modules\Open\Documentation\Infrastructure\Controllers\ChangelogController", "method" => "show", "allowed" => ["get"]],
+    ["url" => "/api/v1", "controller" => "App\Modules\Open\Documentation\Infrastructure\Controllers\DocumentationController", "method" => "show", "allowed" => ["get"]],
+    ["url" => "/api/v1/changelog", "controller" => "App\Modules\Open\Documentation\Infrastructure\Controllers\ChangelogController", "method" => "show", "allowed" => ["get"]],
 
     //@auth
     ["url" => "/api/v1/log-in", "controller" => "App\Modules\Users\Infrastructure\Controllers\LogInUserController", "method" => "logIn", "allowed" => ["post"]],

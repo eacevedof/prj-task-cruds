@@ -5,9 +5,10 @@ import { Translator } from "/js/Modules/Shared/Infrastructure/Components/Transla
 
 const CSS_HIDDEN = "hidden";
 const CSS_ACTIVE = "active";
+const BACKEND_LOGO_PATH = "/img/backends";
 
 /**
- * Menu de pantallas (por el hash de la url: #tasks, #account) y selector de idioma. Cada pantalla es una
+ * Menu de pantallas (por el hash de la url: #tasks, #account), selector de back y de idioma. Cada pantalla es una
  * section con data-screen; solo se ve la del hash y solo con sesion (show/hide).
  */
 export class NavigationView {
@@ -38,12 +39,21 @@ export class NavigationView {
             screenLinks: [...document.querySelectorAll("#nav-screens a[data-screen]")],
             screens: [...document.querySelectorAll("section[data-screen]")],
             selectLanguage: document.getElementById("select-language"),
+            divBackends: document.getElementById("div-backends"),
         };
         window.addEventListener("hashchange", () => this.#renderCurrentScreen());
         this.#elements.selectLanguage.addEventListener("change", () => this.#dispatcher.dispatch(
             SharedEventEnum.LANGUAGE_CHANGE_REQUESTED,
             { languageCode: this.#elements.selectLanguage.value }
         ));
+        this.#elements.divBackends.addEventListener("click", (event) => {
+            const buttonBackend = event.target.closest("button[data-backend-code]");
+            if (!buttonBackend || buttonBackend.getAttribute("aria-checked") === "true") return;
+            this.#dispatcher.dispatch(
+                SharedEventEnum.BACKEND_CHANGE_REQUESTED,
+                { backendCode: buttonBackend.dataset.backendCode }
+            );
+        });
     }
 
     /**
@@ -80,6 +90,46 @@ export class NavigationView {
         document.documentElement.lang = languageCode;
         this.#elements.selectLanguage.value = languageCode;
         this.#translator.translateElement(document);
+    }
+
+    /**
+     * @param {{code: string, name: string}[]} backends los de /config.json
+     * @param {string} backendCode el activo
+     */
+    renderBackends(backends, backendCode) {
+        this.#elements.divBackends.replaceChildren(
+            ...backends.map((backend) => this.#createButtonBackend(backend, backend.code === backendCode))
+        );
+    }
+
+    /**
+     * Boton con el logo del back (/img/backends/<code>.svg); sin logo se queda el nombre.
+     * @param {{code: string, name: string}} backend
+     * @param {boolean} isActive
+     * @returns {HTMLButtonElement}
+     */
+    #createButtonBackend(backend, isActive) {
+        const buttonBackend = document.createElement("button");
+        buttonBackend.type = "button";
+        buttonBackend.dataset.backendCode = backend.code;
+        buttonBackend.title = backend.name;
+        buttonBackend.setAttribute("role", "radio");
+        buttonBackend.setAttribute("aria-checked", String(isActive));
+        buttonBackend.setAttribute("aria-label", backend.name);
+
+        const imgLogo = document.createElement("img");
+        imgLogo.src = `${BACKEND_LOGO_PATH}/${backend.code}.svg`;
+        imgLogo.alt = "";
+        imgLogo.addEventListener("error", () => imgLogo.replaceWith(backend.name), { once: true });
+        buttonBackend.append(imgLogo);
+        return buttonBackend;
+    }
+
+    /**
+     * Otro back: se arranca de cero contra el (sesion, listados y caches son del anterior).
+     */
+    reloadPage() {
+        window.location.reload();
     }
 
     #renderCurrentScreen() {

@@ -16,7 +16,7 @@ services:
 
   task-php-nginx:
     container_name: cont-task-php-nginx
-    image: nginx:1.29-alpine
+    image: nginx:1.30-alpine
     environment:
       TZ: ${TIME_ZONE:-UTC}
     ports:
@@ -34,7 +34,7 @@ services:
   # http://localhost:9125. No los entrega a nadie: en local ningun email sale a internet.
   task-php-mailpit:
     container_name: cont-task-php-mailpit
-    image: axllent/mailpit:v1.27.0
+    image: axllent/mailpit:v1.32.0
     environment:
       TZ: ${TIME_ZONE:-UTC}
     ports:

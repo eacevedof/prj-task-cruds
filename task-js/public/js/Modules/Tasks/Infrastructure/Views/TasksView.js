@@ -18,6 +18,8 @@ const ACTION_EDIT = "edit";
 const ACTION_DELETE = "delete";
 // el buscador no pide la lista en cada tecla
 const TEXT_FILTER_DEBOUNCE_MS = 300;
+// en la lista solo un trozo de la descripcion; la entera en el tooltip (y en el detalle)
+const DESCRIPTION_EXCERPT_CHARS = 90;
 
 /**
  * Pantalla "Tareas": filtros, lista paginada (id desc), modal de detalle (solo lectura) y formulario
@@ -36,6 +38,8 @@ export class TasksView {
     #tasksByUuid = new Map();
     #pagination = { page: TasksPaginationEnum.FIRST_PAGE, totalPages: 0, totalItems: 0 };
     #textFilterTimeoutId = null;
+    // task_id de la tarea que se edita (va en el titulo del formulario); "" = alta
+    #editingTaskId = "";
 
     constructor() {
         this.#dateTimer = DateTimer.getInstance();
@@ -83,8 +87,9 @@ export class TasksView {
     resetForm() {
         this.#elements.formTask.reset();
         this.#elements.hiddenTaskUuid.value = "";
+        this.#editingTaskId = "";
         this.#elements.inputTargetDate.value = this.#dateTimer.getDateFromToday(TasksFormEnum.TARGET_DATE_DAYS_FROM_TODAY);
-        this.#elements.h2TaskForm.textContent = this.#translator.getText(TasksTextEnum.FORM_TITLE_CREATE);
+        this.#renderFormTitle();
         this.#elements.buttonCancelTask.classList.add(CSS_HIDDEN);
         this.#elements.detailsTaskForm.open = false;
         this.renderBusy(false);
@@ -151,9 +156,7 @@ export class TasksView {
         this.#loadSelectOptions();
         this.#renderTasksTable();
         this.#renderPaginationBar();
-        this.#elements.h2TaskForm.textContent = this.#translator.getText(
-            this.#elements.hiddenTaskUuid.value ? TasksTextEnum.FORM_TITLE_UPDATE : TasksTextEnum.FORM_TITLE_CREATE
-        );
+        this.#renderFormTitle();
     }
 
     /**
@@ -287,16 +290,26 @@ export class TasksView {
 
     #loadFormWithTask(task) {
         this.#elements.hiddenTaskUuid.value = task[TasksKeyEnum.TASK_UUID];
+        this.#editingTaskId = String(task[TasksKeyEnum.TASK_ID] ?? "");
         this.#elements.inputTaskTitle.value = task[TasksKeyEnum.TASK_TITLE] ?? "";
         this.#elements.selectTaskStatus.value = task[TasksKeyEnum.TASK_STATUS] ?? TaskStatusEnum.PENDING;
         this.#elements.selectTaskType.value = task[TasksKeyEnum.TASK_TYPE] ?? TaskTypeEnum.PERSONAL;
         this.#elements.inputTargetDate.value = task[TasksKeyEnum.TARGET_DATE] ?? "";
         this.#elements.textareaTaskDescription.value = task[TasksKeyEnum.TASK_DESCRIPTION] ?? "";
-        this.#elements.h2TaskForm.textContent = this.#translator.getText(TasksTextEnum.FORM_TITLE_UPDATE);
+        this.#renderFormTitle();
         this.#elements.buttonCancelTask.classList.remove(CSS_HIDDEN);
         this.#elements.detailsTaskForm.open = true;
         this.#renderMessage("", false);
         this.#elements.inputTaskTitle.focus();
+    }
+
+    /**
+     * "New task" en el alta; "Edit task #12" al editar, con el task_id como en el modal de detalle.
+     */
+    #renderFormTitle() {
+        this.#elements.h2TaskForm.textContent = this.#editingTaskId
+            ? this.#translator.getText(TasksTextEnum.FORM_TITLE_UPDATE, { taskId: this.#editingTaskId })
+            : this.#translator.getText(TasksTextEnum.FORM_TITLE_CREATE);
     }
 
     #onTextFilterInput() {
@@ -371,6 +384,21 @@ export class TasksView {
         this.#elements.buttonNextPage.disabled = !hasNextPage;
     }
 
+    /**
+     * Descripcion en una linea; si es larga se corta con "…" y la entera va en el tooltip (title).
+     * @param {string|null} taskDescription
+     * @returns {string}
+     */
+    #getHtmlTaskDescription(taskDescription) {
+        const fullDescription = String(taskDescription ?? "").trim();
+        const oneLineDescription = fullDescription.replace(/\s+/g, " ");
+        if (oneLineDescription.length <= DESCRIPTION_EXCERPT_CHARS) {
+            return `<div class="task-description">${this.#htmler.getEscaped(oneLineDescription)}</div>`;
+        }
+        const excerpt = `${oneLineDescription.slice(0, DESCRIPTION_EXCERPT_CHARS).trimEnd()}…`;
+        return `<div class="task-description task-description-excerpt" title="${this.#htmler.getEscaped(fullDescription)}" tabindex="0">${this.#htmler.getEscaped(excerpt)}</div>`;
+    }
+
     #getHtmlTaskRow(task) {
         const taskUuid = this.#htmler.getEscaped(task[TasksKeyEnum.TASK_UUID]);
         const taskStatus = task[TasksKeyEnum.TASK_STATUS];
@@ -379,7 +407,7 @@ export class TasksView {
     <td class="task-id">${this.#htmler.getEscaped(task[TasksKeyEnum.TASK_ID])}</td>
     <td>
         <a href="#tasks" class="task-title" data-action="${ACTION_DETAIL}" data-task-uuid="${taskUuid}">${this.#htmler.getEscaped(task[TasksKeyEnum.TASK_TITLE])}</a>
-        <div class="task-description">${this.#htmler.getEscaped(task[TasksKeyEnum.TASK_DESCRIPTION])}</div>
+        ${this.#getHtmlTaskDescription(task[TasksKeyEnum.TASK_DESCRIPTION])}
     </td>
     <td><span class="badge badge-${this.#htmler.getEscaped(taskStatus)}">${this.#htmler.getEscaped(this.#getFieldLabel(TasksKeyEnum.TASK_STATUS, taskStatus))}</span></td>
     <td>${this.#htmler.getEscaped(this.#getFieldLabel(TasksKeyEnum.TASK_TYPE, task[TasksKeyEnum.TASK_TYPE]))}</td>

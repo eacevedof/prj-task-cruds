@@ -10,7 +10,8 @@ const CODE_GRAPHQL_ERROR = 400;
  * POST /graphql de la API con {query, variables} y el Bearer. Normaliza la respuesta a la misma forma que
  * usan los servicios: {code, status, errors, data}, donde data es el campo de la operacion pedida.
  * GraphQL responde 200 tambien con errores: el codigo real viaja en errors[0].extensions.code.
- * Avisa al empezar y al terminar cada llamada (tambien si falla): la interfaz muestra el progreso.
+ * Avisa al empezar y al terminar cada llamada (tambien si falla): la interfaz muestra el progreso y, al
+ * terminar, cuanto ha tardado (tiempo de respuesta medido en el navegador: red + back + lectura del JSON).
  * No captura: fallo de red o una respuesta que no es JSON propagan. Una sola instancia: la url se fija al arrancar.
  */
 export class GraphqlRequester {
@@ -53,6 +54,7 @@ export class GraphqlRequester {
         }
 
         this.#dispatcher.dispatch(SharedEventEnum.API_REQUEST_STARTED);
+        const startedAt = performance.now();
         let response, json;
         try {
             response = await fetch(`${this.#apiBaseUrl}${GRAPHQL_PATH}`, {
@@ -63,7 +65,12 @@ export class GraphqlRequester {
             json = await response.json();
         }
         finally {
-            this.#dispatcher.dispatch(SharedEventEnum.API_REQUEST_FINISHED);
+            // isOk: llego JSON y sin errores (un fallo de red o un error de negocio cuentan como fallidas)
+            this.#dispatcher.dispatch(SharedEventEnum.API_REQUEST_FINISHED, {
+                operationName,
+                durationMs: performance.now() - startedAt,
+                isOk: Boolean(json) && !json.errors,
+            });
         }
 
         const firstError = json.errors?.[0];

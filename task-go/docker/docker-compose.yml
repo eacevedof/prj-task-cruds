@@ -1,0 +1,40 @@
+# docker/docker-compose.yml -- stack local minimo: la API en Go (alpine) + Mailpit. Sin contenedor de BD: SQLite.
+# Sin nginx: la propia API sirve public/ (PublicFilesServer). Lanzar desde task-go/ con el makefile (make up).
+# Variables opcionales en docker/.env (ver .env.example).
+name: task-go
+
+services:
+  task-go-app:
+    container_name: cont-task-go-app
+    build:
+      context: app
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${HTTP_PORT:-9300}:8080
+    volumes:
+      - ../:/app
+      # cache de modulos y de compilacion: el build de cada arranque no vuelve a descargar ni a compilar todo
+      - task-go-gomod:/go/pkg/mod
+      - task-go-gocache:/root/.cache/go-build
+    networks:
+      - task-go-net
+
+  # buzon local: recoge los emails que envia la app (sendmail -> smtp mailpit:1025) y los muestra en
+  # http://localhost:9325. No los entrega a nadie: en local ningun email sale a internet.
+  task-go-mailpit:
+    container_name: cont-task-go-mailpit
+    image: axllent/mailpit:v1.32.0
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${MAILPIT_PORT:-9325}:8025
+    networks:
+      - task-go-net
+
+volumes:
+  task-go-gomod:
+  task-go-gocache:
+
+networks:
+  task-go-net:
