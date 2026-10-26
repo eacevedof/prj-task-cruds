@@ -1,0 +1,24 @@
+// Dev Containers: VS Code dentro de task-rust-app para usar su mismo Rust (1.99.1), no el del host.
+// Reutiliza el compose del proyecto (name: task-rust), asi que comparte contenedores con "make up".
+{
+    "name": "task-rust",
+    "dockerComposeFile": ["../../task-rust/docker/docker-compose.yml"],
+    "service": "task-rust-app",
+    "runServices": ["task-rust-app", "task-rust-mailpit"],
+    "workspaceFolder": "/app",
+    "shutdownAction": "none",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "rust-lang.rust-analyzer"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "sh",
+                "terminal.integrated.profiles.linux": {
+                    "sh": { "path": "/bin/sh" }
+                }
+            }
+        }
+    }
+}

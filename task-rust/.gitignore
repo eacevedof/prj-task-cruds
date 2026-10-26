@@ -1,0 +1,22 @@
+.vscode
+.idea
+
+.env
+.env.local
+.env.prod
+.env.test
+.env.dev
+docker/.env
+
+# binarios (los copia el entrypoint) y la compilacion de cargo en el host
+build/*
+!build/.gitkeep
+target/
+
+# storage: ignore generated cache/logs but keep the folder skeleton
+storage/**/*
+!storage/**/
+!storage/**/.gitkeep
+
+# BD SQLite local (se genera con make migrate) y las de los tests
+database/*.sqlite*

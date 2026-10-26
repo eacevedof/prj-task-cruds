@@ -12,6 +12,7 @@ services:
       # APIs que se pueden elegir desde la interfaz (selector de back)
       API_BASE_URL_PHP: ${API_BASE_URL_PHP:-http://localhost:9100}
       API_BASE_URL_GO: ${API_BASE_URL_GO:-http://localhost:9300}
+      API_BASE_URL_RUST: ${API_BASE_URL_RUST:-http://localhost:9500}
     ports:
       - ${HTTP_PORT:-9200}:80
     volumes:

@@ -4,6 +4,7 @@
 export const BackendCodeEnum = Object.freeze({
     PHP: "php",
     GO: "go",
+    RUST: "rust",
 
     DEFAULT: "php",
 });

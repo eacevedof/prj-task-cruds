@@ -1,0 +1,48 @@
+# docker/docker-compose.yml -- SPA en WebAssembly: Go compilado a main.wasm (GOOS=js GOARCH=wasm) y servido por nginx alpine.
+# task-webassembly-build compila y termina; nginx arranca cuando el build ha ido bien. Lanzar desde task-webassembly/ con el
+# makefile (make up). Variables opcionales en docker/.env (ver .env.example).
+name: task-webassembly
+
+services:
+  task-webassembly-build:
+    container_name: cont-task-webassembly-build
+    image: golang:1.26.10-alpine
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+      GOOS: js
+      GOARCH: wasm
+      CGO_ENABLED: "0"
+      GOFLAGS: -buildvcs=false
+    working_dir: /app
+    # main.wasm + el runtime de Go para el navegador (wasm_exec.js): el de la misma version de Go que compila
+    command: >
+      sh -c "go build -trimpath -ldflags='-s -w' -o public/wasm/main.wasm ./cmd/wasm
+      && cp \"$$(go env GOROOT)/lib/wasm/wasm_exec.js\" public/js/wasm_exec.js
+      && ls -lh public/wasm/main.wasm"
+    volumes:
+      - ../:/app
+      # cache de compilacion: el build de cada arranque no vuelve a compilar todo
+      - task-webassembly-gocache:/root/.cache/go-build
+
+  task-webassembly-web:
+    container_name: cont-task-webassembly-web
+    image: nginx:1.30-alpine
+    depends_on:
+      task-webassembly-build:
+        condition: service_completed_successfully
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+      # el entrypoint de nginx sustituye las variables en /etc/nginx/templates/*.template al arrancar
+      # APIs que se pueden elegir desde la interfaz (selector de back)
+      API_BASE_URL_PHP: ${API_BASE_URL_PHP:-http://localhost:9100}
+      API_BASE_URL_GO: ${API_BASE_URL_GO:-http://localhost:9300}
+      API_BASE_URL_RUST: ${API_BASE_URL_RUST:-http://localhost:9500}
+    ports:
+      - ${HTTP_PORT:-9400}:80
+    volumes:
+      # solo public/ y en lectura: nginx no puede servir nada mas del proyecto (ni el codigo Go)
+      - ../public:/usr/share/nginx/html:ro
+      - ./nginx/default.conf.template:/etc/nginx/templates/default.conf.template:ro
+
+volumes:
+  task-webassembly-gocache:

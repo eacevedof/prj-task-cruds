@@ -1,0 +1,46 @@
+# SPA task-webassembly. Plantilla: el entrypoint de nginx sustituye ${API_BASE_URL_PHP}, ${API_BASE_URL_GO} y ${API_BASE_URL_RUST} al arrancar el contenedor.
+server {
+  listen       80;
+  server_name _;
+
+  root /usr/share/nginx/html;
+  index index.html;
+  autoindex off;
+  server_tokens off;
+  charset utf-8;
+
+  # CSP estricta: solo scripts/estilos propios (nada inline) y fetch solo a la propia web y a la API.
+  # 'wasm-unsafe-eval': sin el, el navegador no compila main.wasm (WebAssembly.instantiateStreaming); no habilita eval de JS.
+  add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data:; connect-src 'self' ${API_BASE_URL_PHP} ${API_BASE_URL_GO} ${API_BASE_URL_RUST}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+  add_header X-Content-Type-Options "nosniff" always;
+  add_header Referrer-Policy "no-referrer" always;
+
+  # configuracion de la SPA desde el entorno del contenedor: las urls de las APIs no se hardcodean en el wasm.
+  # backends: los que se pueden elegir en la interfaz (el primero es el de por defecto)
+  location = /config.json {
+    default_type application/json;
+    add_header Cache-Control "no-store" always;
+    add_header Content-Security-Policy "default-src 'none'" always;
+    return 200 '{"backends":[{"code":"php","name":"PHP","apiBaseUrl":"${API_BASE_URL_PHP}"},{"code":"go","name":"Go","apiBaseUrl":"${API_BASE_URL_GO}"},{"code":"rust","name":"Rust","apiBaseUrl":"${API_BASE_URL_RUST}"}]}';
+  }
+
+  # main.wasm y wasm_exec.js cambian con cada make build: el navegador revalida siempre (si no, seguiria con el viejo).
+  # expires y no add_header: un add_header aqui anularia los de seguridad del server (no se heredan).
+  location ~* \.(wasm|js)$ {
+    expires -1;
+    try_files $uri =404;
+  }
+
+  # ficheros ocultos nunca
+  location ~ /\. {
+    return 404;
+  }
+
+  # SPA: cualquier ruta que no sea un fichero cae en index.html
+  location / {
+    try_files $uri /index.html;
+  }
+
+  error_log /var/log/nginx/task-webassembly-error.log;
+  access_log /var/log/nginx/task-webassembly-access.log main;
+}

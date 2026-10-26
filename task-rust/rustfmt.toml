@@ -1,0 +1,3 @@
+# cargo fmt: lineas de 120 como el resto del monorepo (el ancho de task-php y task-go)
+max_width = 120
+use_small_heuristics = "Max"

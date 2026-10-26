@@ -1,0 +1,40 @@
+# docker/docker-compose.yml -- stack local minimo: la API en Rust (alpine) + Mailpit. Sin contenedor de BD: SQLite.
+# Sin nginx: la propia API sirve public/ (PublicFilesServer). Lanzar desde task-rust/ con el makefile (make up).
+# Variables opcionales en docker/.env (ver .env.example).
+name: task-rust
+
+services:
+  task-rust-app:
+    container_name: cont-task-rust-app
+    build:
+      context: app
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${HTTP_PORT:-9500}:8080
+    volumes:
+      - ../:/app
+      # crates descargados y compilacion: el build de cada arranque no vuelve a descargar ni a compilar todo
+      - task-rust-cargo-registry:/usr/local/cargo/registry
+      - task-rust-cargo-target:/cargo-target
+    networks:
+      - task-rust-net
+
+  # buzon local: recoge los emails que envia la app (sendmail -> smtp mailpit:1025) y los muestra en
+  # http://localhost:9525. No los entrega a nadie: en local ningun email sale a internet.
+  task-rust-mailpit:
+    container_name: cont-task-rust-mailpit
+    image: axllent/mailpit:v1.32.0
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${MAILPIT_PORT:-9525}:8025
+    networks:
+      - task-rust-net
+
+volumes:
+  task-rust-cargo-registry:
+  task-rust-cargo-target:
+
+networks:
+  task-rust-net:

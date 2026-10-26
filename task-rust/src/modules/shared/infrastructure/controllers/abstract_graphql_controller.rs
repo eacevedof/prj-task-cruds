@@ -1,0 +1,68 @@
+use std::error::Error;
+use std::sync::Arc;
+
+use serde_json::json;
+
+use crate::core::config::tr;
+use crate::modules::shared::application::primitives::Primitives;
+use crate::modules::shared::domain::enums::exception_enum::ExceptionEnum;
+use crate::modules::shared::domain::enums::graphql_enum::GraphqlEnum;
+use crate::modules::shared::domain::enums::shared_message_enum::SharedMessageEnum;
+use crate::modules::shared::infrastructure::components::http_requester::http_requester::HttpRequester;
+use crate::modules::shared::infrastructure::controllers::abstract_api_controller::get_auth_user_or_fail;
+use crate::modules::shared::infrastructure::controllers::graphql_error::GraphqlError;
+use crate::modules::shared::infrastructure::exceptions::interface_exception::{AppResult, InterfaceException};
+use crate::modules::shared::infrastructure::traits::log_trait::LogTrait;
+use crate::modules::shared::infrastructure::traits::mail_trait::MailTrait;
+
+/// base de los resolvers GraphQL de cada modulo: son controllers (construyen el DTO, llaman al servicio y distinguen
+/// el error), pero en vez de un HttpResponder devuelven el ResultDto o un GraphqlError.
+#[derive(Debug, Clone)]
+pub struct AbstractGraphqlController {
+    pub log_trait: LogTrait,
+    pub mail_trait: MailTrait,
+    http_request: Arc<HttpRequester>,
+}
+
+impl AbstractGraphqlController {
+    pub fn new(http_requester: Arc<HttpRequester>) -> Self {
+        let log_trait = LogTrait::new(Some(Arc::clone(&http_requester)));
+        Self { mail_trait: MailTrait::new(log_trait.clone()), log_trait, http_request: http_requester }
+    }
+
+    pub fn get_http_request(&self) -> &HttpRequester {
+        &self.http_request
+    }
+
+    /// se llama DENTRO del resolver: el 401 (UsersException) lo mapea su rama de error como cualquier 4xx.
+    pub fn get_auth_user_or_fail(&self) -> AppResult<Primitives> {
+        get_auth_user_or_fail(&self.http_request)
+    }
+
+    /// excepcion controlada (de dominio o FieldsException), distinguida por su tipo: su codigo 4xx va en
+    /// extensions.code y su mensaje en extensions.errors (una FieldsException ya trae en el mensaje el detalle por
+    /// campo).
+    pub fn get_graphql_domain_error(&self, ex: &dyn InterfaceException) -> GraphqlError {
+        GraphqlError::new(
+            ex.to_string(),
+            json!({
+                GraphqlEnum::EXTENSION_CODE: ex.get_code(),
+                GraphqlEnum::EXTENSION_ERRORS: [ex.to_string()],
+            }),
+        )
+    }
+
+    /// cualquier otra cosa: 500, se loguea con el resolver que fallo y no filtra su mensaje.
+    pub fn get_graphql_unexpected_error(&self, error: &dyn Error, log_title: &str) -> GraphqlError {
+        self.log_trait.log_exception(error, log_title);
+        self.mail_trait.send_mail_on_throwable(error, log_title);
+        let unexpected_error = tr(SharedMessageEnum::AN_UNEXPECTED_ERROR_HAS_OCCURRED, &[]);
+        GraphqlError::new(
+            unexpected_error.clone(),
+            json!({
+                GraphqlEnum::EXTENSION_CODE: ExceptionEnum::CODE_INTERNAL_SERVER_ERROR,
+                GraphqlEnum::EXTENSION_ERRORS: [unexpected_error],
+            }),
+        )
+    }
+}

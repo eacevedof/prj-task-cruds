@@ -1,0 +1,6 @@
+# configuracion local del contenedor (se crea con make env desde docker/.env.example)
+.env
+
+# lo genera make build: main.wasm y el runtime de Go que lo acompaña (wasm_exec.js, del mismo toolchain)
+public/wasm/
+public/js/wasm_exec.js

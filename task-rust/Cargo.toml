@@ -1,0 +1,69 @@
+# task-rust: replica 1:1 de task-php (el maestro) en Rust. Mismo contrato GraphQL (src/core/graphql/schema.graphql),
+# mismas migraciones y mismos casos de test.
+[package]
+name = "task-rust"
+version = "2.0.0"
+edition = "2024"
+publish = false
+# binarios y tests declarados abajo: cmd/ como en task-go y los tests con las carpetas de task-php/tests
+autobins = false
+autotests = false
+
+[lib]
+path = "src/lib.rs"
+
+# el public/index.php de task-php
+[[bin]]
+name = "api"
+path = "cmd/api/main.rs"
+
+# el console/console.php de task-php
+[[bin]]
+name = "console"
+path = "cmd/console/main.rs"
+
+# un binario por test de task-php: cada uno con su propia BD (database/task_cruds_test-<nombre>.sqlite)
+[[test]]
+name = "graphql_controller_test"
+path = "tests/core/graphql/graphql_controller/graphql_controller_test.rs"
+
+[[test]]
+name = "log_in_user_controller_test"
+path = "tests/modules/users/infrastructure/controllers/log_in_user_controller/log_in_user_controller_test.rs"
+
+[[test]]
+name = "documentation_controller_test"
+path = "tests/modules/open/documentation/infrastructure/controllers/documentation_controller/documentation_controller_test.rs"
+
+[[test]]
+name = "http_request_test"
+path = "tests/modules/shared/infrastructure/components/http/http_request/http_request_test.rs"
+
+[dependencies]
+# servidor GraphQL: esquema dinamico construido desde schema.graphql (el mismo fichero que task-php)
+async-graphql = { version = "7.2.1", default-features = false, features = ["dynamic-schema"] }
+# hash de passwords compatible con PHP ($2y$, coste 12)
+bcrypt = "0.19.3"
+chrono = { version = "0.4.45", default-features = false, features = ["clock", "std"] }
+# zonas IANA de la cabecera X-Time-Zone y de DateTimer
+chrono-tz = "0.10.4"
+getrandom = "0.4.3"
+# la conexion SQLite unica del proceso: reentrante para que una transaccion pueda lanzar sus sentencias
+parking_lot = "0.13.0"
+# ejecuta el GraphQL (async) dentro del hilo de la peticion
+pollster = "1.0.1"
+regex = "1.13.1"
+# SQLite compilado dentro del binario (bundled): no depende de la libsqlite del sistema
+rusqlite = { version = "0.41.0", features = ["bundled"] }
+serde = "1.0.229"
+# preserve_order: las claves del JSON salen en el orden en que se insertan, como los arrays de PHP
+serde_json = { version = "1.0.154", features = ["preserve_order"] }
+sha2 = "0.11.1"
+tiny_http = "0.12.0"
+
+[profile.release]
+strip = true
+
+# en debug (cargo test) las dependencias van optimizadas: bcrypt de coste 12 sin optimizar tarda segundos por hash
+[profile.dev.package."*"]
+opt-level = 3
