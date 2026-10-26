@@ -8,10 +8,12 @@ var TextsEn = map[string]string{
 	"app.fatal_error":      "The application could not start: check that the API is up and reload the page.",
 	"app.request_progress": "Processing your request…",
 
-	"nav.tasks":    "Tasks",
-	"nav.account":  "Account",
-	"nav.language": "Language",
-	"nav.backend":  "Backend",
+	"nav.tasks":             "Tasks",
+	"nav.account":           "Account",
+	"nav.language":          "Language",
+	"nav.backend":           "Backend",
+	"nav.api_documentation": "API docs",
+	"nav.github":            "Source code on GitHub",
 
 	"request_times.title":   "Response times",
 	"request_times.count":   "Requests",

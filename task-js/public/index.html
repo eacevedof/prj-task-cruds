@@ -14,6 +14,8 @@
         <h1><span data-i18n="app.title">Task JS</span> <small data-i18n="app.subtitle">task CRUD</small></h1>
         <!-- selector de back: un boton con el logo de cada uno de /config.json (NavigationView.renderBackends) -->
         <div id="div-backends" class="backend-switch" role="radiogroup" data-i18n-aria-label="nav.backend" aria-label="Backend"></div>
+        <!-- documentacion de la API del back activo: <apiBaseUrl>/api/v1 (NavigationView.renderBackends) -->
+        <a id="a-api-documentation" class="api-documentation hidden" target="_blank" rel="noopener noreferrer" data-i18n="nav.api_documentation">API docs</a>
     </div>
 
     <nav id="nav-screens" class="nav-screens hidden">
@@ -27,6 +29,9 @@
             <option value="en">EN</option>
             <option value="es">ES</option>
         </select>
+        <a href="https://github.com/eacevedof/prj-task-cruds" class="github-link" target="_blank" rel="noopener noreferrer" title="GitHub" data-i18n-aria-label="nav.github" aria-label="Source code on GitHub">
+            <img src="/img/github.svg" alt="" width="24" height="24">
+        </a>
         <div id="div-session" class="session hidden">
             <span id="span-session-user"></span>
             <button type="button" id="button-log-out" data-i18n="session.log_out">Log out</button>

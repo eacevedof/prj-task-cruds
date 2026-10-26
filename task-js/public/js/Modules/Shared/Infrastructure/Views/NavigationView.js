@@ -6,6 +6,8 @@ import { Translator } from "/js/Modules/Shared/Infrastructure/Components/Transla
 const CSS_HIDDEN = "hidden";
 const CSS_ACTIVE = "active";
 const BACKEND_LOGO_PATH = "/img/backends";
+// donde publica cada back su documentacion (la misma ruta en php, go y rust)
+const API_DOCUMENTATION_PATH = "/api/v1";
 
 /**
  * Menu de pantallas (por el hash de la url: #tasks, #account), selector de back y de idioma. Cada pantalla es una
@@ -40,6 +42,7 @@ export class NavigationView {
             screens: [...document.querySelectorAll("section[data-screen]")],
             selectLanguage: document.getElementById("select-language"),
             divBackends: document.getElementById("div-backends"),
+            aApiDocumentation: document.getElementById("a-api-documentation"),
         };
         window.addEventListener("hashchange", () => this.#renderCurrentScreen());
         this.#elements.selectLanguage.addEventListener("change", () => this.#dispatcher.dispatch(
@@ -93,13 +96,21 @@ export class NavigationView {
     }
 
     /**
-     * @param {{code: string, name: string}[]} backends los de /config.json
+     * Logos de los backs y, al lado, el enlace a la documentacion de la API del activo.
+     * @param {{code: string, name: string, apiBaseUrl: string}[]} backends los de /config.json
      * @param {string} backendCode el activo
      */
     renderBackends(backends, backendCode) {
         this.#elements.divBackends.replaceChildren(
             ...backends.map((backend) => this.#createButtonBackend(backend, backend.code === backendCode))
         );
+
+        const activeBackend = backends.find((backend) => backend.code === backendCode);
+        if (!activeBackend) return;
+        const apiDocumentationUrl = `${activeBackend.apiBaseUrl}${API_DOCUMENTATION_PATH}`;
+        this.#elements.aApiDocumentation.href = apiDocumentationUrl;
+        this.#elements.aApiDocumentation.title = `${activeBackend.name}: ${apiDocumentationUrl}`;
+        this.#elements.aApiDocumentation.classList.remove(CSS_HIDDEN);
     }
 
     /**

@@ -7,10 +7,12 @@ var TextsEs = map[string]string{
 	"app.fatal_error":      "No se ha podido arrancar la aplicación: revisa que la API esté levantada y recarga la página.",
 	"app.request_progress": "Procesando tu solicitud…",
 
-	"nav.tasks":    "Tareas",
-	"nav.account":  "Cuenta",
-	"nav.language": "Idioma",
-	"nav.backend":  "Back",
+	"nav.tasks":             "Tareas",
+	"nav.account":           "Cuenta",
+	"nav.language":          "Idioma",
+	"nav.backend":           "Back",
+	"nav.api_documentation": "Docs de la API",
+	"nav.github":            "Código fuente en GitHub",
 
 	"request_times.title":   "Tiempos de respuesta",
 	"request_times.count":   "Peticiones",

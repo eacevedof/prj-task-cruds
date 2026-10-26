@@ -12,6 +12,8 @@ export const TextsEn = Object.freeze({
     "nav.account": "Account",
     "nav.language": "Language",
     "nav.backend": "Backend",
+    "nav.api_documentation": "API docs",
+    "nav.github": "Source code on GitHub",
 
     "request_times.title": "Response times",
     "request_times.count": "Requests",

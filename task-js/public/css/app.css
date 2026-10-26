@@ -326,6 +326,28 @@ td.actions button {
     padding: 4px 8px;
 }
 
+/* enlace al repositorio, a la derecha del idioma */
+.github-link {
+    display: flex;
+    align-items: center;
+    opacity: 0.75;
+}
+
+.github-link:hover {
+    opacity: 1;
+}
+
+/* documentacion de la API del back activo, al lado de los logos */
+.api-documentation {
+    color: var(--color-primary);
+    font-size: 0.875rem;
+    text-decoration: none;
+}
+
+.api-documentation:hover {
+    text-decoration: underline;
+}
+
 /* selector de back: titulo y logos a la izquierda */
 .topbar-start {
     display: flex;

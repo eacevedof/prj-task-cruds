@@ -16,14 +16,17 @@ const (
 	CSS_HIDDEN        = "hidden"
 	CSS_ACTIVE        = "active"
 	BACKEND_LOGO_PATH = "/img/backends"
+	// donde publica cada back su documentacion (la misma ruta en php, go y rust)
+	API_DOCUMENTATION_PATH = "/api/v1"
 )
 
 type navigationElements struct {
-	navScreens     js.Value
-	screenLinks    []js.Value
-	screens        []js.Value
-	selectLanguage js.Value
-	divBackends    js.Value
+	navScreens        js.Value
+	screenLinks       []js.Value
+	screens           []js.Value
+	selectLanguage    js.Value
+	divBackends       js.Value
+	aApiDocumentation js.Value
 }
 
 // NavigationView menu de pantallas (por el hash de la url: #tasks, #account), selector de back y de idioma. Cada
@@ -52,11 +55,12 @@ func NavigationViewGetInstance() *NavigationView {
 func (v *NavigationView) Init() {
 	document := js.Global().Get("document")
 	v.elements = navigationElements{
-		navScreens:     document.Call("getElementById", "nav-screens"),
-		screenLinks:    v.jsvaluer.GetValues(document.Call("querySelectorAll", "#nav-screens a[data-screen]")),
-		screens:        v.jsvaluer.GetValues(document.Call("querySelectorAll", "section[data-screen]")),
-		selectLanguage: document.Call("getElementById", "select-language"),
-		divBackends:    document.Call("getElementById", "div-backends"),
+		navScreens:        document.Call("getElementById", "nav-screens"),
+		screenLinks:       v.jsvaluer.GetValues(document.Call("querySelectorAll", "#nav-screens a[data-screen]")),
+		screens:           v.jsvaluer.GetValues(document.Call("querySelectorAll", "section[data-screen]")),
+		selectLanguage:    document.Call("getElementById", "select-language"),
+		divBackends:       document.Call("getElementById", "div-backends"),
+		aApiDocumentation: document.Call("getElementById", "a-api-documentation"),
 	}
 	js.Global().Call("addEventListener", "hashchange", js.FuncOf(func(this js.Value, args []js.Value) any {
 		v.renderCurrentScreen()
@@ -114,13 +118,26 @@ func (v *NavigationView) RenderLanguage() {
 	v.translator.TranslateElement(document)
 }
 
-// RenderBackends backends: los de /config.json ({code, name, apiBaseUrl}); backendCode: el activo.
+// RenderBackends logos de los backs y, al lado, el enlace a la documentacion de la API del activo.
+// backends: los de /config.json ({code, name, apiBaseUrl}); backendCode: el activo.
 func (v *NavigationView) RenderBackends(backends []map[string]any, backendCode string) {
 	buttonsBackend := make([]any, 0, len(backends))
 	for _, backend := range backends {
 		buttonsBackend = append(buttonsBackend, v.createButtonBackend(backend, application.ToString(backend["code"]) == backendCode))
 	}
 	v.elements.divBackends.Call("replaceChildren", buttonsBackend...)
+
+	activeBackendIndex := slices.IndexFunc(backends, func(backend map[string]any) bool {
+		return application.ToString(backend["code"]) == backendCode
+	})
+	if activeBackendIndex < 0 {
+		return
+	}
+	activeBackend := backends[activeBackendIndex]
+	apiDocumentationUrl := application.ToString(activeBackend["apiBaseUrl"]) + API_DOCUMENTATION_PATH
+	v.elements.aApiDocumentation.Set("href", apiDocumentationUrl)
+	v.elements.aApiDocumentation.Set("title", application.ToString(activeBackend["name"])+": "+apiDocumentationUrl)
+	v.elements.aApiDocumentation.Get("classList").Call("remove", CSS_HIDDEN)
 }
 
 // createButtonBackend boton con el logo del back (/img/backends/<code>.svg); sin logo se queda el nombre.
