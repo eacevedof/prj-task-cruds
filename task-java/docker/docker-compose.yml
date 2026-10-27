@@ -1,0 +1,38 @@
+# docker/docker-compose.yml -- stack local minimo: la API en Java (alpine) + Mailpit. Sin contenedor de BD: SQLite.
+# Sin nginx: la propia API sirve public/ (PublicFilesServer). Lanzar desde task-java/ con el makefile (make up).
+# Variables opcionales en docker/.env (ver .env.example).
+name: task-java
+
+services:
+  task-java-app:
+    container_name: cont-task-java-app
+    build:
+      context: app
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${HTTP_PORT:-9700}:8080
+    volumes:
+      - ../:/app
+      # repositorio de maven en un volumen: las dependencias se descargan una vez y no se mezclan con las del host
+      - task-java-m2:/root/.m2
+    networks:
+      - task-java-net
+
+  # buzon local: recoge los emails que envia la app (sendmail -> smtp mailpit:1025) y los muestra en
+  # http://localhost:9725. No los entrega a nadie: en local ningun email sale a internet.
+  task-java-mailpit:
+    container_name: cont-task-java-mailpit
+    image: axllent/mailpit:v1.32.0
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${MAILPIT_PORT:-9725}:8025
+    networks:
+      - task-java-net
+
+volumes:
+  task-java-m2:
+
+networks:
+  task-java-net:

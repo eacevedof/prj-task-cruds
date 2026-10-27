@@ -1,0 +1,24 @@
+// Dev Containers: VS Code dentro de task-java-app para usar su mismo Java (Temurin 25) y Maven, no los del host.
+// Reutiliza el compose del proyecto (name: task-java), asi que comparte contenedores con "make up".
+{
+    "name": "task-java",
+    "dockerComposeFile": ["../../task-java/docker/docker-compose.yml"],
+    "service": "task-java-app",
+    "runServices": ["task-java-app", "task-java-mailpit"],
+    "workspaceFolder": "/app",
+    "shutdownAction": "none",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "vscjava.vscode-java-pack"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "sh",
+                "terminal.integrated.profiles.linux": {
+                    "sh": { "path": "/bin/sh" }
+                }
+            }
+        }
+    }
+}

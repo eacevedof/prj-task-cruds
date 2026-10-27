@@ -1,0 +1,6 @@
+#!/bin/sh
+# API de task-java (el public/index.php de task-php): bin/api --addr=0.0.0.0:8080
+# Necesita target/ compilado (mvn package -DskipTests: lo hace el entrypoint en cada arranque).
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+# --enable-native-access: sqlite-jdbc carga su libreria nativa (sin el, la JVM avisa en cada arranque)
+exec java --enable-native-access=ALL-UNNAMED -cp "$ROOT/target/classes:$ROOT/target/lib/*" cmd.api.Main "$@"

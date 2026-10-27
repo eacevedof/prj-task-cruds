@@ -32,5 +32,6 @@
     "php.validate.enable": true,
     "php.validate.executablePath": "C:\\programs\\php-8.3\\php.exe",
     "php.validate.run": "onType",
-    "intelephense.environment.phpVersion": "8.5.12"
+    "intelephense.environment.phpVersion": "8.5.12",
+    "java.compile.nullAnalysis.mode": "automatic"
 }

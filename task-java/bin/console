@@ -1,0 +1,5 @@
+#!/bin/sh
+# Consola de task-java (el console/console.php de task-php): bin/console help
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+# --enable-native-access: sqlite-jdbc carga su libreria nativa (sin el, la JVM avisa en cada llamada)
+exec java --enable-native-access=ALL-UNNAMED -cp "$ROOT/target/classes:$ROOT/target/lib/*" cmd.console.Main "$@"
