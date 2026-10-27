@@ -1,0 +1,38 @@
+# docker/docker-compose.yml -- stack local minimo: la API en Node.js (alpine) + Mailpit. Sin contenedor de BD: SQLite.
+# Sin nginx: la propia API sirve public/ (PublicFilesServer). Lanzar desde task-nodejs/ con el makefile (make up).
+# Variables opcionales en docker/.env (ver .env.example).
+name: task-nodejs
+
+services:
+  task-nodejs-app:
+    container_name: cont-task-nodejs-app
+    build:
+      context: app
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${HTTP_PORT:-9600}:8080
+    volumes:
+      - ../:/app
+      # dependencias en un volumen: las del contenedor no se mezclan con las que se instalen en el host (npm install)
+      - task-nodejs-node-modules:/app/node_modules
+    networks:
+      - task-nodejs-net
+
+  # buzon local: recoge los emails que envia la app (sendmail -> smtp mailpit:1025) y los muestra en
+  # http://localhost:9625. No los entrega a nadie: en local ningun email sale a internet.
+  task-nodejs-mailpit:
+    container_name: cont-task-nodejs-mailpit
+    image: axllent/mailpit:v1.32.0
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${MAILPIT_PORT:-9625}:8025
+    networks:
+      - task-nodejs-net
+
+volumes:
+  task-nodejs-node-modules:
+
+networks:
+  task-nodejs-net:

@@ -1,0 +1,30 @@
+{
+  "name": "task-nodejs",
+  "version": "2.0.0",
+  "description": "task-cruds: to-do list CRUD en DDD, solo API, SQLite (replica en Node.js de task-php)",
+  "private": true,
+  "license": "UNLICENSED",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "imports": {
+    "#app/*": "./src/*",
+    "#console/*": "./console/*",
+    "#tests/*": "./tests/*"
+  },
+  "scripts": {
+    "api": "node cmd/api/main.ts",
+    "console": "node cmd/console/main.ts",
+    "test": "node --test \"tests/**/*Test.ts\"",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "bcryptjs": "3.0.3",
+    "graphql": "17.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "24.19.2",
+    "typescript": "6.0.3"
+  }
+}

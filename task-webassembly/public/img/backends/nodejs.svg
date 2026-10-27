@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 32" role="img" aria-label="Node.js">
+    <!-- hexagono (el de Node.js), dibujo propio -->
+    <path d="M10 2 L18 6.5 L18 15.5 L10 20 L2 15.5 L2 6.5 Z" fill="#5fa04e" stroke="#3e7a32" stroke-width="1.2" stroke-linejoin="round"/>
+    <text x="10" y="15" text-anchor="middle" font-family="Verdana, Arial, sans-serif" font-size="8" font-weight="bold" fill="#fff">JS</text>
+    <text x="41" y="22" text-anchor="middle" font-family="Verdana, Arial, sans-serif" font-size="17" font-weight="bold" fill="#3e7a32">node</text>
+</svg>

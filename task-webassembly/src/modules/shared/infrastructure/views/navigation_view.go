@@ -16,7 +16,7 @@ const (
 	CSS_HIDDEN        = "hidden"
 	CSS_ACTIVE        = "active"
 	BACKEND_LOGO_PATH = "/img/backends"
-	// donde publica cada back su documentacion (la misma ruta en php, go y rust)
+	// donde publica cada back su documentacion (la misma ruta en php, go, rust y nodejs)
 	API_DOCUMENTATION_PATH = "/api/v1"
 )
 

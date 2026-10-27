@@ -6,7 +6,7 @@ import { Translator } from "/js/Modules/Shared/Infrastructure/Components/Transla
 const CSS_HIDDEN = "hidden";
 const CSS_ACTIVE = "active";
 const BACKEND_LOGO_PATH = "/img/backends";
-// donde publica cada back su documentacion (la misma ruta en php, go y rust)
+// donde publica cada back su documentacion (la misma ruta en php, go, rust y nodejs)
 const API_DOCUMENTATION_PATH = "/api/v1";
 
 /**

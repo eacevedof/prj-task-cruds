@@ -1,4 +1,4 @@
-# SPA task-js. Plantilla: el entrypoint de nginx sustituye ${API_BASE_URL_PHP}, ${API_BASE_URL_GO} y ${API_BASE_URL_RUST} al arrancar el contenedor.
+# SPA task-js. Plantilla: el entrypoint de nginx sustituye ${API_BASE_URL_PHP}, ${API_BASE_URL_GO}, ${API_BASE_URL_RUST} y ${API_BASE_URL_NODEJS} al arrancar el contenedor.
 server {
   listen       80;
   server_name _;
@@ -10,7 +10,7 @@ server {
   charset utf-8;
 
   # CSP estricta: solo scripts/estilos propios (nada inline) y fetch solo a la propia web y a la API
-  add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' ${API_BASE_URL_PHP} ${API_BASE_URL_GO} ${API_BASE_URL_RUST}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
+  add_header Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self' ${API_BASE_URL_PHP} ${API_BASE_URL_GO} ${API_BASE_URL_RUST} ${API_BASE_URL_NODEJS}; frame-ancestors 'none'; base-uri 'self'; form-action 'self'" always;
   add_header X-Content-Type-Options "nosniff" always;
   add_header Referrer-Policy "no-referrer" always;
 
@@ -20,7 +20,7 @@ server {
     default_type application/json;
     add_header Cache-Control "no-store" always;
     add_header Content-Security-Policy "default-src 'none'" always;
-    return 200 '{"backends":[{"code":"php","name":"PHP","apiBaseUrl":"${API_BASE_URL_PHP}"},{"code":"go","name":"Go","apiBaseUrl":"${API_BASE_URL_GO}"},{"code":"rust","name":"Rust","apiBaseUrl":"${API_BASE_URL_RUST}"}]}';
+    return 200 '{"backends":[{"code":"php","name":"PHP","apiBaseUrl":"${API_BASE_URL_PHP}"},{"code":"go","name":"Go","apiBaseUrl":"${API_BASE_URL_GO}"},{"code":"rust","name":"Rust","apiBaseUrl":"${API_BASE_URL_RUST}"},{"code":"nodejs","name":"Node.js","apiBaseUrl":"${API_BASE_URL_NODEJS}"}]}';
   }
 
   # ficheros ocultos nunca
