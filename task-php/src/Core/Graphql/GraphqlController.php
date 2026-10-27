@@ -18,10 +18,22 @@ use App\Modules\Shared\Domain\Enums\GraphqlEnum;
 use App\Modules\Shared\Domain\Enums\SharedMessageEnum;
 use App\Modules\Shared\Infrastructure\Components\HttpResponder\HttpResponder;
 use App\Modules\Shared\Infrastructure\Controllers\AbstractApiController;
-use App\Modules\Tasks\Domain\Enums\TasksKeyEnum;
-use App\Modules\Tasks\Infrastructure\Controllers\TasksGraphqlController;
+
 use App\Modules\Users\Domain\Enums\UsersKeyEnum;
-use App\Modules\Users\Infrastructure\Controllers\UsersGraphqlController;
+use App\Modules\Users\Infrastructure\Controllers\CreateUserApiController;
+use App\Modules\Users\Infrastructure\Controllers\DeleteUserApiController;
+use App\Modules\Users\Infrastructure\Controllers\GetUserApiController;
+use App\Modules\Users\Infrastructure\Controllers\ListUsersApiController;
+use App\Modules\Users\Infrastructure\Controllers\LogInUserApiController;
+use App\Modules\Users\Infrastructure\Controllers\RegenerateUserApiTokenApiController;
+use App\Modules\Users\Infrastructure\Controllers\UpdateUserApiController;
+
+use App\Modules\Tasks\Domain\Enums\TasksKeyEnum;
+use App\Modules\Tasks\Infrastructure\Controllers\CreateTaskApiController;
+use App\Modules\Tasks\Infrastructure\Controllers\DeleteTaskApiController;
+use App\Modules\Tasks\Infrastructure\Controllers\GetTaskApiController;
+use App\Modules\Tasks\Infrastructure\Controllers\SearchTasksApiController;
+use App\Modules\Tasks\Infrastructure\Controllers\UpdateTaskApiController;
 
 /**
  * POST /graphql  body: {query, variables?, operationName?}  header: Authorization: Bearer <api_token>
@@ -32,14 +44,34 @@ use App\Modules\Users\Infrastructure\Controllers\UsersGraphqlController;
  */
 final class GraphqlController extends AbstractApiController
 {
-    private UsersGraphqlController $usersGraphqlController;
-    private TasksGraphqlController $tasksGraphqlController;
+    private ListUsersApiController $listUsersApiController;
+    private GetUserApiController $getUserApiController;
+    private CreateUserApiController $createUserApiController;
+    private LogInUserApiController $logInUserApiController;
+    private UpdateUserApiController $updateUserApiController;
+    private DeleteUserApiController $deleteUserApiController;
+    private RegenerateUserApiTokenApiController $regenerateUserApiTokenApiController;
+    private SearchTasksApiController $searchTasksApiController;
+    private GetTaskApiController $getTaskApiController;
+    private CreateTaskApiController $createTaskApiController;
+    private UpdateTaskApiController $updateTaskApiController;
+    private DeleteTaskApiController $deleteTaskApiController;
 
     public function __construct()
     {
         parent::__construct();
-        $this->usersGraphqlController = UsersGraphqlController::getInstance();
-        $this->tasksGraphqlController = TasksGraphqlController::getInstance();
+        $this->listUsersApiController = ListUsersApiController::getInstance();
+        $this->getUserApiController = GetUserApiController::getInstance();
+        $this->createUserApiController = CreateUserApiController::getInstance();
+        $this->logInUserApiController = LogInUserApiController::getInstance();
+        $this->updateUserApiController = UpdateUserApiController::getInstance();
+        $this->deleteUserApiController = DeleteUserApiController::getInstance();
+        $this->regenerateUserApiTokenApiController = RegenerateUserApiTokenApiController::getInstance();
+        $this->searchTasksApiController = SearchTasksApiController::getInstance();
+        $this->getTaskApiController = GetTaskApiController::getInstance();
+        $this->createTaskApiController = CreateTaskApiController::getInstance();
+        $this->updateTaskApiController = UpdateTaskApiController::getInstance();
+        $this->deleteTaskApiController = DeleteTaskApiController::getInstance();
     }
 
     public function execute(): HttpResponder
@@ -98,27 +130,27 @@ final class GraphqlController extends AbstractApiController
     {
         return [
             GraphqlEnum::TYPE_QUERY => [
-                "users" => fn() => $this->usersGraphqlController->getUsers(),
-                "user" => fn(array $args) => $this->usersGraphqlController->getUser($args),
-                "tasks" => fn(array $args) => $this->tasksGraphqlController->searchTasks("", $args),
-                "task" => fn(array $args) => $this->tasksGraphqlController->getTask($args),
-                "userTasks" => fn(array $args) => $this->tasksGraphqlController->searchTasks(
+                "users" => fn() => $this->listUsersApiController->invoke(),
+                "user" => fn(array $args) => $this->getUserApiController->invoke($args),
+                "tasks" => fn(array $args) => $this->searchTasksApiController->invoke("", $args),
+                "task" => fn(array $args) => $this->getTaskApiController->invoke($args),
+                "userTasks" => fn(array $args) => $this->searchTasksApiController->invoke(
                     (string) ($args[TasksKeyEnum::USER_UUID] ?? ""),
                     $args
                 ),
             ],
             GraphqlEnum::TYPE_MUTATION => [
-                "createUser" => fn(array $args) => $this->usersGraphqlController->createUser($args),
-                "logIn" => fn(array $args) => $this->usersGraphqlController->logIn($args),
-                "updateUser" => fn(array $args) => $this->usersGraphqlController->updateUser($args),
-                "deleteUser" => fn(array $args) => $this->usersGraphqlController->deleteUser($args),
-                "regenerateApiToken" => fn(array $args) => $this->usersGraphqlController->regenerateApiToken($args),
-                "createTask" => fn(array $args) => $this->tasksGraphqlController->createTask($args),
-                "updateTask" => fn(array $args) => $this->tasksGraphqlController->updateTask($args),
-                "deleteTask" => fn(array $args) => $this->tasksGraphqlController->deleteTask($args),
+                "createUser" => fn(array $args) => $this->createUserApiController->invoke($args),
+                "logIn" => fn(array $args) => $this->logInUserApiController->invoke($args),
+                "updateUser" => fn(array $args) => $this->updateUserApiController->invoke($args),
+                "deleteUser" => fn(array $args) => $this->deleteUserApiController->invoke($args),
+                "regenerateApiToken" => fn(array $args) => $this->regenerateUserApiTokenApiController->invoke($args),
+                "createTask" => fn(array $args) => $this->createTaskApiController->invoke($args),
+                "updateTask" => fn(array $args) => $this->updateTaskApiController->invoke($args),
+                "deleteTask" => fn(array $args) => $this->deleteTaskApiController->invoke($args),
             ],
             GraphqlEnum::TYPE_USER => [
-                "tasks" => fn(array $args, array $user) => $this->tasksGraphqlController->searchTasks(
+                "tasks" => fn(array $args, array $user) => $this->searchTasksApiController->invoke(
                     (string) ($user[UsersKeyEnum::USER_UUID] ?? ""),
                     $args
                 ),

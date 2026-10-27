@@ -36,15 +36,35 @@ var (
 // errors[].extensions (ver AbstractGraphqlController) con status 200, como manda GraphQL sobre HTTP.
 type GraphqlController struct {
 	controllers.AbstractApiController
-	usersGraphqlController *userscontrollers.UsersGraphqlController
-	tasksGraphqlController *taskscontrollers.TasksGraphqlController
+	listUsersApiController              *userscontrollers.ListUsersApiController
+	getUserApiController                *userscontrollers.GetUserApiController
+	createUserApiController             *userscontrollers.CreateUserApiController
+	logInUserApiController              *userscontrollers.LogInUserApiController
+	updateUserApiController             *userscontrollers.UpdateUserApiController
+	deleteUserApiController             *userscontrollers.DeleteUserApiController
+	regenerateUserApiTokenApiController *userscontrollers.RegenerateUserApiTokenApiController
+	searchTasksApiController            *taskscontrollers.SearchTasksApiController
+	getTaskApiController                *taskscontrollers.GetTaskApiController
+	createTaskApiController             *taskscontrollers.CreateTaskApiController
+	updateTaskApiController             *taskscontrollers.UpdateTaskApiController
+	deleteTaskApiController             *taskscontrollers.DeleteTaskApiController
 }
 
 func GraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *GraphqlController {
 	return &GraphqlController{
-		AbstractApiController:  controllers.NewAbstractApiController(httpRequester),
-		usersGraphqlController: userscontrollers.UsersGraphqlControllerGetInstance(httpRequester),
-		tasksGraphqlController: taskscontrollers.TasksGraphqlControllerGetInstance(httpRequester),
+		AbstractApiController:               controllers.NewAbstractApiController(httpRequester),
+		listUsersApiController:              userscontrollers.ListUsersApiControllerGetInstance(httpRequester),
+		getUserApiController:                userscontrollers.GetUserApiControllerGetInstance(httpRequester),
+		createUserApiController:             userscontrollers.CreateUserApiControllerGetInstance(httpRequester),
+		logInUserApiController:              userscontrollers.LogInUserApiControllerGetInstance(httpRequester),
+		updateUserApiController:             userscontrollers.UpdateUserApiControllerGetInstance(httpRequester),
+		deleteUserApiController:             userscontrollers.DeleteUserApiControllerGetInstance(httpRequester),
+		regenerateUserApiTokenApiController: userscontrollers.RegenerateUserApiTokenApiControllerGetInstance(httpRequester),
+		searchTasksApiController:            taskscontrollers.SearchTasksApiControllerGetInstance(httpRequester),
+		getTaskApiController:                taskscontrollers.GetTaskApiControllerGetInstance(httpRequester),
+		createTaskApiController:             taskscontrollers.CreateTaskApiControllerGetInstance(httpRequester),
+		updateTaskApiController:             taskscontrollers.UpdateTaskApiControllerGetInstance(httpRequester),
+		deleteTaskApiController:             taskscontrollers.DeleteTaskApiControllerGetInstance(httpRequester),
 	}
 }
 
@@ -69,8 +89,18 @@ func (c *GraphqlController) Execute() (httpResponder *httpresponder.HttpResponde
 
 	executionResult := getSchema().Exec(
 		context.WithValue(context.Background(), resolversByTypeKey{}, &resolversByType{
-			usersGraphqlController: c.usersGraphqlController,
-			tasksGraphqlController: c.tasksGraphqlController,
+			listUsersApiController:              c.listUsersApiController,
+			getUserApiController:                c.getUserApiController,
+			createUserApiController:             c.createUserApiController,
+			logInUserApiController:              c.logInUserApiController,
+			updateUserApiController:             c.updateUserApiController,
+			deleteUserApiController:             c.deleteUserApiController,
+			regenerateUserApiTokenApiController: c.regenerateUserApiTokenApiController,
+			searchTasksApiController:            c.searchTasksApiController,
+			getTaskApiController:                c.getTaskApiController,
+			createTaskApiController:             c.createTaskApiController,
+			updateTaskApiController:             c.updateTaskApiController,
+			deleteTaskApiController:             c.deleteTaskApiController,
 		}),
 		query,
 		c.GetHttpRequest().GetPostString(enums.GraphqlEnum.KEY_OPERATION_NAME),

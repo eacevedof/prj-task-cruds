@@ -45,9 +45,8 @@ func start() error {
 	for _, view := range views {
 		view.Init()
 	}
-	changeBackendController := sharedcontrollers.ChangeBackendControllerGetInstance()
 	controllers := []initer{
-		sharedcontrollers.ChangeLanguageControllerGetInstance(), changeBackendController,
+		sharedcontrollers.ChangeLanguageControllerGetInstance(), sharedcontrollers.ChangeBackendControllerGetInstance(),
 		sharedcontrollers.ShowRequestProgressControllerGetInstance(), sharedcontrollers.ShowRequestTimesControllerGetInstance(),
 		userscontrollers.StartSessionControllerGetInstance(), userscontrollers.RestoreSessionControllerGetInstance(),
 		userscontrollers.LogInControllerGetInstance(), userscontrollers.CreateUserControllerGetInstance(),
@@ -70,7 +69,7 @@ func start() error {
 	if len(backends) == 0 {
 		return errors.New("config.json has no backends")
 	}
-	changeBackendController.ApplySavedBackend(backends)
+	sharedcontrollers.ApplySavedBackendControllerGetInstance().Invoke(backends)
 
 	// la sesion guardada se revalida contra la API (el token pudo rotarse o el usuario borrarse)
 	apiToken, err := sessionstorer.GetInstance().GetApiToken()

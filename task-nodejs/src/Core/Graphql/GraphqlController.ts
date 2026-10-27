@@ -23,10 +23,22 @@ import { getTrimmedString, type Primitives } from "#app/Modules/Shared/Applicati
 import { HttpResponder } from "#app/Modules/Shared/Infrastructure/Components/HttpResponder/HttpResponder.ts";
 import { AbstractApiController } from "#app/Modules/Shared/Infrastructure/Controllers/AbstractApiController.ts";
 import { getThrowable } from "#app/Modules/Shared/Infrastructure/Exceptions/InterfaceException.ts";
-import { TasksKeyEnum } from "#app/Modules/Tasks/Domain/Enums/TasksKeyEnum.ts";
-import { TasksGraphqlController } from "#app/Modules/Tasks/Infrastructure/Controllers/TasksGraphqlController.ts";
+
 import { UsersKeyEnum } from "#app/Modules/Users/Domain/Enums/UsersKeyEnum.ts";
-import { UsersGraphqlController } from "#app/Modules/Users/Infrastructure/Controllers/UsersGraphqlController.ts";
+import { CreateUserApiController } from "#app/Modules/Users/Infrastructure/Controllers/CreateUserApiController.ts";
+import { DeleteUserApiController } from "#app/Modules/Users/Infrastructure/Controllers/DeleteUserApiController.ts";
+import { GetUserApiController } from "#app/Modules/Users/Infrastructure/Controllers/GetUserApiController.ts";
+import { ListUsersApiController } from "#app/Modules/Users/Infrastructure/Controllers/ListUsersApiController.ts";
+import { LogInUserApiController } from "#app/Modules/Users/Infrastructure/Controllers/LogInUserApiController.ts";
+import { RegenerateUserApiTokenApiController } from "#app/Modules/Users/Infrastructure/Controllers/RegenerateUserApiTokenApiController.ts";
+import { UpdateUserApiController } from "#app/Modules/Users/Infrastructure/Controllers/UpdateUserApiController.ts";
+
+import { TasksKeyEnum } from "#app/Modules/Tasks/Domain/Enums/TasksKeyEnum.ts";
+import { CreateTaskApiController } from "#app/Modules/Tasks/Infrastructure/Controllers/CreateTaskApiController.ts";
+import { DeleteTaskApiController } from "#app/Modules/Tasks/Infrastructure/Controllers/DeleteTaskApiController.ts";
+import { GetTaskApiController } from "#app/Modules/Tasks/Infrastructure/Controllers/GetTaskApiController.ts";
+import { SearchTasksApiController } from "#app/Modules/Tasks/Infrastructure/Controllers/SearchTasksApiController.ts";
+import { UpdateTaskApiController } from "#app/Modules/Tasks/Infrastructure/Controllers/UpdateTaskApiController.ts";
 
 /**
  * Tipo de schema.graphql => campo => fn(args, parent).
@@ -45,13 +57,33 @@ let schema: GraphQLSchema | null = null;
  */
 export class GraphqlController extends AbstractApiController {
 
-    readonly #usersGraphqlController: UsersGraphqlController;
-    readonly #tasksGraphqlController: TasksGraphqlController;
+    readonly #listUsersApiController: ListUsersApiController;
+    readonly #getUserApiController: GetUserApiController;
+    readonly #createUserApiController: CreateUserApiController;
+    readonly #logInUserApiController: LogInUserApiController;
+    readonly #updateUserApiController: UpdateUserApiController;
+    readonly #deleteUserApiController: DeleteUserApiController;
+    readonly #regenerateUserApiTokenApiController: RegenerateUserApiTokenApiController;
+    readonly #searchTasksApiController: SearchTasksApiController;
+    readonly #getTaskApiController: GetTaskApiController;
+    readonly #createTaskApiController: CreateTaskApiController;
+    readonly #updateTaskApiController: UpdateTaskApiController;
+    readonly #deleteTaskApiController: DeleteTaskApiController;
 
     constructor() {
         super();
-        this.#usersGraphqlController = UsersGraphqlController.getInstance();
-        this.#tasksGraphqlController = TasksGraphqlController.getInstance();
+        this.#listUsersApiController = ListUsersApiController.getInstance();
+        this.#getUserApiController = GetUserApiController.getInstance();
+        this.#createUserApiController = CreateUserApiController.getInstance();
+        this.#logInUserApiController = LogInUserApiController.getInstance();
+        this.#updateUserApiController = UpdateUserApiController.getInstance();
+        this.#deleteUserApiController = DeleteUserApiController.getInstance();
+        this.#regenerateUserApiTokenApiController = RegenerateUserApiTokenApiController.getInstance();
+        this.#searchTasksApiController = SearchTasksApiController.getInstance();
+        this.#getTaskApiController = GetTaskApiController.getInstance();
+        this.#createTaskApiController = CreateTaskApiController.getInstance();
+        this.#updateTaskApiController = UpdateTaskApiController.getInstance();
+        this.#deleteTaskApiController = DeleteTaskApiController.getInstance();
     }
 
     static getInstance(): GraphqlController {
@@ -149,27 +181,27 @@ export class GraphqlController extends AbstractApiController {
     #getResolversByType(): ResolversByType {
         return {
             [GraphqlEnum.TYPE_QUERY]: {
-                users: () => this.#usersGraphqlController.getUsers(),
-                user: (args) => this.#usersGraphqlController.getUser(args),
-                tasks: (args) => this.#tasksGraphqlController.searchTasks("", args),
-                task: (args) => this.#tasksGraphqlController.getTask(args),
-                userTasks: (args) => this.#tasksGraphqlController.searchTasks(
+                users: () => this.#listUsersApiController.invoke(),
+                user: (args) => this.#getUserApiController.invoke(args),
+                tasks: (args) => this.#searchTasksApiController.invoke("", args),
+                task: (args) => this.#getTaskApiController.invoke(args),
+                userTasks: (args) => this.#searchTasksApiController.invoke(
                     getTrimmedString(args[TasksKeyEnum.USER_UUID]),
                     args
                 ),
             },
             [GraphqlEnum.TYPE_MUTATION]: {
-                createUser: (args) => this.#usersGraphqlController.createUser(args),
-                logIn: (args) => this.#usersGraphqlController.logIn(args),
-                updateUser: (args) => this.#usersGraphqlController.updateUser(args),
-                deleteUser: (args) => this.#usersGraphqlController.deleteUser(args),
-                regenerateApiToken: (args) => this.#usersGraphqlController.regenerateApiToken(args),
-                createTask: (args) => this.#tasksGraphqlController.createTask(args),
-                updateTask: (args) => this.#tasksGraphqlController.updateTask(args),
-                deleteTask: (args) => this.#tasksGraphqlController.deleteTask(args),
+                createUser: (args) => this.#createUserApiController.invoke(args),
+                logIn: (args) => this.#logInUserApiController.invoke(args),
+                updateUser: (args) => this.#updateUserApiController.invoke(args),
+                deleteUser: (args) => this.#deleteUserApiController.invoke(args),
+                regenerateApiToken: (args) => this.#regenerateUserApiTokenApiController.invoke(args),
+                createTask: (args) => this.#createTaskApiController.invoke(args),
+                updateTask: (args) => this.#updateTaskApiController.invoke(args),
+                deleteTask: (args) => this.#deleteTaskApiController.invoke(args),
             },
             [GraphqlEnum.TYPE_USER]: {
-                tasks: (args, user) => this.#tasksGraphqlController.searchTasks(
+                tasks: (args, user) => this.#searchTasksApiController.invoke(
                     getTrimmedString(user[UsersKeyEnum.USER_UUID]),
                     args
                 ),

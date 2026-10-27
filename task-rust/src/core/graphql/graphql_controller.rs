@@ -19,8 +19,18 @@ use crate::modules::shared::infrastructure::controllers::abstract_api_controller
     AbstractApiController, get_json_encoded,
 };
 use crate::modules::shared::infrastructure::exceptions::interface_exception::get_panic_error;
-use crate::modules::tasks::infrastructure::controllers::tasks_graphql_controller::TasksGraphqlController;
-use crate::modules::users::infrastructure::controllers::users_graphql_controller::UsersGraphqlController;
+use crate::modules::tasks::infrastructure::controllers::create_task_api_controller::CreateTaskApiController;
+use crate::modules::tasks::infrastructure::controllers::delete_task_api_controller::DeleteTaskApiController;
+use crate::modules::tasks::infrastructure::controllers::get_task_api_controller::GetTaskApiController;
+use crate::modules::tasks::infrastructure::controllers::search_tasks_api_controller::SearchTasksApiController;
+use crate::modules::tasks::infrastructure::controllers::update_task_api_controller::UpdateTaskApiController;
+use crate::modules::users::infrastructure::controllers::create_user_api_controller::CreateUserApiController;
+use crate::modules::users::infrastructure::controllers::delete_user_api_controller::DeleteUserApiController;
+use crate::modules::users::infrastructure::controllers::get_user_api_controller::GetUserApiController;
+use crate::modules::users::infrastructure::controllers::list_users_api_controller::ListUsersApiController;
+use crate::modules::users::infrastructure::controllers::log_in_user_api_controller::LogInUserApiController;
+use crate::modules::users::infrastructure::controllers::regenerate_user_api_token_api_controller::RegenerateUserApiTokenApiController;
+use crate::modules::users::infrastructure::controllers::update_user_api_controller::UpdateUserApiController;
 
 const SCHEMA_GRAPHQL: &str = include_str!("schema.graphql");
 
@@ -56,10 +66,7 @@ impl GraphqlController {
 
         let mut request = Request::new(query)
             .variables(Variables::from_json(Value::Object(self.get_variables())))
-            .data(ResolversByType {
-                users_graphql_controller: UsersGraphqlController::get_instance(Arc::clone(&self.http_requester)),
-                tasks_graphql_controller: TasksGraphqlController::get_instance(Arc::clone(&self.http_requester)),
-            });
+            .data(self.get_resolvers_by_type());
         let operation_name = self.get_http_request().get_post_string(GraphqlEnum::KEY_OPERATION_NAME);
         if !operation_name.is_empty() {
             request = request.operation_name(operation_name);
@@ -76,6 +83,26 @@ impl GraphqlController {
                     &tr(SharedMessageEnum::AN_UNEXPECTED_ERROR_HAS_OCCURRED, &[]),
                 )
             }
+        }
+    }
+
+    /// un controller por caso de uso (el constructor de task-php), todos con el HttpRequester de la peticion.
+    fn get_resolvers_by_type(&self) -> ResolversByType {
+        ResolversByType {
+            list_users_api_controller: ListUsersApiController::get_instance(Arc::clone(&self.http_requester)),
+            get_user_api_controller: GetUserApiController::get_instance(Arc::clone(&self.http_requester)),
+            create_user_api_controller: CreateUserApiController::get_instance(Arc::clone(&self.http_requester)),
+            log_in_user_api_controller: LogInUserApiController::get_instance(Arc::clone(&self.http_requester)),
+            update_user_api_controller: UpdateUserApiController::get_instance(Arc::clone(&self.http_requester)),
+            delete_user_api_controller: DeleteUserApiController::get_instance(Arc::clone(&self.http_requester)),
+            regenerate_user_api_token_api_controller: RegenerateUserApiTokenApiController::get_instance(Arc::clone(
+                &self.http_requester,
+            )),
+            search_tasks_api_controller: SearchTasksApiController::get_instance(Arc::clone(&self.http_requester)),
+            get_task_api_controller: GetTaskApiController::get_instance(Arc::clone(&self.http_requester)),
+            create_task_api_controller: CreateTaskApiController::get_instance(Arc::clone(&self.http_requester)),
+            update_task_api_controller: UpdateTaskApiController::get_instance(Arc::clone(&self.http_requester)),
+            delete_task_api_controller: DeleteTaskApiController::get_instance(Arc::clone(&self.http_requester)),
         }
     }
 

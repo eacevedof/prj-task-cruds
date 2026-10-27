@@ -1,0 +1,47 @@
+package modules.users.infrastructure.controllers;
+
+import java.util.Map;
+
+import modules.shared.application.Primitives;
+import modules.shared.infrastructure.controllers.AbstractGraphqlController;
+import modules.users.application.getuser.GetUserDto;
+import modules.users.application.getuser.GetUserService;
+import modules.users.domain.enums.UsersKeyEnum;
+import modules.users.domain.exceptions.UsersException;
+
+import static modules.shared.application.Primitives.getValueOrDefault;
+
+/**
+ * Query user(user_uuid) (src/core/graphql/schema.graphql). Exige Bearer.
+ */
+public final class GetUserApiController extends AbstractGraphqlController {
+
+    public GetUserApiController() {
+        super();
+    }
+
+    public static GetUserApiController getInstance() {
+        return new GetUserApiController();
+    }
+
+    /**
+     * @throws graphql.GraphqlErrorException
+     */
+    public Map<String, Object> invoke(Map<String, Object> args) {
+        try {
+            return GetUserService.getInstance().invoke(
+                GetUserDto.fromPrimitives(Primitives.merge(
+                    httpRequest.getMetadata(),
+                    getAuthUserOrFail(),
+                    Primitives.of("userUuid", getValueOrDefault(args, UsersKeyEnum.USER_UUID, ""))
+                ))
+            ).toArray();
+        }
+        catch (UsersException ex) {
+            throw getGraphqlDomainError(ex);
+        }
+        catch (Exception ex) {
+            throw getGraphqlUnexpectedError(ex, "GetUserApiController::invoke");
+        }
+    }
+}

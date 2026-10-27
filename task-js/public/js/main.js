@@ -1,5 +1,6 @@
 import { Dispatcher } from "/js/Modules/Shared/Infrastructure/Components/Dispatcher.js";
 import { SessionStorer } from "/js/Modules/Shared/Infrastructure/Components/SessionStorer.js";
+import { ApplySavedBackendController } from "/js/Modules/Shared/Infrastructure/Controllers/ApplySavedBackendController.js";
 import { ChangeBackendController } from "/js/Modules/Shared/Infrastructure/Controllers/ChangeBackendController.js";
 import { ChangeLanguageController } from "/js/Modules/Shared/Infrastructure/Controllers/ChangeLanguageController.js";
 import { ShowRequestProgressController } from "/js/Modules/Shared/Infrastructure/Controllers/ShowRequestProgressController.js";
@@ -44,7 +45,7 @@ const start = async function () {
     ].forEach((controller) => controller.getInstance().init());
 
     const config = await ConfigReaderJsonRepository.getInstance().getConfig();
-    ChangeBackendController.getInstance().applySavedBackend(config.backends);
+    ApplySavedBackendController.getInstance().invoke(config.backends);
 
     // la sesion guardada se revalida contra la API (el token pudo rotarse o el usuario borrarse)
     const apiToken = SessionStorer.getInstance().getApiToken();

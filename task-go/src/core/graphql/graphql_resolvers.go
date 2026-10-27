@@ -20,8 +20,18 @@ import (
 // resolversByType los controllers GraphQL de la peticion en curso (el getResolversByType() de task-php): viajan en
 // el context porque el schema se construye una sola vez por proceso.
 type resolversByType struct {
-	usersGraphqlController *userscontrollers.UsersGraphqlController
-	tasksGraphqlController *taskscontrollers.TasksGraphqlController
+	listUsersApiController              *userscontrollers.ListUsersApiController
+	getUserApiController                *userscontrollers.GetUserApiController
+	createUserApiController             *userscontrollers.CreateUserApiController
+	logInUserApiController              *userscontrollers.LogInUserApiController
+	updateUserApiController             *userscontrollers.UpdateUserApiController
+	deleteUserApiController             *userscontrollers.DeleteUserApiController
+	regenerateUserApiTokenApiController *userscontrollers.RegenerateUserApiTokenApiController
+	searchTasksApiController            *taskscontrollers.SearchTasksApiController
+	getTaskApiController                *taskscontrollers.GetTaskApiController
+	createTaskApiController             *taskscontrollers.CreateTaskApiController
+	updateTaskApiController             *taskscontrollers.UpdateTaskApiController
+	deleteTaskApiController             *taskscontrollers.DeleteTaskApiController
 }
 
 type resolversByTypeKey struct{}
@@ -85,11 +95,11 @@ type (
 )
 
 // rootResolver tipos Query y Mutation de schema.graphql: cada campo pasa sus argumentos, como el $args de task-php,
-// al controller GraphQL de su modulo.
+// al controller de su caso de uso (uno por campo: <CasoDeUso>ApiController.Invoke).
 type rootResolver struct{}
 
 func (r *rootResolver) Users(ctx context.Context) ([]*userResolver, error) {
-	users, err := getResolversByType(ctx).usersGraphqlController.GetUsers()
+	users, err := getResolversByType(ctx).listUsersApiController.Invoke()
 	if err != nil {
 		return nil, err
 	}
@@ -101,7 +111,7 @@ func (r *rootResolver) Users(ctx context.Context) ([]*userResolver, error) {
 }
 
 func (r *rootResolver) User(ctx context.Context, args userUuidArgs) (*userResolver, error) {
-	user, err := getResolversByType(ctx).usersGraphqlController.GetUser(map[string]any{
+	user, err := getResolversByType(ctx).getUserApiController.Invoke(map[string]any{
 		usersenums.UsersKeyEnum.USER_UUID: string(args.UserUuid),
 	})
 	if err != nil {
@@ -111,24 +121,24 @@ func (r *rootResolver) User(ctx context.Context, args userUuidArgs) (*userResolv
 }
 
 func (r *rootResolver) Tasks(ctx context.Context, args tasksArgs) (*taskPageResolver, error) {
-	return getTaskPageResolver(getResolversByType(ctx).tasksGraphqlController.SearchTasks("", args.toArgs()))
+	return getTaskPageResolver(getResolversByType(ctx).searchTasksApiController.Invoke("", args.toArgs()))
 }
 
 func (r *rootResolver) Task(ctx context.Context, args taskUuidArgs) (*taskResolver, error) {
-	return getTaskResolver(getResolversByType(ctx).tasksGraphqlController.GetTask(map[string]any{
+	return getTaskResolver(getResolversByType(ctx).getTaskApiController.Invoke(map[string]any{
 		tasksenums.TasksKeyEnum.TASK_UUID: string(args.TaskUuid),
 	}))
 }
 
 func (r *rootResolver) UserTasks(ctx context.Context, args userTasksArgs) (*taskPageResolver, error) {
-	return getTaskPageResolver(getResolversByType(ctx).tasksGraphqlController.SearchTasks(
+	return getTaskPageResolver(getResolversByType(ctx).searchTasksApiController.Invoke(
 		string(args.UserUuid),
 		tasksArgs{Filter: args.Filter, Page: args.Page, PageSize: args.PageSize}.toArgs(),
 	))
 }
 
 func (r *rootResolver) CreateUser(ctx context.Context, args createUserArgs) (*userResolver, error) {
-	return getUserWithApiTokenResolver(getResolversByType(ctx).usersGraphqlController.CreateUser(map[string]any{
+	return getUserWithApiTokenResolver(getResolversByType(ctx).createUserApiController.Invoke(map[string]any{
 		usersenums.UsersKeyEnum.USER_NAME:  args.UserName,
 		usersenums.UsersKeyEnum.USER_EMAIL: args.UserEmail,
 		usersenums.UsersKeyEnum.PASSWORD:   args.Password,
@@ -136,14 +146,14 @@ func (r *rootResolver) CreateUser(ctx context.Context, args createUserArgs) (*us
 }
 
 func (r *rootResolver) LogIn(ctx context.Context, args logInArgs) (*userResolver, error) {
-	return getUserWithApiTokenResolver(getResolversByType(ctx).usersGraphqlController.LogIn(map[string]any{
+	return getUserWithApiTokenResolver(getResolversByType(ctx).logInUserApiController.Invoke(map[string]any{
 		usersenums.UsersKeyEnum.USER_NAME: args.UserName,
 		usersenums.UsersKeyEnum.PASSWORD:  args.Password,
 	}))
 }
 
 func (r *rootResolver) UpdateUser(ctx context.Context, args updateUserArgs) (*userResolver, error) {
-	user, err := getResolversByType(ctx).usersGraphqlController.UpdateUser(map[string]any{
+	user, err := getResolversByType(ctx).updateUserApiController.Invoke(map[string]any{
 		usersenums.UsersKeyEnum.USER_UUID:  string(args.UserUuid),
 		usersenums.UsersKeyEnum.USER_NAME:  args.UserName,
 		usersenums.UsersKeyEnum.USER_EMAIL: args.UserEmail,
@@ -155,7 +165,7 @@ func (r *rootResolver) UpdateUser(ctx context.Context, args updateUserArgs) (*us
 }
 
 func (r *rootResolver) DeleteUser(ctx context.Context, args userUuidArgs) (*deleteUserResultResolver, error) {
-	deleteUserResult, err := getResolversByType(ctx).usersGraphqlController.DeleteUser(map[string]any{
+	deleteUserResult, err := getResolversByType(ctx).deleteUserApiController.Invoke(map[string]any{
 		usersenums.UsersKeyEnum.USER_UUID: string(args.UserUuid),
 	})
 	if err != nil {
@@ -165,7 +175,7 @@ func (r *rootResolver) DeleteUser(ctx context.Context, args userUuidArgs) (*dele
 }
 
 func (r *rootResolver) RegenerateApiToken(ctx context.Context, args userUuidArgs) (*apiTokenResultResolver, error) {
-	apiTokenResult, err := getResolversByType(ctx).usersGraphqlController.RegenerateApiToken(map[string]any{
+	apiTokenResult, err := getResolversByType(ctx).regenerateUserApiTokenApiController.Invoke(map[string]any{
 		usersenums.UsersKeyEnum.USER_UUID: string(args.UserUuid),
 	})
 	if err != nil {
@@ -175,7 +185,7 @@ func (r *rootResolver) RegenerateApiToken(ctx context.Context, args userUuidArgs
 }
 
 func (r *rootResolver) CreateTask(ctx context.Context, args createTaskArgs) (*taskResolver, error) {
-	return getTaskResolver(getResolversByType(ctx).tasksGraphqlController.CreateTask(map[string]any{
+	return getTaskResolver(getResolversByType(ctx).createTaskApiController.Invoke(map[string]any{
 		tasksenums.TasksKeyEnum.TASK_TITLE:       args.TaskTitle,
 		tasksenums.TasksKeyEnum.TASK_STATUS:      args.TaskStatus,
 		tasksenums.TasksKeyEnum.TASK_TYPE:        args.TaskType,
@@ -185,7 +195,7 @@ func (r *rootResolver) CreateTask(ctx context.Context, args createTaskArgs) (*ta
 }
 
 func (r *rootResolver) UpdateTask(ctx context.Context, args updateTaskArgs) (*taskResolver, error) {
-	return getTaskResolver(getResolversByType(ctx).tasksGraphqlController.UpdateTask(map[string]any{
+	return getTaskResolver(getResolversByType(ctx).updateTaskApiController.Invoke(map[string]any{
 		tasksenums.TasksKeyEnum.TASK_UUID:        string(args.TaskUuid),
 		tasksenums.TasksKeyEnum.TASK_TITLE:       args.TaskTitle,
 		tasksenums.TasksKeyEnum.TASK_STATUS:      args.TaskStatus,
@@ -196,7 +206,7 @@ func (r *rootResolver) UpdateTask(ctx context.Context, args updateTaskArgs) (*ta
 }
 
 func (r *rootResolver) DeleteTask(ctx context.Context, args taskUuidArgs) (*deleteTaskResultResolver, error) {
-	deleteTaskResult, err := getResolversByType(ctx).tasksGraphqlController.DeleteTask(map[string]any{
+	deleteTaskResult, err := getResolversByType(ctx).deleteTaskApiController.Invoke(map[string]any{
 		tasksenums.TasksKeyEnum.TASK_UUID: string(args.TaskUuid),
 	})
 	if err != nil {
@@ -254,7 +264,7 @@ func (u *userResolver) ApiToken() *string {
 
 // Tasks User.tasks: las tasks paginadas de ese usuario (el resolver de tipo User de task-php).
 func (u *userResolver) Tasks(ctx context.Context, args tasksArgs) (*taskPageResolver, error) {
-	return getTaskPageResolver(getResolversByType(ctx).tasksGraphqlController.SearchTasks(u.user.UserUuid, args.toArgs()))
+	return getTaskPageResolver(getResolversByType(ctx).searchTasksApiController.Invoke(u.user.UserUuid, args.toArgs()))
 }
 
 func getUserWithApiTokenResolver(user *usersentities.UserWithApiTokenPrimitives, err error) (*userResolver, error) {
