@@ -1,10 +1,11 @@
 import type { Route } from "#app/Core/Boot/ApiRouter.ts";
-import { GraphqlController } from "#app/Core/Graphql/GraphqlController.ts";
 
 import { ChangelogController } from "#app/Modules/Open/Documentation/Infrastructure/Controllers/ChangelogController.ts";
 import { DocumentationController } from "#app/Modules/Open/Documentation/Infrastructure/Controllers/DocumentationController.ts";
 import { HealthController } from "#app/Modules/Shared/Infrastructure/Controllers/HealthController.ts";
 import { LogInUserRestController } from "#app/Modules/Users/Infrastructure/Controllers/LogInUserRestController.ts";
+
+import { GraphqlController } from "#app/Modules/Graphql/Infrastructure/Controllers/GraphqlController.ts";
 
 /**
  * Rutas de la API (ApiRouter). "url" con tags ":nombre" -> argumento con ese nombre para el controller.
@@ -24,7 +25,7 @@ export function getRoutes(): Route[] {
         //@auth
         { url: "/api/v1/log-in", controller: () => LogInUserRestController.getInstance().logIn(), allowed: ["post"] },
 
-        //@graphql (schema en src/Core/Graphql/schema.graphql)
+        //@graphql (cada modulo se registra en src/Core/config/graphqlSchema.ts con su XxxGraphqlSchemaProvider)
         { url: "/graphql", controller: () => GraphqlController.getInstance().execute(), allowed: ["post"] },
     ];
 }

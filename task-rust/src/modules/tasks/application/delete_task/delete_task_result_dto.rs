@@ -22,7 +22,7 @@ impl DeleteTaskResultDto {
         self.affected
     }
 
-    /// tipo DeleteTaskResult de schema.graphql.
+    /// tipo DeleteTaskResult de tasks.graphql.
     pub fn to_array(&self) -> Value {
         json!({
             TasksKeyEnum::TASK_UUID: self.task_uuid,

@@ -44,7 +44,7 @@ impl SearchTasksResultDto {
         self.total_pages
     }
 
-    /// tipo TaskPage de schema.graphql.
+    /// tipo TaskPage de tasks.graphql.
     pub fn to_array(&self) -> Value {
         json!({
             TasksKeyEnum::ITEMS: self.tasks,

@@ -1,5 +1,5 @@
 import type { Primitives } from "#app/Modules/Shared/Application/Primitives.ts";
-import { AbstractGraphqlController } from "#app/Modules/Shared/Infrastructure/Controllers/AbstractGraphqlController.ts";
+import { AbstractGraphqlController } from "#app/Modules/Graphql/Infrastructure/Controllers/AbstractGraphqlController.ts";
 import { getThrowable } from "#app/Modules/Shared/Infrastructure/Exceptions/InterfaceException.ts";
 
 import { UsersKeyEnum } from "#app/Modules/Users/Domain/Enums/UsersKeyEnum.ts";
@@ -8,7 +8,7 @@ import { LogInUserService } from "#app/Modules/Users/Application/LogInUser/LogIn
 import { UsersException } from "#app/Modules/Users/Domain/Exceptions/UsersException.ts";
 
 /**
- * Mutation logIn (src/Core/Graphql/schema.graphql). Publico (sin token): user_name + password -> el usuario con un
+ * Mutation logIn (src/Modules/Users/Infrastructure/Providers/users.graphql). Publico (sin token): user_name + password -> el usuario con un
  * api_token nuevo. El mismo caso de uso que POST /api/v1/log-in (LogInUserRestController).
  */
 export class LogInUserGraphqlController extends AbstractGraphqlController {

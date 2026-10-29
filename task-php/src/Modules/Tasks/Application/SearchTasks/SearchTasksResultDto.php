@@ -56,7 +56,7 @@ final readonly class SearchTasksResultDto
     }
 
     /**
-     * Tipo TaskPage de schema.graphql.
+     * Tipo TaskPage de tasks.graphql.
      */
     public function toArray(): array
     {

@@ -7,7 +7,7 @@ use Throwable;
 
 use GraphQL\Error\Error;
 
-use App\Modules\Shared\Infrastructure\Controllers\AbstractGraphqlController;
+use App\Modules\Graphql\Infrastructure\Controllers\AbstractGraphqlController;
 use App\Modules\Shared\Infrastructure\Exceptions\FieldsException;
 
 use App\Modules\Users\Domain\Enums\UsersKeyEnum;
@@ -16,7 +16,7 @@ use App\Modules\Users\Application\CreateUser\CreateUserService;
 use App\Modules\Users\Domain\Exceptions\UsersException;
 
 /**
- * Mutation createUser (src/Core/Graphql/schema.graphql): alta abierta (sin token), devuelve el primer api_token.
+ * Mutation createUser (src/Modules/Users/Infrastructure/Providers/users.graphql): alta abierta (sin token), devuelve el primer api_token.
  */
 final class CreateUserGraphqlController extends AbstractGraphqlController
 {

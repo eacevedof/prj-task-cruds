@@ -1,5 +1,5 @@
 import type { Primitives } from "#app/Modules/Shared/Application/Primitives.ts";
-import { AbstractGraphqlController } from "#app/Modules/Shared/Infrastructure/Controllers/AbstractGraphqlController.ts";
+import { AbstractGraphqlController } from "#app/Modules/Graphql/Infrastructure/Controllers/AbstractGraphqlController.ts";
 import { getThrowable } from "#app/Modules/Shared/Infrastructure/Exceptions/InterfaceException.ts";
 import { FieldsException } from "#app/Modules/Shared/Infrastructure/Exceptions/FieldsException.ts";
 
@@ -9,7 +9,7 @@ import { CreateUserService } from "#app/Modules/Users/Application/CreateUser/Cre
 import { UsersException } from "#app/Modules/Users/Domain/Exceptions/UsersException.ts";
 
 /**
- * Mutation createUser (src/Core/Graphql/schema.graphql): alta abierta (sin token), devuelve el primer api_token.
+ * Mutation createUser (src/Modules/Users/Infrastructure/Providers/users.graphql): alta abierta (sin token), devuelve el primer api_token.
  */
 export class CreateUserGraphqlController extends AbstractGraphqlController {
 

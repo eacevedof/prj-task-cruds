@@ -2,8 +2,9 @@ package modules.tasks.infrastructure.controllers;
 
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.shared.infrastructure.exceptions.FieldsException;
 import modules.tasks.application.searchtasks.SearchTasksDto;
 import modules.tasks.application.searchtasks.SearchTasksService;
@@ -15,7 +16,8 @@ import modules.users.domain.exceptions.UsersException;
 import static modules.shared.application.Primitives.getValueOrDefault;
 
 /**
- * Query tasks (userUuid "") y userTasks / User.tasks (src/core/graphql/schema.graphql): busqueda paginada con filtros.
+ * Query tasks (src/modules/tasks/infrastructure/providers/tasks.graphql): las tasks del usuario autenticado, paginadas y
+ * con filtros. Las de un usuario concreto (userTasks, User.tasks) van por SearchTasksByUserGraphqlController.
  * El 401 de la autenticacion llega como UsersException.
  */
 public final class SearchTasksGraphqlController extends AbstractGraphqlController {
@@ -32,7 +34,7 @@ public final class SearchTasksGraphqlController extends AbstractGraphqlControlle
      * args: {filter?: {task_text?, task_status?, task_type?, target_date_from?, target_date_to?}, page?, page_size?}
      * @throws graphql.GraphqlErrorException
      */
-    public Map<String, Object> invoke(String userUuid, Map<String, Object> args) {
+    public Map<String, Object> invoke(Map<String, Object> args) {
         try {
             Map<String, Object> filter = Primitives.getPrimitives(args.get(TasksKeyEnum.FILTER));
             return SearchTasksService.getInstance().invoke(
@@ -40,7 +42,6 @@ public final class SearchTasksGraphqlController extends AbstractGraphqlControlle
                     httpRequest.getMetadata(),
                     getAuthUserOrFail(),
                     Primitives.of(
-                        "userUuid", userUuid,
                         "taskText", getValueOrDefault(filter, TasksKeyEnum.TASK_TEXT, ""),
                         "taskStatus", getValueOrDefault(filter, TasksKeyEnum.TASK_STATUS, ""),
                         "taskType", getValueOrDefault(filter, TasksKeyEnum.TASK_TYPE, ""),

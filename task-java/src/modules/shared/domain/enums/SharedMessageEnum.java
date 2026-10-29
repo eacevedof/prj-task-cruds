@@ -7,7 +7,6 @@ public final class SharedMessageEnum {
 
     public static final String AN_UNEXPECTED_ERROR_HAS_OCCURRED = "An unexpected error has occurred";
     public static final String FIELDS_VALIDATION_ERRORS = "Fields validation errors";
-    public static final String GRAPHQL_QUERY_IS_REQUIRED = "GraphQL query is required";
 
     private SharedMessageEnum() {
     }

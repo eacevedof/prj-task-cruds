@@ -7,7 +7,7 @@ use Throwable;
 
 use GraphQL\Error\Error;
 
-use App\Modules\Shared\Infrastructure\Controllers\AbstractGraphqlController;
+use App\Modules\Graphql\Infrastructure\Controllers\AbstractGraphqlController;
 
 use App\Modules\Users\Domain\Enums\UsersKeyEnum;
 use App\Modules\Users\Application\LogInUser\LogInUserDto;
@@ -15,7 +15,7 @@ use App\Modules\Users\Application\LogInUser\LogInUserService;
 use App\Modules\Users\Domain\Exceptions\UsersException;
 
 /**
- * Mutation logIn (src/Core/Graphql/schema.graphql). Publico (sin token): user_name + password -> el usuario con un
+ * Mutation logIn (src/Modules/Users/Infrastructure/Providers/users.graphql). Publico (sin token): user_name + password -> el usuario con un
  * api_token nuevo. El mismo caso de uso que POST /api/v1/log-in (LogInUserRestController).
  */
 final class LogInUserGraphqlController extends AbstractGraphqlController

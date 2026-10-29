@@ -3,21 +3,21 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	"task-go/src/modules/users/application/deleteuser"
 	"task-go/src/modules/users/domain/enums"
 	"task-go/src/modules/users/domain/exceptions"
 )
 
-// DeleteUserGraphqlController mutation deleteUser(user_uuid) (src/core/graphql/schema.graphql). Exige Bearer.
+// DeleteUserGraphqlController mutation deleteUser(user_uuid) (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
 type DeleteUserGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func DeleteUserGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *DeleteUserGraphqlController {
-	return &DeleteUserGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &DeleteUserGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 func (c *DeleteUserGraphqlController) Invoke(args map[string]any) (*deleteuser.DeleteUserResultPrimitives, error) {

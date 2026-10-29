@@ -3,23 +3,23 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	"task-go/src/modules/users/application/loginuser"
 	"task-go/src/modules/users/domain/entities"
 	"task-go/src/modules/users/domain/enums"
 	"task-go/src/modules/users/domain/exceptions"
 )
 
-// LogInUserGraphqlController mutation logIn (src/core/graphql/schema.graphql). Publico (sin token): user_name + password
+// LogInUserGraphqlController mutation logIn (src/modules/users/infrastructure/providers/users.graphql). Publico (sin token): user_name + password
 // -> el usuario con un api_token nuevo. El mismo caso de uso que POST /api/v1/log-in (LogInUserRestController).
 type LogInUserGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func LogInUserGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *LogInUserGraphqlController {
-	return &LogInUserGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &LogInUserGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 func (c *LogInUserGraphqlController) Invoke(args map[string]any) (*entities.UserWithApiTokenPrimitives, error) {

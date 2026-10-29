@@ -1,5 +1,5 @@
 import type { Primitives } from "#app/Modules/Shared/Application/Primitives.ts";
-import { AbstractGraphqlController } from "#app/Modules/Shared/Infrastructure/Controllers/AbstractGraphqlController.ts";
+import { AbstractGraphqlController } from "#app/Modules/Graphql/Infrastructure/Controllers/AbstractGraphqlController.ts";
 import { getThrowable } from "#app/Modules/Shared/Infrastructure/Exceptions/InterfaceException.ts";
 
 import { DeleteTaskDto } from "#app/Modules/Tasks/Application/DeleteTask/DeleteTaskDto.ts";
@@ -10,7 +10,7 @@ import { TasksException } from "#app/Modules/Tasks/Domain/Exceptions/TasksExcept
 import { UsersException } from "#app/Modules/Users/Domain/Exceptions/UsersException.ts";
 
 /**
- * Mutation deleteTask(task_uuid) (src/Core/Graphql/schema.graphql). El 401 de la autenticacion llega como UsersException.
+ * Mutation deleteTask(task_uuid) (src/Modules/Tasks/Infrastructure/Providers/tasks.graphql). El 401 de la autenticacion llega como UsersException.
  */
 export class DeleteTaskGraphqlController extends AbstractGraphqlController {
 

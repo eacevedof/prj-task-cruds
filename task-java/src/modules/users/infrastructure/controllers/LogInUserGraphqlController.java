@@ -2,8 +2,9 @@ package modules.users.infrastructure.controllers;
 
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.users.application.loginuser.LogInUserDto;
 import modules.users.application.loginuser.LogInUserService;
 import modules.users.domain.enums.UsersKeyEnum;
@@ -12,7 +13,7 @@ import modules.users.domain.exceptions.UsersException;
 import static modules.shared.application.Primitives.getValueOrDefault;
 
 /**
- * Mutation logIn (src/core/graphql/schema.graphql). Publico (sin token): user_name + password -> el usuario con un
+ * Mutation logIn (src/modules/users/infrastructure/providers/users.graphql). Publico (sin token): user_name + password -> el usuario con un
  * api_token nuevo. El mismo caso de uso que POST /api/v1/log-in (LogInUserRestController).
  */
 public final class LogInUserGraphqlController extends AbstractGraphqlController {

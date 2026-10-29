@@ -3,9 +3,9 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	sharedexceptions "task-go/src/modules/shared/infrastructure/exceptions"
 	"task-go/src/modules/users/application/updateuser"
 	"task-go/src/modules/users/domain/entities"
@@ -13,13 +13,13 @@ import (
 	"task-go/src/modules/users/domain/exceptions"
 )
 
-// UpdateUserGraphqlController mutation updateUser (src/core/graphql/schema.graphql). Exige Bearer.
+// UpdateUserGraphqlController mutation updateUser (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
 type UpdateUserGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func UpdateUserGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *UpdateUserGraphqlController {
-	return &UpdateUserGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &UpdateUserGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 func (c *UpdateUserGraphqlController) Invoke(args map[string]any) (*entities.UserPrimitives, error) {

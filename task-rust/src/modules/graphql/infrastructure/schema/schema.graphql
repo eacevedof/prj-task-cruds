@@ -1,0 +1,8 @@
+# POST /graphql -- unica API de la app junto al login REST (src/core/routes/routes.rs). Claves en snake_case.
+# Cabecera comun del schema: cada modulo trae su parte (users/infrastructure/providers/users.graphql define Query y
+# Mutation; tasks/infrastructure/providers/tasks.graphql las extiende) y GraphqlSchemaRegistry las une en el orden de
+# src/core/config/graphql_schema.rs.
+# Un error de dominio llega en errors[] con extensions.code = el codigo HTTP equivalente y
+# extensions.errors = el detalle por campo.
+# Auth: "Authorization: Bearer <api_token>" en todo salvo createUser (alta abierta) y logIn. Cada token solo ve y
+# modifica su propio usuario y sus tasks; lo ajeno responde 404 como si no existiera.

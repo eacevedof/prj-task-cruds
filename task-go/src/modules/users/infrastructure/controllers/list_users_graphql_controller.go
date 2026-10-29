@@ -3,21 +3,21 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	"task-go/src/modules/users/application/listusers"
 	"task-go/src/modules/users/domain/entities"
 	"task-go/src/modules/users/domain/exceptions"
 )
 
-// ListUsersGraphqlController query users (src/core/graphql/schema.graphql). Exige Bearer.
+// ListUsersGraphqlController query users (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
 type ListUsersGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func ListUsersGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *ListUsersGraphqlController {
-	return &ListUsersGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &ListUsersGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 func (c *ListUsersGraphqlController) Invoke() ([]entities.UserPrimitives, error) {

@@ -14,7 +14,7 @@ use App\Modules\Users\Domain\Exceptions\UsersException;
 /**
  * Base de todo lo que entra por HTTP: la peticion (HttpRequester), log + mail y la autenticacion por Bearer.
  * Cada protocolo pone encima su forma de responder y de mapear errores: AbstractRestController (envelope JSON con
- * status HTTP) y AbstractGraphqlController (array o GraphQL\Error). El endpoint /graphql (Core) la usa tal cual.
+ * status HTTP) y, en el modulo Graphql, AbstractGraphqlController (array o GraphQL\Error) y el endpoint /graphql.
  */
 abstract class AbstractHttpController
 {

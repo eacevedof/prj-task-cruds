@@ -13,7 +13,6 @@ abstract class SharedMessageEnum
     public const string EMPTY_FIELD_IS_NOT_ALLOWED = "Empty field is not allowed";
     public const string EMPTY_REQUIRED_CODE = "Empty required code";
     public const string FIELDS_VALIDATION_ERRORS = "Fields validation errors";
-    public const string GRAPHQL_QUERY_IS_REQUIRED = "GraphQL query is required";
     public const string INVALID_CSRF_TOKEN = "Invalid CSRF token";
     public const string INVALID_X_FORMAT = "Invalid {0} format";
     public const string IS_NOT_POSSIBLE_TO_RESTORE_ENTITY_X = "Is not possible to restore entity {0}";

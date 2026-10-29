@@ -3,23 +3,23 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	"task-go/src/modules/tasks/application/deletetask"
 	"task-go/src/modules/tasks/domain/enums"
 	"task-go/src/modules/tasks/domain/exceptions"
 	usersexceptions "task-go/src/modules/users/domain/exceptions"
 )
 
-// DeleteTaskGraphqlController mutation deleteTask(task_uuid) (src/core/graphql/schema.graphql). El 401 de la
+// DeleteTaskGraphqlController mutation deleteTask(task_uuid) (src/modules/tasks/infrastructure/providers/tasks.graphql). El 401 de la
 // autenticacion llega como UsersException.
 type DeleteTaskGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func DeleteTaskGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *DeleteTaskGraphqlController {
-	return &DeleteTaskGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &DeleteTaskGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 func (c *DeleteTaskGraphqlController) Invoke(args map[string]any) (*deletetask.DeleteTaskResultPrimitives, error) {

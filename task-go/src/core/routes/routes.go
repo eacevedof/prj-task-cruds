@@ -2,7 +2,7 @@ package routes
 
 import (
 	"task-go/src/core/boot"
-	"task-go/src/core/graphql"
+	"task-go/src/modules/graphql/infrastructure/controllers/graphqlcontroller"
 	documentationcontrollers "task-go/src/modules/open/documentation/infrastructure/controllers"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
 	"task-go/src/modules/shared/infrastructure/components/httpresponder"
@@ -34,9 +34,10 @@ func GetRoutes() []boot.Route {
 			return userscontrollers.LogInUserRestControllerGetInstance(h).LogIn()
 		}},
 
-		//@graphql (schema en src/core/graphql/schema.graphql)
+		//@graphql (schema: src/modules/graphql/infrastructure/schema/schema.graphql + infrastructure/providers/<modulo>.graphql
+		// de cada modulo, en el orden de graphql_schema.go)
 		{Url: "/graphql", Allowed: []string{"post"}, Controller: func(h *httprequester.HttpRequester, args map[string]string) *httpresponder.HttpResponder {
-			return graphql.GraphqlControllerGetInstance(h).Execute()
+			return graphqlcontroller.GraphqlControllerGetInstance(h, GetGraphqlSchemaRegistry()).Execute()
 		}},
 	}
 }

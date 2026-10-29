@@ -7,7 +7,7 @@ use Throwable;
 
 use GraphQL\Error\Error;
 
-use App\Modules\Shared\Infrastructure\Controllers\AbstractGraphqlController;
+use App\Modules\Graphql\Infrastructure\Controllers\AbstractGraphqlController;
 
 use App\Modules\Users\Domain\Exceptions\UsersException;
 
@@ -17,7 +17,7 @@ use App\Modules\Tasks\Application\GetTask\GetTaskService;
 use App\Modules\Tasks\Domain\Exceptions\TasksException;
 
 /**
- * Query task(task_uuid) (src/Core/Graphql/schema.graphql). El 401 de la autenticacion llega como UsersException.
+ * Query task(task_uuid) (src/Modules/Tasks/Infrastructure/Providers/tasks.graphql). El 401 de la autenticacion llega como UsersException.
  */
 final class GetTaskGraphqlController extends AbstractGraphqlController
 {

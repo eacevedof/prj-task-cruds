@@ -1,5 +1,5 @@
 import type { Primitives } from "#app/Modules/Shared/Application/Primitives.ts";
-import { AbstractGraphqlController } from "#app/Modules/Shared/Infrastructure/Controllers/AbstractGraphqlController.ts";
+import { AbstractGraphqlController } from "#app/Modules/Graphql/Infrastructure/Controllers/AbstractGraphqlController.ts";
 import { getThrowable } from "#app/Modules/Shared/Infrastructure/Exceptions/InterfaceException.ts";
 import { FieldsException } from "#app/Modules/Shared/Infrastructure/Exceptions/FieldsException.ts";
 
@@ -11,7 +11,7 @@ import { TasksException } from "#app/Modules/Tasks/Domain/Exceptions/TasksExcept
 import { UsersException } from "#app/Modules/Users/Domain/Exceptions/UsersException.ts";
 
 /**
- * Mutation createTask (src/Core/Graphql/schema.graphql): el dueno es el usuario del token.
+ * Mutation createTask (src/Modules/Tasks/Infrastructure/Providers/tasks.graphql): el dueno es el usuario del token.
  * El 401 de la autenticacion llega como UsersException.
  */
 export class CreateTaskGraphqlController extends AbstractGraphqlController {

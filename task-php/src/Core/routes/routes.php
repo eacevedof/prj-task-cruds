@@ -18,6 +18,6 @@ return [
     //@auth
     ["url" => "/api/v1/log-in", "controller" => "App\Modules\Users\Infrastructure\Controllers\LogInUserRestController", "method" => "logIn", "allowed" => ["post"]],
 
-    //@graphql (schema en src/Core/Graphql/schema.graphql)
-    ["url" => "/graphql", "controller" => "App\Core\Graphql\GraphqlController", "method" => "execute", "allowed" => ["post"]],
+    //@graphql (cada modulo se registra en src/Core/config/graphql_schema.php con su XxxGraphqlSchemaProvider)
+    ["url" => "/graphql", "controller" => "App\Modules\Graphql\Infrastructure\Controllers\GraphqlController", "method" => "execute", "allowed" => ["post"]],
 ];

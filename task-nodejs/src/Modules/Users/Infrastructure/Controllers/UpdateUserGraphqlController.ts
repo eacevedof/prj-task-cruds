@@ -1,5 +1,5 @@
 import type { Primitives } from "#app/Modules/Shared/Application/Primitives.ts";
-import { AbstractGraphqlController } from "#app/Modules/Shared/Infrastructure/Controllers/AbstractGraphqlController.ts";
+import { AbstractGraphqlController } from "#app/Modules/Graphql/Infrastructure/Controllers/AbstractGraphqlController.ts";
 import { getThrowable } from "#app/Modules/Shared/Infrastructure/Exceptions/InterfaceException.ts";
 import { FieldsException } from "#app/Modules/Shared/Infrastructure/Exceptions/FieldsException.ts";
 
@@ -9,7 +9,7 @@ import { UpdateUserService } from "#app/Modules/Users/Application/UpdateUser/Upd
 import { UsersException } from "#app/Modules/Users/Domain/Exceptions/UsersException.ts";
 
 /**
- * Mutation updateUser (src/Core/Graphql/schema.graphql). Exige Bearer.
+ * Mutation updateUser (src/Modules/Users/Infrastructure/Providers/users.graphql). Exige Bearer.
  */
 export class UpdateUserGraphqlController extends AbstractGraphqlController {
 

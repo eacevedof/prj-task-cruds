@@ -7,14 +7,14 @@ use Throwable;
 
 use GraphQL\Error\Error;
 
-use App\Modules\Shared\Infrastructure\Controllers\AbstractGraphqlController;
+use App\Modules\Graphql\Infrastructure\Controllers\AbstractGraphqlController;
 
 use App\Modules\Users\Application\ListUsers\ListUsersDto;
 use App\Modules\Users\Application\ListUsers\ListUsersService;
 use App\Modules\Users\Domain\Exceptions\UsersException;
 
 /**
- * Query users (src/Core/Graphql/schema.graphql). Exige Bearer.
+ * Query users (src/Modules/Users/Infrastructure/Providers/users.graphql). Exige Bearer.
  */
 final class ListUsersGraphqlController extends AbstractGraphqlController
 {

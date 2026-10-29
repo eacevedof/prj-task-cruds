@@ -3,9 +3,9 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	sharedexceptions "task-go/src/modules/shared/infrastructure/exceptions"
 	"task-go/src/modules/users/application/createuser"
 	"task-go/src/modules/users/domain/entities"
@@ -13,14 +13,14 @@ import (
 	"task-go/src/modules/users/domain/exceptions"
 )
 
-// CreateUserGraphqlController mutation createUser (src/core/graphql/schema.graphql): alta abierta (sin token), devuelve
+// CreateUserGraphqlController mutation createUser (src/modules/users/infrastructure/providers/users.graphql): alta abierta (sin token), devuelve
 // el primer api_token.
 type CreateUserGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func CreateUserGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *CreateUserGraphqlController {
-	return &CreateUserGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &CreateUserGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 func (c *CreateUserGraphqlController) Invoke(args map[string]any) (*entities.UserWithApiTokenPrimitives, error) {

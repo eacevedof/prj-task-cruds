@@ -7,7 +7,7 @@ use Throwable;
 
 use GraphQL\Error\Error;
 
-use App\Modules\Shared\Infrastructure\Controllers\AbstractGraphqlController;
+use App\Modules\Graphql\Infrastructure\Controllers\AbstractGraphqlController;
 use App\Modules\Shared\Infrastructure\Exceptions\FieldsException;
 
 use App\Modules\Users\Domain\Enums\UsersKeyEnum;
@@ -16,7 +16,7 @@ use App\Modules\Users\Application\UpdateUser\UpdateUserService;
 use App\Modules\Users\Domain\Exceptions\UsersException;
 
 /**
- * Mutation updateUser (src/Core/Graphql/schema.graphql). Exige Bearer.
+ * Mutation updateUser (src/Modules/Users/Infrastructure/Providers/users.graphql). Exige Bearer.
  */
 final class UpdateUserGraphqlController extends AbstractGraphqlController
 {

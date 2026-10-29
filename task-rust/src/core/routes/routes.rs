@@ -1,5 +1,5 @@
 use crate::core::boot::api_router::Route;
-use crate::core::graphql::graphql_controller::GraphqlController;
+use crate::modules::graphql::infrastructure::controllers::graphql_controller::GraphqlController;
 use crate::modules::open::documentation::infrastructure::controllers::changelog_controller::ChangelogController;
 use crate::modules::open::documentation::infrastructure::controllers::documentation_controller::DocumentationController;
 use crate::modules::shared::infrastructure::controllers::health_controller::HealthController;
@@ -34,7 +34,7 @@ pub fn get_routes() -> Vec<Route> {
             allowed: vec!["post"],
             controller: |http_requester, _args| LogInUserRestController::get_instance(http_requester).log_in(),
         },
-        //@graphql (schema en src/core/graphql/schema.graphql)
+        //@graphql (schema y resolvers: los XxxGraphqlSchemaProvider de src/core/config/graphql_schema.rs)
         Route {
             url: "/graphql",
             allowed: vec!["post"],

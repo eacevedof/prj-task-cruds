@@ -2,8 +2,9 @@ package modules.users.infrastructure.controllers;
 
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.shared.infrastructure.exceptions.FieldsException;
 import modules.users.application.createuser.CreateUserDto;
 import modules.users.application.createuser.CreateUserService;
@@ -13,7 +14,7 @@ import modules.users.domain.exceptions.UsersException;
 import static modules.shared.application.Primitives.getValueOrDefault;
 
 /**
- * Mutation createUser (src/core/graphql/schema.graphql): alta abierta (sin token), devuelve el primer api_token.
+ * Mutation createUser (src/modules/users/infrastructure/providers/users.graphql): alta abierta (sin token), devuelve el primer api_token.
  */
 public final class CreateUserGraphqlController extends AbstractGraphqlController {
 

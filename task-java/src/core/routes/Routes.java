@@ -3,12 +3,13 @@ package core.routes;
 import java.util.List;
 
 import core.boot.ApiRouter.Route;
-import core.graphql.GraphqlController;
 
 import modules.open.documentation.infrastructure.controllers.ChangelogController;
 import modules.open.documentation.infrastructure.controllers.DocumentationController;
 import modules.shared.infrastructure.controllers.HealthController;
 import modules.users.infrastructure.controllers.LogInUserRestController;
+
+import modules.graphql.infrastructure.controllers.GraphqlController;
 
 /**
  * Rutas de la API (ApiRouter). "url" con tags ":nombre" -> argumento con ese nombre para el controller.
@@ -33,7 +34,7 @@ public final class Routes {
             //@auth
             new Route("/api/v1/log-in", args -> LogInUserRestController.getInstance().logIn(), List.of("post")),
 
-            //@graphql (schema en src/core/graphql/schema.graphql)
+            //@graphql (cada modulo se registra en src/core/config/GraphqlSchema.java con su XxxGraphqlSchemaProvider)
             new Route("/graphql", args -> GraphqlController.getInstance().execute(), List.of("post"))
         );
     }

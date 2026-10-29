@@ -2,8 +2,9 @@ package modules.tasks.infrastructure.controllers;
 
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.shared.infrastructure.exceptions.FieldsException;
 import modules.tasks.application.updatetask.UpdateTaskDto;
 import modules.tasks.application.updatetask.UpdateTaskService;
@@ -15,7 +16,7 @@ import modules.users.domain.exceptions.UsersException;
 import static modules.shared.application.Primitives.getValueOrDefault;
 
 /**
- * Mutation updateTask (src/core/graphql/schema.graphql). El 401 de la autenticacion llega como UsersException.
+ * Mutation updateTask (src/modules/tasks/infrastructure/providers/tasks.graphql). El 401 de la autenticacion llega como UsersException.
  */
 public final class UpdateTaskGraphqlController extends AbstractGraphqlController {
 

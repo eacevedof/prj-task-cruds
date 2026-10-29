@@ -1,5 +1,5 @@
 import type { Primitives } from "#app/Modules/Shared/Application/Primitives.ts";
-import { AbstractGraphqlController } from "#app/Modules/Shared/Infrastructure/Controllers/AbstractGraphqlController.ts";
+import { AbstractGraphqlController } from "#app/Modules/Graphql/Infrastructure/Controllers/AbstractGraphqlController.ts";
 import { getThrowable } from "#app/Modules/Shared/Infrastructure/Exceptions/InterfaceException.ts";
 
 import { UsersKeyEnum } from "#app/Modules/Users/Domain/Enums/UsersKeyEnum.ts";
@@ -8,7 +8,7 @@ import { RegenerateUserApiTokenService } from "#app/Modules/Users/Application/Re
 import { UsersException } from "#app/Modules/Users/Domain/Exceptions/UsersException.ts";
 
 /**
- * Mutation regenerateApiToken(user_uuid) (src/Core/Graphql/schema.graphql). Exige Bearer.
+ * Mutation regenerateApiToken(user_uuid) (src/Modules/Users/Infrastructure/Providers/users.graphql). Exige Bearer.
  */
 export class RegenerateUserApiTokenGraphqlController extends AbstractGraphqlController {
 

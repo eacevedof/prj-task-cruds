@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use serde_json::{Value, json};
 
+use crate::modules::graphql::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
+use crate::modules::graphql::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::application::primitives::{Primitives, get_primitives, merge_primitives};
 use crate::modules::shared::infrastructure::components::http_requester::http_requester::HttpRequester;
-use crate::modules::shared::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
-use crate::modules::shared::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::infrastructure::exceptions::fields_exception::FieldsException;
 use crate::modules::shared::infrastructure::exceptions::interface_exception::AppError;
 use crate::modules::tasks::application::search_tasks::search_tasks_dto::SearchTasksDto;
@@ -14,8 +14,9 @@ use crate::modules::tasks::domain::enums::tasks_key_enum::TasksKeyEnum;
 use crate::modules::tasks::domain::exceptions::tasks_exception::TasksException;
 use crate::modules::users::domain::exceptions::users_exception::UsersException;
 
-/// query tasks (user_uuid "") y userTasks / User.tasks (src/core/graphql/schema.graphql): busqueda paginada con
-/// filtros. El 401 de la autenticacion llega como UsersException.
+/// query tasks (src/modules/tasks/infrastructure/providers/tasks.graphql): las tasks del usuario autenticado, paginadas y
+/// con filtros. Las de un usuario concreto (userTasks, User.tasks) van por SearchTasksByUserGraphqlController.
+/// El 401 de la autenticacion llega como UsersException.
 pub struct SearchTasksGraphqlController {
     abstract_graphql_controller: AbstractGraphqlController,
 }
@@ -28,7 +29,7 @@ impl SearchTasksGraphqlController {
     }
 
     /// args {filter?: {task_text?, task_status?, task_type?, target_date_from?, target_date_to?}, page?, page_size?}
-    pub fn invoke(&self, user_uuid: &str, args: &Primitives) -> Result<Value, GraphqlError> {
+    pub fn invoke(&self, args: &Primitives) -> Result<Value, GraphqlError> {
         let log_title = "SearchTasksGraphqlController.Invoke";
         let auth_user_primitives =
             self.get_auth_user_or_fail().map_err(|error| self.get_graphql_error(error, log_title))?;
@@ -38,7 +39,6 @@ impl SearchTasksGraphqlController {
                 &self.get_http_request().get_metadata(),
                 &auth_user_primitives,
                 &get_primitives(json!({
-                    "userUuid": user_uuid,
                     "taskText": filter.get(TasksKeyEnum::TASK_TEXT),
                     "taskStatus": filter.get(TasksKeyEnum::TASK_STATUS),
                     "taskType": filter.get(TasksKeyEnum::TASK_TYPE),

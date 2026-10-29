@@ -1,5 +1,5 @@
-# task-rust: replica 1:1 de task-php (el maestro) en Rust. Mismo contrato GraphQL (src/core/graphql/schema.graphql),
-# mismas migraciones y mismos casos de test.
+# task-rust: replica 1:1 de task-php (el maestro) en Rust. Mismo contrato GraphQL (los mismos .graphql: el schema.graphql
+# de modules/graphql y el <modulo>.graphql de users y tasks), mismas migraciones y mismos casos de test.
 [package]
 name = "task-rust"
 version = "2.0.1"
@@ -25,7 +25,7 @@ path = "cmd/console/main.rs"
 # un binario por test de task-php: cada uno con su propia BD (database/task_cruds_test-<nombre>.sqlite)
 [[test]]
 name = "graphql_controller_test"
-path = "tests/core/graphql/graphql_controller/graphql_controller_test.rs"
+path = "tests/modules/graphql/infrastructure/controllers/graphql_controller/graphql_controller_test.rs"
 
 [[test]]
 name = "log_in_user_rest_controller_test"
@@ -40,7 +40,7 @@ name = "http_request_test"
 path = "tests/modules/shared/infrastructure/components/http/http_request/http_request_test.rs"
 
 [dependencies]
-# servidor GraphQL: esquema dinamico construido desde schema.graphql (el mismo fichero que task-php)
+# servidor GraphQL: esquema dinamico construido desde los .graphql (los mismos ficheros que task-php)
 async-graphql = { version = "7.2.1", default-features = false, features = ["dynamic-schema"] }
 # hash de passwords compatible con PHP ($2y$, coste 12)
 bcrypt = "0.19.3"

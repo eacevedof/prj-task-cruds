@@ -1,5 +1,5 @@
 import type { Primitives } from "#app/Modules/Shared/Application/Primitives.ts";
-import { AbstractGraphqlController } from "#app/Modules/Shared/Infrastructure/Controllers/AbstractGraphqlController.ts";
+import { AbstractGraphqlController } from "#app/Modules/Graphql/Infrastructure/Controllers/AbstractGraphqlController.ts";
 import { getThrowable } from "#app/Modules/Shared/Infrastructure/Exceptions/InterfaceException.ts";
 
 import { ListUsersDto } from "#app/Modules/Users/Application/ListUsers/ListUsersDto.ts";
@@ -7,7 +7,7 @@ import { ListUsersService } from "#app/Modules/Users/Application/ListUsers/ListU
 import { UsersException } from "#app/Modules/Users/Domain/Exceptions/UsersException.ts";
 
 /**
- * Query users (src/Core/Graphql/schema.graphql). Exige Bearer.
+ * Query users (src/Modules/Users/Infrastructure/Providers/users.graphql). Exige Bearer.
  */
 export class ListUsersGraphqlController extends AbstractGraphqlController {
 

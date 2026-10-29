@@ -2,7 +2,7 @@ package deletetask
 
 import "task-go/src/modules/shared/application"
 
-// DeleteTaskResultPrimitives tipo DeleteTaskResult de schema.graphql.
+// DeleteTaskResultPrimitives tipo DeleteTaskResult de tasks.graphql.
 type DeleteTaskResultPrimitives struct {
 	TaskUuid string `json:"task_uuid"`
 	Affected int    `json:"affected"`

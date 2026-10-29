@@ -3,9 +3,9 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	sharedexceptions "task-go/src/modules/shared/infrastructure/exceptions"
 	"task-go/src/modules/tasks/application/updatetask"
 	"task-go/src/modules/tasks/domain/entities"
@@ -14,14 +14,14 @@ import (
 	usersexceptions "task-go/src/modules/users/domain/exceptions"
 )
 
-// UpdateTaskGraphqlController mutation updateTask (src/core/graphql/schema.graphql). El 401 de la autenticacion llega
+// UpdateTaskGraphqlController mutation updateTask (src/modules/tasks/infrastructure/providers/tasks.graphql). El 401 de la autenticacion llega
 // como UsersException.
 type UpdateTaskGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func UpdateTaskGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *UpdateTaskGraphqlController {
-	return &UpdateTaskGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &UpdateTaskGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 func (c *UpdateTaskGraphqlController) Invoke(args map[string]any) (*entities.TaskPrimitives, error) {

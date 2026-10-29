@@ -44,7 +44,7 @@ export class SearchTasksResultDto {
     }
 
     /**
-     * Tipo TaskPage de schema.graphql.
+     * Tipo TaskPage de tasks.graphql.
      */
     toArray(): Primitives {
         return {

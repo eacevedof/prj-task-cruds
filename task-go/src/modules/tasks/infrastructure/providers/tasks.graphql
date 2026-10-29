@@ -1,0 +1,76 @@
+# Parte de tasks del schema de /graphql (la registra TasksGraphqlSchemaProvider): extiende Query, Mutation y
+# User de users.graphql.
+# task_status / task_type van como String: los valores permitidos (TaskStatusEnum / TaskTypeEnum) los valida
+# el dominio, asi no se repiten aqui.
+# Listados de tasks (tasks, userTasks, User.tasks): paginados y filtrables, la mas reciente primero (id desc).
+# page empieza en 1; page_size entre 1 y 100 (20 por defecto).
+
+extend type Query {
+    tasks(filter: TasksFilter, page: Int = 1, page_size: Int = 20): TaskPage
+    task(task_uuid: ID!): Task
+    userTasks(user_uuid: ID!, filter: TasksFilter, page: Int = 1, page_size: Int = 20): TaskPage
+}
+
+extend type Mutation {
+    createTask(
+        task_title: String!
+        task_status: String
+        task_type: String
+        target_date: String
+        task_description: String
+    ): Task
+    updateTask(
+        task_uuid: ID!
+        task_title: String!
+        task_status: String
+        task_type: String
+        target_date: String
+        task_description: String
+    ): Task
+    deleteTask(task_uuid: ID!): DeleteTaskResult
+}
+
+extend type User {
+    tasks(filter: TasksFilter, page: Int = 1, page_size: Int = 20): TaskPage
+}
+
+type Task {
+    "id numerico, solo informativo: para operar se usa task_uuid"
+    task_id: Int!
+    task_uuid: ID!
+    user_uuid: ID!
+    task_title: String!
+    task_status: String!
+    task_type: String!
+    target_date: String
+    task_description: String
+    created_at: String!
+    updated_at: String!
+}
+
+"""
+Filtros de los listados de tasks; los que no vienen (o vacios) no filtran.
+task_text: contenido en titulo o descripcion, sin distinguir mayusculas.
+target_date_from / target_date_to: YYYY-MM-DD, ambos incluidos (una task sin target_date no entra).
+"""
+input TasksFilter {
+    task_text: String
+    task_status: String
+    task_type: String
+    target_date_from: String
+    target_date_to: String
+}
+
+"Una pagina de tasks (id desc)"
+type TaskPage {
+    items: [Task!]!
+    page: Int!
+    page_size: Int!
+    total_items: Int!
+    total_pages: Int!
+}
+
+type DeleteTaskResult {
+    task_uuid: ID!
+    affected: Int!
+}

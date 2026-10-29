@@ -2,7 +2,7 @@ package regenerateuserapitoken
 
 import "task-go/src/modules/shared/application"
 
-// RegenerateUserApiTokenResultPrimitives tipo ApiTokenResult de schema.graphql.
+// RegenerateUserApiTokenResultPrimitives tipo ApiTokenResult de users.graphql.
 type RegenerateUserApiTokenResultPrimitives struct {
 	UserUuid string `json:"user_uuid"`
 	ApiToken string `json:"api_token"`

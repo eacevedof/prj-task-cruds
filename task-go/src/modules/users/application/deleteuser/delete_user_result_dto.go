@@ -2,7 +2,7 @@ package deleteuser
 
 import "task-go/src/modules/shared/application"
 
-// DeleteUserResultPrimitives tipo DeleteUserResult de schema.graphql.
+// DeleteUserResultPrimitives tipo DeleteUserResult de users.graphql.
 type DeleteUserResultPrimitives struct {
 	UserUuid string `json:"user_uuid"`
 	Affected int    `json:"affected"`

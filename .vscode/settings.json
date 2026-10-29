@@ -34,5 +34,6 @@
     "php.validate.run": "onType",
     "intelephense.environment.phpVersion": "8.5.12",
     "java.compile.nullAnalysis.mode": "automatic",
-    "workbench.browser.openLocalhostLinks": false
+    "workbench.browser.openLocalhostLinks": false,
+    "java.configuration.updateBuildConfiguration": "interactive"
 }

@@ -50,7 +50,7 @@ public final class SearchTasksResultDto {
     }
 
     /**
-     * Tipo TaskPage de schema.graphql.
+     * Tipo TaskPage de tasks.graphql.
      */
     public Map<String, Object> toArray() {
         return Primitives.of(

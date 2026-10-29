@@ -1,0 +1,37 @@
+# Parte de users del schema de /graphql (la registra UsersGraphqlSchemaProvider). Define las raices Query y
+# Mutation: los demas modulos las extienden con "extend type".
+
+type Query {
+    users: [User!]!
+    user(user_uuid: ID!): User
+}
+
+type Mutation {
+    "user_name: login unico, 3-50 de letras, digitos, punto, guion bajo y guion. password: 8-72"
+    createUser(user_name: String!, user_email: String!, password: String!): User
+    "devuelve el usuario con un api_token nuevo: el anterior deja de valer"
+    logIn(user_name: String!, password: String!): User
+    updateUser(user_uuid: ID!, user_name: String!, user_email: String!): User
+    deleteUser(user_uuid: ID!): DeleteUserResult
+    regenerateApiToken(user_uuid: ID!): ApiTokenResult
+}
+
+type User {
+    user_uuid: ID!
+    user_name: String!
+    user_email: String!
+    created_at: String!
+    updated_at: String!
+    "solo en createUser y logIn: el token en claro se devuelve una unica vez"
+    api_token: String
+}
+
+type DeleteUserResult {
+    user_uuid: ID!
+    affected: Int!
+}
+
+type ApiTokenResult {
+    user_uuid: ID!
+    api_token: String!
+}

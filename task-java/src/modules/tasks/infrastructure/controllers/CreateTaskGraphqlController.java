@@ -2,8 +2,9 @@ package modules.tasks.infrastructure.controllers;
 
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.shared.infrastructure.exceptions.FieldsException;
 import modules.tasks.application.createtask.CreateTaskDto;
 import modules.tasks.application.createtask.CreateTaskService;
@@ -15,7 +16,7 @@ import modules.users.domain.exceptions.UsersException;
 import static modules.shared.application.Primitives.getValueOrDefault;
 
 /**
- * Mutation createTask (src/core/graphql/schema.graphql): el dueno es el usuario del token.
+ * Mutation createTask (src/modules/tasks/infrastructure/providers/tasks.graphql): el dueno es el usuario del token.
  * El 401 de la autenticacion llega como UsersException.
  */
 public final class CreateTaskGraphqlController extends AbstractGraphqlController {

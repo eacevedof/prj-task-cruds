@@ -2,16 +2,16 @@ use std::sync::Arc;
 
 use serde_json::Value;
 
+use crate::modules::graphql::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
+use crate::modules::graphql::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::application::primitives::merge_primitives;
 use crate::modules::shared::infrastructure::components::http_requester::http_requester::HttpRequester;
-use crate::modules::shared::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
-use crate::modules::shared::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::infrastructure::exceptions::interface_exception::AppError;
 use crate::modules::users::application::list_users::list_users_dto::ListUsersDto;
 use crate::modules::users::application::list_users::list_users_service::ListUsersService;
 use crate::modules::users::domain::exceptions::users_exception::UsersException;
 
-/// query users (src/core/graphql/schema.graphql). Exige Bearer.
+/// query users (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
 pub struct ListUsersGraphqlController {
     abstract_graphql_controller: AbstractGraphqlController,
 }

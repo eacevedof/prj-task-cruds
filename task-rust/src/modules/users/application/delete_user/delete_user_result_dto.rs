@@ -22,7 +22,7 @@ impl DeleteUserResultDto {
         self.affected
     }
 
-    /// tipo DeleteUserResult de schema.graphql.
+    /// tipo DeleteUserResult de users.graphql.
     pub fn to_array(&self) -> Value {
         json!({
             UsersKeyEnum::USER_UUID: self.user_uuid,

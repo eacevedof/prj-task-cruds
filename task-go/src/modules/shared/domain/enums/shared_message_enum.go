@@ -4,9 +4,7 @@ package enums
 var SharedMessageEnum = struct {
 	AN_UNEXPECTED_ERROR_HAS_OCCURRED string
 	FIELDS_VALIDATION_ERRORS         string
-	GRAPHQL_QUERY_IS_REQUIRED        string
 }{
 	AN_UNEXPECTED_ERROR_HAS_OCCURRED: "An unexpected error has occurred",
 	FIELDS_VALIDATION_ERRORS:         "Fields validation errors",
-	GRAPHQL_QUERY_IS_REQUIRED:        "GraphQL query is required",
 }

@@ -2,17 +2,17 @@ use std::sync::Arc;
 
 use serde_json::{Value, json};
 
+use crate::modules::graphql::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
+use crate::modules::graphql::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::application::primitives::{Primitives, get_primitives, merge_primitives};
 use crate::modules::shared::infrastructure::components::http_requester::http_requester::HttpRequester;
-use crate::modules::shared::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
-use crate::modules::shared::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::infrastructure::exceptions::interface_exception::AppError;
 use crate::modules::users::application::delete_user::delete_user_dto::DeleteUserDto;
 use crate::modules::users::application::delete_user::delete_user_service::DeleteUserService;
 use crate::modules::users::domain::enums::users_key_enum::UsersKeyEnum;
 use crate::modules::users::domain::exceptions::users_exception::UsersException;
 
-/// mutation deleteUser(user_uuid) (src/core/graphql/schema.graphql). Exige Bearer.
+/// mutation deleteUser(user_uuid) (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
 pub struct DeleteUserGraphqlController {
     abstract_graphql_controller: AbstractGraphqlController,
 }

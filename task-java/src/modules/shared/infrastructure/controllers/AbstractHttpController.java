@@ -13,7 +13,7 @@ import modules.users.application.authenticateuser.AuthenticateUserService;
 /**
  * Base de todo lo que entra por HTTP: la peticion (HttpRequester), log + mail y la autenticacion por Bearer.
  * Cada protocolo pone encima su forma de responder y de mapear errores: AbstractRestController (envelope JSON con
- * status HTTP) y AbstractGraphqlController (mapa o GraphqlErrorException). El endpoint /graphql (Core) la usa tal cual.
+ * status HTTP) y, en el modulo graphql, AbstractGraphqlController (mapa o GraphqlErrorException) y el endpoint /graphql.
  */
 public abstract class AbstractHttpController {
 

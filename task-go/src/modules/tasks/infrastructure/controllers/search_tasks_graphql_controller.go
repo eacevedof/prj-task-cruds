@@ -3,9 +3,9 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	sharedexceptions "task-go/src/modules/shared/infrastructure/exceptions"
 	"task-go/src/modules/tasks/application/searchtasks"
 	"task-go/src/modules/tasks/domain/enums"
@@ -13,18 +13,19 @@ import (
 	usersexceptions "task-go/src/modules/users/domain/exceptions"
 )
 
-// SearchTasksGraphqlController query tasks (userUuid "") y userTasks / User.tasks (src/core/graphql/schema.graphql):
-// busqueda paginada con filtros. El 401 de la autenticacion llega como UsersException.
+// SearchTasksGraphqlController query tasks (src/modules/tasks/infrastructure/providers/tasks.graphql): las tasks del
+// usuario autenticado, paginadas y con filtros. Las de un usuario concreto (userTasks, User.tasks) van por
+// SearchTasksByUserGraphqlController. El 401 de la autenticacion llega como UsersException.
 type SearchTasksGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func SearchTasksGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *SearchTasksGraphqlController {
-	return &SearchTasksGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &SearchTasksGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 // Invoke args {filter?: {task_text?, task_status?, task_type?, target_date_from?, target_date_to?}, page?, page_size?}
-func (c *SearchTasksGraphqlController) Invoke(userUuid string, args map[string]any) (*searchtasks.SearchTasksResultPrimitives, error) {
+func (c *SearchTasksGraphqlController) Invoke(args map[string]any) (*searchtasks.SearchTasksResultPrimitives, error) {
 	authUserPrimitives, err := c.GetAuthUserOrFail()
 	if err != nil {
 		return nil, c.getGraphqlError(err, "SearchTasksGraphqlController.Invoke")
@@ -35,7 +36,6 @@ func (c *SearchTasksGraphqlController) Invoke(userUuid string, args map[string]a
 			c.GetHttpRequest().GetMetadata(),
 			authUserPrimitives,
 			map[string]any{
-				"userUuid":       userUuid,
 				"taskText":       filter[enums.TasksKeyEnum.TASK_TEXT],
 				"taskStatus":     filter[enums.TasksKeyEnum.TASK_STATUS],
 				"taskType":       filter[enums.TasksKeyEnum.TASK_TYPE],

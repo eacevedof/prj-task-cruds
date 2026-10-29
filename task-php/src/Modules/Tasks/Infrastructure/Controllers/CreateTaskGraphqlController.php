@@ -7,7 +7,7 @@ use Throwable;
 
 use GraphQL\Error\Error;
 
-use App\Modules\Shared\Infrastructure\Controllers\AbstractGraphqlController;
+use App\Modules\Graphql\Infrastructure\Controllers\AbstractGraphqlController;
 use App\Modules\Shared\Infrastructure\Exceptions\FieldsException;
 
 use App\Modules\Users\Domain\Exceptions\UsersException;
@@ -18,7 +18,7 @@ use App\Modules\Tasks\Application\CreateTask\CreateTaskService;
 use App\Modules\Tasks\Domain\Exceptions\TasksException;
 
 /**
- * Mutation createTask (src/Core/Graphql/schema.graphql): el dueno es el usuario del token.
+ * Mutation createTask (src/Modules/Tasks/Infrastructure/Providers/tasks.graphql): el dueno es el usuario del token.
  * El 401 de la autenticacion llega como UsersException.
  */
 final class CreateTaskGraphqlController extends AbstractGraphqlController

@@ -2,8 +2,9 @@ package modules.tasks.infrastructure.controllers;
 
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.tasks.application.gettask.GetTaskDto;
 import modules.tasks.application.gettask.GetTaskService;
 import modules.tasks.domain.enums.TasksKeyEnum;
@@ -14,7 +15,7 @@ import modules.users.domain.exceptions.UsersException;
 import static modules.shared.application.Primitives.getValueOrDefault;
 
 /**
- * Query task(task_uuid) (src/core/graphql/schema.graphql). El 401 de la autenticacion llega como UsersException.
+ * Query task(task_uuid) (src/modules/tasks/infrastructure/providers/tasks.graphql). El 401 de la autenticacion llega como UsersException.
  */
 public final class GetTaskGraphqlController extends AbstractGraphqlController {
 

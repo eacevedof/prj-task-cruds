@@ -3,25 +3,25 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	"task-go/src/modules/users/application/regenerateuserapitoken"
 	"task-go/src/modules/users/domain/enums"
 	"task-go/src/modules/users/domain/exceptions"
 )
 
-// RegenerateUserApiTokenGraphqlController mutation regenerateApiToken(user_uuid) (src/core/graphql/schema.graphql).
+// RegenerateUserApiTokenGraphqlController mutation regenerateApiToken(user_uuid) (src/modules/users/infrastructure/providers/users.graphql).
 // Exige Bearer.
 type RegenerateUserApiTokenGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func RegenerateUserApiTokenGraphqlControllerGetInstance(
 	httpRequester *httprequester.HttpRequester,
 ) *RegenerateUserApiTokenGraphqlController {
 	return &RegenerateUserApiTokenGraphqlController{
-		AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester),
+		AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester),
 	}
 }
 

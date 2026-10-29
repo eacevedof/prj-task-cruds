@@ -7,7 +7,7 @@ use Throwable;
 
 use GraphQL\Error\Error;
 
-use App\Modules\Shared\Infrastructure\Controllers\AbstractGraphqlController;
+use App\Modules\Graphql\Infrastructure\Controllers\AbstractGraphqlController;
 
 use App\Modules\Users\Domain\Enums\UsersKeyEnum;
 use App\Modules\Users\Application\GetUser\GetUserDto;
@@ -15,7 +15,7 @@ use App\Modules\Users\Application\GetUser\GetUserService;
 use App\Modules\Users\Domain\Exceptions\UsersException;
 
 /**
- * Query user(user_uuid) (src/Core/Graphql/schema.graphql). Exige Bearer.
+ * Query user(user_uuid) (src/Modules/Users/Infrastructure/Providers/users.graphql). Exige Bearer.
  */
 final class GetUserGraphqlController extends AbstractGraphqlController
 {

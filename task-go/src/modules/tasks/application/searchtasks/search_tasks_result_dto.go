@@ -5,7 +5,7 @@ import (
 	"task-go/src/modules/tasks/domain/entities"
 )
 
-// SearchTasksResultPrimitives tipo TaskPage de schema.graphql.
+// SearchTasksResultPrimitives tipo TaskPage de tasks.graphql.
 type SearchTasksResultPrimitives struct {
 	Items      []entities.TaskPrimitives `json:"items"`
 	Page       int                       `json:"page"`
@@ -54,7 +54,7 @@ func (d *SearchTasksResultDto) GetTotalPages() int {
 	return d.totalPages
 }
 
-// ToArray tipo TaskPage de schema.graphql.
+// ToArray tipo TaskPage de tasks.graphql.
 func (d *SearchTasksResultDto) ToArray() SearchTasksResultPrimitives {
 	return SearchTasksResultPrimitives{
 		Items:      d.tasks,

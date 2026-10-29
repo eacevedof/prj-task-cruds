@@ -25,7 +25,7 @@ impl RegenerateUserApiTokenResultDto {
         &self.api_token
     }
 
-    /// tipo ApiTokenResult de schema.graphql.
+    /// tipo ApiTokenResult de users.graphql.
     pub fn to_array(&self) -> Value {
         json!({
             UsersKeyEnum::USER_UUID: self.user_uuid,

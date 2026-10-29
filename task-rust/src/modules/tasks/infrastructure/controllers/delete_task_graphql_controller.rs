@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use serde_json::{Value, json};
 
+use crate::modules::graphql::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
+use crate::modules::graphql::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::application::primitives::{Primitives, get_primitives, merge_primitives};
 use crate::modules::shared::infrastructure::components::http_requester::http_requester::HttpRequester;
-use crate::modules::shared::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
-use crate::modules::shared::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::infrastructure::exceptions::interface_exception::AppError;
 use crate::modules::tasks::application::delete_task::delete_task_dto::DeleteTaskDto;
 use crate::modules::tasks::application::delete_task::delete_task_service::DeleteTaskService;
@@ -13,8 +13,8 @@ use crate::modules::tasks::domain::enums::tasks_key_enum::TasksKeyEnum;
 use crate::modules::tasks::domain::exceptions::tasks_exception::TasksException;
 use crate::modules::users::domain::exceptions::users_exception::UsersException;
 
-/// mutation deleteTask(task_uuid) (src/core/graphql/schema.graphql). El 401 de la autenticacion llega como
-/// UsersException.
+/// mutation deleteTask(task_uuid) (src/modules/tasks/infrastructure/providers/tasks.graphql). El 401 de la autenticacion
+/// llega como UsersException.
 pub struct DeleteTaskGraphqlController {
     abstract_graphql_controller: AbstractGraphqlController,
 }

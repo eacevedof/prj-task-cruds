@@ -1,7 +1,7 @@
 # tests — ejemplos de llamadas CRUD por GraphQL
 
 Llamadas manuales contra el stack local (`make up`). Copiadas de task-php (mismo contrato) y adaptadas al puerto de task-go (9300).
-Los tests automáticos están en `tests/core/graphql/graphqlcontroller` (`make test f="Graphql"`).
+Los tests automáticos están en `tests/modules/graphql/infrastructure/controllers/graphqlcontroller` (`make test f="Graphql"`).
 
 ## 1 - Antes de empezar
 

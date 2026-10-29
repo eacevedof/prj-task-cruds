@@ -3,14 +3,15 @@ package modules.users.infrastructure.controllers;
 import java.util.List;
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.users.application.listusers.ListUsersDto;
 import modules.users.application.listusers.ListUsersService;
 import modules.users.domain.exceptions.UsersException;
 
 /**
- * Query users (src/core/graphql/schema.graphql). Exige Bearer.
+ * Query users (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
  */
 public final class ListUsersGraphqlController extends AbstractGraphqlController {
 

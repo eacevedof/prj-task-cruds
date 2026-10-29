@@ -2,10 +2,10 @@ use std::sync::Arc;
 
 use serde_json::{Value, json};
 
+use crate::modules::graphql::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
+use crate::modules::graphql::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::application::primitives::{Primitives, get_primitives, merge_primitives};
 use crate::modules::shared::infrastructure::components::http_requester::http_requester::HttpRequester;
-use crate::modules::shared::infrastructure::controllers::abstract_graphql_controller::AbstractGraphqlController;
-use crate::modules::shared::infrastructure::controllers::graphql_error::GraphqlError;
 use crate::modules::shared::infrastructure::exceptions::fields_exception::FieldsException;
 use crate::modules::shared::infrastructure::exceptions::interface_exception::AppError;
 use crate::modules::users::application::create_user::create_user_dto::CreateUserDto;
@@ -13,7 +13,8 @@ use crate::modules::users::application::create_user::create_user_service::Create
 use crate::modules::users::domain::enums::users_key_enum::UsersKeyEnum;
 use crate::modules::users::domain::exceptions::users_exception::UsersException;
 
-/// mutation createUser (src/core/graphql/schema.graphql): alta abierta (sin token), devuelve el primer api_token.
+/// mutation createUser (src/modules/users/infrastructure/providers/users.graphql): alta abierta (sin token), devuelve el
+/// primer api_token.
 pub struct CreateUserGraphqlController {
     abstract_graphql_controller: AbstractGraphqlController,
 }

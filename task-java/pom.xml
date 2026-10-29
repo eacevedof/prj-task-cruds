@@ -21,7 +21,7 @@
     </properties>
 
     <dependencies>
-        <!-- servidor GraphQL sobre el mismo schema.graphql -->
+        <!-- servidor GraphQL sobre los mismos .graphql de task-php -->
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
@@ -57,7 +57,7 @@
     <build>
         <sourceDirectory>src</sourceDirectory>
         <testSourceDirectory>tests</testSourceDirectory>
-        <!-- schema.graphql y los .md de la documentacion viven junto a su clase, como en task-php -->
+        <!-- los .graphql (cabecera en modulo graphql + uno por modulo) y los .md de la documentacion van al classpath desde src/, como en task-php -->
         <resources>
             <resource>
                 <directory>src</directory>

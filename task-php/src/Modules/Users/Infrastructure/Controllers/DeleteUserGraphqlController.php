@@ -7,7 +7,7 @@ use Throwable;
 
 use GraphQL\Error\Error;
 
-use App\Modules\Shared\Infrastructure\Controllers\AbstractGraphqlController;
+use App\Modules\Graphql\Infrastructure\Controllers\AbstractGraphqlController;
 
 use App\Modules\Users\Domain\Enums\UsersKeyEnum;
 use App\Modules\Users\Application\DeleteUser\DeleteUserDto;
@@ -15,7 +15,7 @@ use App\Modules\Users\Application\DeleteUser\DeleteUserService;
 use App\Modules\Users\Domain\Exceptions\UsersException;
 
 /**
- * Mutation deleteUser(user_uuid) (src/Core/Graphql/schema.graphql). Exige Bearer.
+ * Mutation deleteUser(user_uuid) (src/Modules/Users/Infrastructure/Providers/users.graphql). Exige Bearer.
  */
 final class DeleteUserGraphqlController extends AbstractGraphqlController
 {

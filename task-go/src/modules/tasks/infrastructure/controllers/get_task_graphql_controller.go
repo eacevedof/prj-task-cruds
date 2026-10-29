@@ -3,9 +3,9 @@ package controllers
 import (
 	"errors"
 
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	"task-go/src/modules/tasks/application/gettask"
 	"task-go/src/modules/tasks/domain/entities"
 	"task-go/src/modules/tasks/domain/enums"
@@ -13,14 +13,14 @@ import (
 	usersexceptions "task-go/src/modules/users/domain/exceptions"
 )
 
-// GetTaskGraphqlController query task(task_uuid) (src/core/graphql/schema.graphql). El 401 de la autenticacion llega como
+// GetTaskGraphqlController query task(task_uuid) (src/modules/tasks/infrastructure/providers/tasks.graphql). El 401 de la autenticacion llega como
 // UsersException.
 type GetTaskGraphqlController struct {
-	sharedcontrollers.AbstractGraphqlController
+	graphqlcontrollers.AbstractGraphqlController
 }
 
 func GetTaskGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *GetTaskGraphqlController {
-	return &GetTaskGraphqlController{AbstractGraphqlController: sharedcontrollers.NewAbstractGraphqlController(httpRequester)}
+	return &GetTaskGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
 }
 
 func (c *GetTaskGraphqlController) Invoke(args map[string]any) (*entities.TaskPrimitives, error) {

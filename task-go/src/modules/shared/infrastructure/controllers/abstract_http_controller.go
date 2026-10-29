@@ -12,8 +12,8 @@ import (
 
 // AbstractHttpController base de todo lo que entra por HTTP: la peticion (HttpRequester), log + mail y la
 // autenticacion por Bearer. Cada protocolo pone encima su forma de responder y de mapear errores:
-// AbstractRestController (envelope JSON con status HTTP) y AbstractGraphqlController (ResultDto o GraphqlError). El
-// endpoint /graphql (core) la usa tal cual.
+// AbstractRestController (envelope JSON con status HTTP) y, en el modulo graphql, AbstractGraphqlController (ResultDto
+// o GraphqlError) y el endpoint /graphql.
 type AbstractHttpController struct {
 	traits.LogTrait
 	traits.MailTrait

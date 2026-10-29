@@ -2,8 +2,9 @@ package modules.users.infrastructure.controllers;
 
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.users.application.regenerateuserapitoken.RegenerateUserApiTokenDto;
 import modules.users.application.regenerateuserapitoken.RegenerateUserApiTokenService;
 import modules.users.domain.enums.UsersKeyEnum;
@@ -12,7 +13,7 @@ import modules.users.domain.exceptions.UsersException;
 import static modules.shared.application.Primitives.getValueOrDefault;
 
 /**
- * Mutation regenerateApiToken(user_uuid) (src/core/graphql/schema.graphql). Exige Bearer.
+ * Mutation regenerateApiToken(user_uuid) (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
  */
 public final class RegenerateUserApiTokenGraphqlController extends AbstractGraphqlController {
 

@@ -2,8 +2,9 @@ package modules.users.infrastructure.controllers;
 
 import java.util.Map;
 
+import modules.graphql.infrastructure.controllers.AbstractGraphqlController;
+
 import modules.shared.application.Primitives;
-import modules.shared.infrastructure.controllers.AbstractGraphqlController;
 import modules.shared.infrastructure.exceptions.FieldsException;
 import modules.users.application.updateuser.UpdateUserDto;
 import modules.users.application.updateuser.UpdateUserService;
@@ -13,7 +14,7 @@ import modules.users.domain.exceptions.UsersException;
 import static modules.shared.application.Primitives.getValueOrDefault;
 
 /**
- * Mutation updateUser (src/core/graphql/schema.graphql). Exige Bearer.
+ * Mutation updateUser (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
  */
 public final class UpdateUserGraphqlController extends AbstractGraphqlController {
 
