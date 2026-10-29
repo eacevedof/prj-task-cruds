@@ -2,7 +2,7 @@
 # mismas migraciones y mismos casos de test.
 [package]
 name = "task-rust"
-version = "2.0.0"
+version = "2.0.1"
 edition = "2024"
 publish = false
 # binarios y tests declarados abajo: cmd/ como en task-go y los tests con las carpetas de task-php/tests

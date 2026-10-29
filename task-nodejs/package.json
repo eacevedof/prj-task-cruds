@@ -1,6 +1,6 @@
 {
   "name": "task-nodejs",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "task-cruds: to-do list CRUD en DDD, solo API, SQLite (replica en Node.js de task-php)",
   "private": true,
   "license": "UNLICENSED",

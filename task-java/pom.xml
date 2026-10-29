@@ -11,7 +11,7 @@
 
     <groupId>es.eduardoaf</groupId>
     <artifactId>task-java</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1</version>
     <packaging>jar</packaging>
     <description>task-cruds: to-do list CRUD en DDD, solo API, SQLite (replica en Java de task-php)</description>
 

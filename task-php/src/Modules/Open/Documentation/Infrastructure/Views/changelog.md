@@ -2,6 +2,15 @@
 
 ⬅️ [back to the documentation]({{appBaseUrl}}/api/v1)
 
+## 2.0.1
+- Date: 2026-10-29
+
+**Changes:**
+- The documentation moves to `/api/v1` (before `/api/v1/documentation`, which now responds `404`). This changelog is at `/api/v1/changelog`.
+
+**Internal (the contract does not change):**
+- One controller per use case, named after its protocol (`CreateTaskGraphqlController`, `LogInUserRestController`…). Operations, arguments, responses and error codes stay the same.
+
 ## 2.0.0
 - Date: 2026-10-25
 

@@ -17,8 +17,8 @@ use App\Core\Boot\ENV;
 final class EnvironmentReaderRawRepository
 {
     // version publicada en /api/v1: al subirla, anotar el cambio en changelog.md
-    private const string APP_VERSION = "2.0.0";
-    private const string APP_VERSION_UPDATE = "2026-10-25";
+    private const string APP_VERSION = "2.0.1";
+    private const string APP_VERSION_UPDATE = "2026-10-29";
 
     private array $envVars;
     private static ?self $instance = null;

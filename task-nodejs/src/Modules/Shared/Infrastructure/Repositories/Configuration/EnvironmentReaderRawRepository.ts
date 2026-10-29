@@ -4,8 +4,8 @@ import { AppEnvKeyEnum } from "#app/Modules/Shared/Domain/Enums/AppEnvKeyEnum.ts
 
 // version publicada en /api/v1: es la del CONTRATO (la misma que task-php). Al subirla, anotar el cambio en
 // changelog.md
-const APP_VERSION = "2.0.0";
-const APP_VERSION_UPDATE = "2026-10-25";
+const APP_VERSION = "2.0.1";
+const APP_VERSION_UPDATE = "2026-10-29";
 
 let instance: EnvironmentReaderRawRepository | null = null;
 

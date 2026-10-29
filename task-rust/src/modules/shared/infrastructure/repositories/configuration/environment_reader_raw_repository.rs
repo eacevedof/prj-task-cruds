@@ -5,8 +5,8 @@ use crate::modules::shared::domain::enums::app_env_key_enum::AppEnvKeyEnum;
 
 /// version publicada en /api/v1: es la del CONTRATO (la misma que task-php). Al subirla, anotar el cambio en
 /// changelog.md
-pub const APP_VERSION: &str = "2.0.0";
-pub const APP_VERSION_UPDATE: &str = "2026-10-25";
+pub const APP_VERSION: &str = "2.0.1";
+pub const APP_VERSION_UPDATE: &str = "2026-10-29";
 
 /// fuente UNICA de lectura de entorno: un getter semantico por cada clave del .env que la app consume (claves en
 /// AppEnvKeyEnum). El .env lo carga appboot_loadenv() (core/config) en el entorno del proceso antes del primer
