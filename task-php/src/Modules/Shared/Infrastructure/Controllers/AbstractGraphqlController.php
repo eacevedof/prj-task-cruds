@@ -11,44 +11,14 @@ use GraphQL\Error\Error;
 use App\Modules\Shared\Domain\Enums\ExceptionEnum;
 use App\Modules\Shared\Domain\Enums\GraphqlEnum;
 use App\Modules\Shared\Domain\Enums\SharedMessageEnum;
-use App\Modules\Shared\Infrastructure\Components\HttpRequester\HttpRequester;
-use App\Modules\Shared\Infrastructure\Traits\LogTrait;
-use App\Modules\Shared\Infrastructure\Traits\MailTrait;
-
-use App\Modules\Users\Application\AuthenticateUser\AuthenticateUserDto;
-use App\Modules\Users\Application\AuthenticateUser\AuthenticateUserService;
-use App\Modules\Users\Domain\Exceptions\UsersException;
 
 /**
- * Base de los resolvers GraphQL de cada modulo: son controllers (construyen el DTO, llaman al servicio y
- * capturan), pero en vez de un HttpResponder devuelven el array del ResultDto o lanzan un Error de GraphQL.
- * Los Error se crean sin $previous: con el graphql-php ocultaria el mensaje al cliente.
+ * Base de los resolvers GraphQL de cada modulo (XxxGraphqlController): son controllers (construyen el DTO, llaman
+ * al servicio y capturan), pero en vez de un HttpResponder devuelven el array del ResultDto o lanzan un Error de
+ * GraphQL. Los Error se crean sin $previous: con el graphql-php ocultaria el mensaje al cliente.
  */
-abstract class AbstractGraphqlController
+abstract class AbstractGraphqlController extends AbstractHttpController
 {
-    use LogTrait, MailTrait;
-
-    protected readonly HttpRequester $httpRequest;
-
-    public function __construct()
-    {
-        $this->httpRequest = HttpRequester::getInstance();
-    }
-
-    /**
-     * Se llama DENTRO del try del resolver: el 401 lo mapea su catch como cualquier 4xx.
-     * @throws UsersException
-     */
-    protected function getAuthUserOrFail(): array
-    {
-        return AuthenticateUserService::getInstance()->__invoke(
-            AuthenticateUserDto::fromPrimitives([
-                "apiToken" => $this->httpRequest->getBearerToken(),
-                ...$this->httpRequest->getMetadata(),
-            ])
-        )->toAuthPrimitives();
-    }
-
     /**
      * Excepcion controlada (de dominio o FieldsException), capturada por su nombre: su codigo 4xx va en
      * extensions.code y su mensaje en extensions.errors (una FieldsException ya trae en el mensaje el detalle por campo).

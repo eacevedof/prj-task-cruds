@@ -11,11 +11,11 @@ import (
 
 // HealthController GET /health
 type HealthController struct {
-	AbstractApiController
+	AbstractRestController
 }
 
 func HealthControllerGetInstance(httpRequester *httprequester.HttpRequester) *HealthController {
-	return &HealthController{AbstractApiController: NewAbstractApiController(httpRequester)}
+	return &HealthController{AbstractRestController: NewAbstractRestController(httpRequester)}
 }
 
 func (c *HealthController) Index() *httpresponder.HttpResponder {

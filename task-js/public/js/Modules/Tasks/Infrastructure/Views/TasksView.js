@@ -64,6 +64,7 @@ export class TasksView {
         this.#elements.formTask.addEventListener("keydown", (event) => this.#onTaskFormKeydown(event));
         this.#elements.buttonCancelTask.addEventListener("click", () => this.resetForm());
         this.#elements.tbodyTasks.addEventListener("click", (event) => this.#onTasksTableClick(event));
+        this.#elements.formFilters.addEventListener("submit", (event) => this.#onFiltersSubmit(event));
         this.#elements.inputFilterTaskText.addEventListener("input", () => this.#onTextFilterInput());
         this.#elements.inputFilterTargetDateFrom.addEventListener("change", () => this.#dispatchListTasks(TasksPaginationEnum.FIRST_PAGE));
         this.#elements.inputFilterTargetDateTo.addEventListener("change", () => this.#dispatchListTasks(TasksPaginationEnum.FIRST_PAGE));
@@ -189,6 +190,7 @@ export class TasksView {
             inputTargetDate: document.getElementById("input-target-date"),
             textareaTaskDescription: document.getElementById("textarea-task-description"),
             buttonCancelTask: document.getElementById("button-cancel-task"),
+            formFilters: document.getElementById("form-filters"),
             inputFilterTaskText: document.getElementById("input-filter-task-text"),
             inputFilterTargetDateFrom: document.getElementById("input-filter-target-date-from"),
             inputFilterTargetDateTo: document.getElementById("input-filter-target-date-to"),
@@ -310,6 +312,16 @@ export class TasksView {
         this.#elements.h2TaskForm.textContent = this.#editingTaskId
             ? this.#translator.getText(TasksTextEnum.FORM_TITLE_UPDATE, { taskId: this.#editingTaskId })
             : this.#translator.getText(TasksTextEnum.FORM_TITLE_CREATE);
+    }
+
+    /**
+     * Enter en un filtro o la tool search_tasks de WebMCP (la IA rellena los campos y envia sin pasar por
+     * input/change): busca ya, sin esperar al debounce del texto.
+     */
+    #onFiltersSubmit(event) {
+        event.preventDefault();
+        clearTimeout(this.#textFilterTimeoutId);
+        this.#dispatchListTasks(TasksPaginationEnum.FIRST_PAGE);
     }
 
     #onTextFilterInput() {

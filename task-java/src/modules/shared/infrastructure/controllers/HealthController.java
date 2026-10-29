@@ -9,7 +9,7 @@ import modules.shared.infrastructure.components.httpresponder.HttpResponder;
 /**
  * GET /health
  */
-public final class HealthController extends AbstractApiController {
+public final class HealthController extends AbstractRestController {
 
     public static HealthController getInstance() {
         return new HealthController();

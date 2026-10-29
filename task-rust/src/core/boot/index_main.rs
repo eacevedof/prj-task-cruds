@@ -13,9 +13,8 @@ use crate::modules::shared::domain::enums::exception_enum::ExceptionEnum;
 use crate::modules::shared::infrastructure::components::http_requester::http_requester::{HttpRequest, HttpRequester};
 use crate::modules::shared::infrastructure::components::http_responder::http_responder::HttpResponder;
 use crate::modules::shared::infrastructure::components::uuid::uuid_generator::UuidGenerator;
-use crate::modules::shared::infrastructure::controllers::abstract_api_controller::{
-    get_json_encoded, get_json_envelope,
-};
+use crate::modules::shared::infrastructure::controllers::abstract_http_controller::get_json_encoded;
+use crate::modules::shared::infrastructure::controllers::abstract_rest_controller::get_json_envelope;
 use crate::modules::shared::infrastructure::exceptions::interface_exception::get_panic_error;
 use crate::modules::shared::infrastructure::repositories::configuration::environment_reader_raw_repository::EnvironmentReaderRawRepository;
 

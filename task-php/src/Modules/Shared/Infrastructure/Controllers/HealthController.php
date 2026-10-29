@@ -11,7 +11,7 @@ use App\Modules\Shared\Infrastructure\Components\HttpResponder\HttpResponder;
 /**
  * GET /health
  */
-final class HealthController extends AbstractApiController
+final class HealthController extends AbstractRestController
 {
     public function index(): HttpResponder
     {

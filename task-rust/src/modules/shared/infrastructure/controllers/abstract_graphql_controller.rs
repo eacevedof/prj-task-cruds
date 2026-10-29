@@ -4,39 +4,26 @@ use std::sync::Arc;
 use serde_json::json;
 
 use crate::core::config::tr;
-use crate::modules::shared::application::primitives::Primitives;
 use crate::modules::shared::domain::enums::exception_enum::ExceptionEnum;
 use crate::modules::shared::domain::enums::graphql_enum::GraphqlEnum;
 use crate::modules::shared::domain::enums::shared_message_enum::SharedMessageEnum;
 use crate::modules::shared::infrastructure::components::http_requester::http_requester::HttpRequester;
-use crate::modules::shared::infrastructure::controllers::abstract_api_controller::get_auth_user_or_fail;
+use crate::modules::shared::infrastructure::controllers::abstract_http_controller::AbstractHttpController;
 use crate::modules::shared::infrastructure::controllers::graphql_error::GraphqlError;
-use crate::modules::shared::infrastructure::exceptions::interface_exception::{AppResult, InterfaceException};
-use crate::modules::shared::infrastructure::traits::log_trait::LogTrait;
-use crate::modules::shared::infrastructure::traits::mail_trait::MailTrait;
+use crate::modules::shared::infrastructure::exceptions::interface_exception::InterfaceException;
 
-/// base de los resolvers GraphQL de cada modulo: son controllers (construyen el DTO, llaman al servicio y distinguen
-/// el error), pero en vez de un HttpResponder devuelven el ResultDto o un GraphqlError.
+/// base de los resolvers GraphQL de cada modulo (XxxGraphqlController): son controllers (construyen el DTO, llaman
+/// al servicio y distinguen el error), pero en vez de un HttpResponder devuelven el ResultDto o un GraphqlError.
 #[derive(Debug, Clone)]
 pub struct AbstractGraphqlController {
-    pub log_trait: LogTrait,
-    pub mail_trait: MailTrait,
-    http_request: Arc<HttpRequester>,
+    abstract_http_controller: AbstractHttpController,
 }
+
+extends!(AbstractGraphqlController, abstract_http_controller, AbstractHttpController);
 
 impl AbstractGraphqlController {
     pub fn new(http_requester: Arc<HttpRequester>) -> Self {
-        let log_trait = LogTrait::new(Some(Arc::clone(&http_requester)));
-        Self { mail_trait: MailTrait::new(log_trait.clone()), log_trait, http_request: http_requester }
-    }
-
-    pub fn get_http_request(&self) -> &HttpRequester {
-        &self.http_request
-    }
-
-    /// se llama DENTRO del resolver: el 401 (UsersException) lo mapea su rama de error como cualquier 4xx.
-    pub fn get_auth_user_or_fail(&self) -> AppResult<Primitives> {
-        get_auth_user_or_fail(&self.http_request)
+        Self { abstract_http_controller: AbstractHttpController::new(http_requester) }
     }
 
     /// excepcion controlada (de dominio o FieldsException), distinguida por su tipo: su codigo 4xx va en

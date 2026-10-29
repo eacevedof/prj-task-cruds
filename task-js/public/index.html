@@ -81,29 +81,32 @@
 
         <details id="details-task-form" class="card">
             <summary id="h2-task-form" data-i18n="tasks.form.title_create">New task</summary>
-            <form id="form-task">
+            <!-- WebMCP (API declarativa): toolname/tooldescription convierten el form en una tool para la IA del
+                 navegador; cada campo con name es un parametro (required, options del select y label o
+                 toolparamdescription forman su esquema). Sin toolautosubmit: la IA rellena y el usuario guarda. -->
+            <form id="form-task" toolname="save_task" tooldescription="Create a new task for the logged-in user. If a task is being edited (the form title shows its id), it saves the changes to that task instead.">
                 <input type="hidden" id="hidden-task-uuid">
 
                 <label for="input-task-title" data-i18n="tasks.form.task_title">Title</label>
-                <input type="text" id="input-task-title" maxlength="150" required>
+                <input type="text" id="input-task-title" name="task_title" maxlength="150" required toolparamdescription="Short title of the task (required, at most 150 characters)">
 
                 <div class="grid-3">
                     <div>
                         <label for="select-task-status" data-i18n="tasks.form.task_status">Status</label>
-                        <select id="select-task-status"></select>
+                        <select id="select-task-status" name="task_status"></select>
                     </div>
                     <div>
                         <label for="select-task-type" data-i18n="tasks.form.task_type">Type</label>
-                        <select id="select-task-type"></select>
+                        <select id="select-task-type" name="task_type"></select>
                     </div>
                     <div>
                         <label for="input-target-date" data-i18n="tasks.form.target_date">Target date</label>
-                        <input type="date" id="input-target-date" required>
+                        <input type="date" id="input-target-date" name="target_date" required toolparamdescription="Due date of the task, format YYYY-MM-DD (required)">
                     </div>
                 </div>
 
                 <label for="textarea-task-description" data-i18n="tasks.form.task_description">Description</label>
-                <textarea id="textarea-task-description" maxlength="2000" rows="3"></textarea>
+                <textarea id="textarea-task-description" name="task_description" maxlength="2000" rows="3" toolparamdescription="Optional details of the task (at most 2000 characters)"></textarea>
 
                 <div class="actions">
                     <button type="submit" data-i18n="tasks.form.save">Save</button>
@@ -115,23 +118,24 @@
         <div class="card">
             <h2><span data-i18n="tasks.list.title">My tasks</span> <span id="span-tasks-count" class="count"></span></h2>
 
-            <div class="filters">
+            <!-- form (y no div) para que sea la tool search_tasks de WebMCP; solo lee, asi que se envia sola -->
+            <form id="form-filters" class="filters" toolname="search_tasks" tooldescription="Search the tasks of the logged-in user by text and target date range. Empty fields mean no filter. The matching tasks are shown in the table." toolautosubmit>
                 <div>
                     <label for="input-filter-task-text" data-i18n="tasks.filters.text">Search</label>
-                    <input type="search" id="input-filter-task-text" data-i18n-placeholder="tasks.filters.text_placeholder" placeholder="Title or description">
+                    <input type="search" id="input-filter-task-text" name="task_text" data-i18n-placeholder="tasks.filters.text_placeholder" placeholder="Title or description" toolparamdescription="Text to look for in the title or the description (optional)">
                 </div>
                 <div>
                     <label for="input-filter-target-date-from" data-i18n="tasks.filters.date_from">Target date from</label>
-                    <input type="date" id="input-filter-target-date-from">
+                    <input type="date" id="input-filter-target-date-from" name="target_date_from" toolparamdescription="Earliest target date, format YYYY-MM-DD (optional)">
                 </div>
                 <div>
                     <label for="input-filter-target-date-to" data-i18n="tasks.filters.date_to">Target date to</label>
-                    <input type="date" id="input-filter-target-date-to">
+                    <input type="date" id="input-filter-target-date-to" name="target_date_to" toolparamdescription="Latest target date, format YYYY-MM-DD (optional)">
                 </div>
                 <div class="filters-actions">
                     <button type="button" id="button-clear-filters" class="secondary" data-i18n="tasks.filters.clear">Clear filters</button>
                 </div>
-            </div>
+            </form>
 
             <p id="p-tasks-empty" class="hint hidden"></p>
             <table id="table-tasks" class="hidden">
@@ -186,12 +190,13 @@
     <section id="section-account" data-screen="account" class="hidden">
         <div id="div-account-message" class="message hidden"></div>
 
-        <form id="form-account" class="card">
+        <!-- WebMCP: la IA rellena y el usuario guarda. Login y alta no son tools: llevan password -->
+        <form id="form-account" class="card" toolname="update_account" tooldescription="Change the user name and/or the email of the logged-in user. Both fields are sent: keep the current value of the one that does not change.">
             <h2 data-i18n="account.title">My account</h2>
             <label for="input-account-user-name" data-i18n="account.user_name">User name</label>
-            <input type="text" id="input-account-user-name" autocomplete="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9._\-]+" autocapitalize="off" spellcheck="false" required>
+            <input type="text" id="input-account-user-name" name="user_name" autocomplete="username" minlength="3" maxlength="50" pattern="[A-Za-z0-9._\-]+" autocapitalize="off" spellcheck="false" required toolparamdescription="Login name: 3 to 50 letters, digits, dot, underscore or hyphen (required)">
             <label for="input-account-user-email" data-i18n="account.user_email">Email</label>
-            <input type="email" id="input-account-user-email" maxlength="150" required>
+            <input type="email" id="input-account-user-email" name="user_email" maxlength="150" required toolparamdescription="Email address, at most 150 characters (required)">
             <button type="submit" data-i18n="account.save">Save</button>
         </form>
 

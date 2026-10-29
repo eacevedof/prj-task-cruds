@@ -5,34 +5,17 @@ import (
 	"task-go/src/modules/shared/domain/enums"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
 	"task-go/src/modules/shared/infrastructure/exceptions"
-	"task-go/src/modules/shared/infrastructure/traits"
 )
 
-// AbstractGraphqlController base de los resolvers GraphQL de cada modulo: son controllers (construyen el DTO, llaman
-// al servicio y distinguen el error), pero en vez de un HttpResponder devuelven el ResultDto o un GraphqlError.
+// AbstractGraphqlController base de los resolvers GraphQL de cada modulo (XxxGraphqlController): son controllers
+// (construyen el DTO, llaman al servicio y distinguen el error), pero en vez de un HttpResponder devuelven el
+// ResultDto o un GraphqlError.
 type AbstractGraphqlController struct {
-	traits.LogTrait
-	traits.MailTrait
-	httpRequest *httprequester.HttpRequester
+	AbstractHttpController
 }
 
 func NewAbstractGraphqlController(httpRequester *httprequester.HttpRequester) AbstractGraphqlController {
-	logTrait := traits.NewLogTrait(httpRequester)
-	return AbstractGraphqlController{
-		LogTrait:    logTrait,
-		MailTrait:   traits.NewMailTrait(logTrait),
-		httpRequest: httpRequester,
-	}
-}
-
-func (c *AbstractGraphqlController) GetHttpRequest() *httprequester.HttpRequester {
-	return c.httpRequest
-}
-
-// GetAuthUserOrFail se llama DENTRO del resolver: el 401 (UsersException) lo mapea su rama de error como
-// cualquier 4xx.
-func (c *AbstractGraphqlController) GetAuthUserOrFail() (map[string]any, error) {
-	return getAuthUserOrFail(c.httpRequest)
+	return AbstractGraphqlController{AbstractHttpController: NewAbstractHttpController(httpRequester)}
 }
 
 // GetGraphqlDomainError excepcion controlada (de dominio o FieldsException), distinguida por su tipo: su codigo 4xx

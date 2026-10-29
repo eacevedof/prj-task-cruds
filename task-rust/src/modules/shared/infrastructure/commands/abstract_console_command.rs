@@ -16,7 +16,7 @@ use crate::modules::shared::infrastructure::traits::mail_trait::MailTrait;
 pub const EXIT_CODE_DOMAIN_ERROR: i32 = 1;
 pub const EXIT_CODE_INFRASTRUCTURE_ERROR: i32 = 2;
 
-/// el AbstractApiController de la consola (vault: CLI Commands as Controllers): lee --clave=valor, imprime el
+/// el AbstractHttpController de la consola (vault: CLI Commands as Controllers): lee --clave=valor, imprime el
 /// ResultDto en JSON por stdout (sin color: se puede pasar a jq) y los errores en rojo por stderr con su codigo de
 /// salida.
 /// 0 ok · 1 error de dominio (lo que en HTTP es un 4xx) · 2 error de infraestructura (el 500, se loguea).

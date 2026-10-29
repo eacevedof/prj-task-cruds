@@ -16,7 +16,7 @@ return [
     ["url" => "/api/v1/changelog", "controller" => "App\Modules\Open\Documentation\Infrastructure\Controllers\ChangelogController", "method" => "show", "allowed" => ["get"]],
 
     //@auth
-    ["url" => "/api/v1/log-in", "controller" => "App\Modules\Users\Infrastructure\Controllers\LogInUserController", "method" => "logIn", "allowed" => ["post"]],
+    ["url" => "/api/v1/log-in", "controller" => "App\Modules\Users\Infrastructure\Controllers\LogInUserRestController", "method" => "logIn", "allowed" => ["post"]],
 
     //@graphql (schema en src/Core/Graphql/schema.graphql)
     ["url" => "/graphql", "controller" => "App\Core\Graphql\GraphqlController", "method" => "execute", "allowed" => ["post"]],

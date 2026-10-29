@@ -28,8 +28,8 @@ name = "graphql_controller_test"
 path = "tests/core/graphql/graphql_controller/graphql_controller_test.rs"
 
 [[test]]
-name = "log_in_user_controller_test"
-path = "tests/modules/users/infrastructure/controllers/log_in_user_controller/log_in_user_controller_test.rs"
+name = "log_in_user_rest_controller_test"
+path = "tests/modules/users/infrastructure/controllers/log_in_user_rest_controller/log_in_user_rest_controller_test.rs"
 
 [[test]]
 name = "documentation_controller_test"

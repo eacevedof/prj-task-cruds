@@ -35,36 +35,36 @@ var (
 // La respuesta es la de GraphQL ({data, errors}), no el envelope REST: un error de dominio va en
 // errors[].extensions (ver AbstractGraphqlController) con status 200, como manda GraphQL sobre HTTP.
 type GraphqlController struct {
-	controllers.AbstractApiController
-	listUsersApiController              *userscontrollers.ListUsersApiController
-	getUserApiController                *userscontrollers.GetUserApiController
-	createUserApiController             *userscontrollers.CreateUserApiController
-	logInUserApiController              *userscontrollers.LogInUserApiController
-	updateUserApiController             *userscontrollers.UpdateUserApiController
-	deleteUserApiController             *userscontrollers.DeleteUserApiController
-	regenerateUserApiTokenApiController *userscontrollers.RegenerateUserApiTokenApiController
-	searchTasksApiController            *taskscontrollers.SearchTasksApiController
-	getTaskApiController                *taskscontrollers.GetTaskApiController
-	createTaskApiController             *taskscontrollers.CreateTaskApiController
-	updateTaskApiController             *taskscontrollers.UpdateTaskApiController
-	deleteTaskApiController             *taskscontrollers.DeleteTaskApiController
+	controllers.AbstractHttpController
+	listUsersGraphqlController              *userscontrollers.ListUsersGraphqlController
+	getUserGraphqlController                *userscontrollers.GetUserGraphqlController
+	createUserGraphqlController             *userscontrollers.CreateUserGraphqlController
+	logInUserGraphqlController              *userscontrollers.LogInUserGraphqlController
+	updateUserGraphqlController             *userscontrollers.UpdateUserGraphqlController
+	deleteUserGraphqlController             *userscontrollers.DeleteUserGraphqlController
+	regenerateUserApiTokenGraphqlController *userscontrollers.RegenerateUserApiTokenGraphqlController
+	searchTasksGraphqlController            *taskscontrollers.SearchTasksGraphqlController
+	getTaskGraphqlController                *taskscontrollers.GetTaskGraphqlController
+	createTaskGraphqlController             *taskscontrollers.CreateTaskGraphqlController
+	updateTaskGraphqlController             *taskscontrollers.UpdateTaskGraphqlController
+	deleteTaskGraphqlController             *taskscontrollers.DeleteTaskGraphqlController
 }
 
 func GraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *GraphqlController {
 	return &GraphqlController{
-		AbstractApiController:               controllers.NewAbstractApiController(httpRequester),
-		listUsersApiController:              userscontrollers.ListUsersApiControllerGetInstance(httpRequester),
-		getUserApiController:                userscontrollers.GetUserApiControllerGetInstance(httpRequester),
-		createUserApiController:             userscontrollers.CreateUserApiControllerGetInstance(httpRequester),
-		logInUserApiController:              userscontrollers.LogInUserApiControllerGetInstance(httpRequester),
-		updateUserApiController:             userscontrollers.UpdateUserApiControllerGetInstance(httpRequester),
-		deleteUserApiController:             userscontrollers.DeleteUserApiControllerGetInstance(httpRequester),
-		regenerateUserApiTokenApiController: userscontrollers.RegenerateUserApiTokenApiControllerGetInstance(httpRequester),
-		searchTasksApiController:            taskscontrollers.SearchTasksApiControllerGetInstance(httpRequester),
-		getTaskApiController:                taskscontrollers.GetTaskApiControllerGetInstance(httpRequester),
-		createTaskApiController:             taskscontrollers.CreateTaskApiControllerGetInstance(httpRequester),
-		updateTaskApiController:             taskscontrollers.UpdateTaskApiControllerGetInstance(httpRequester),
-		deleteTaskApiController:             taskscontrollers.DeleteTaskApiControllerGetInstance(httpRequester),
+		AbstractHttpController:                  controllers.NewAbstractHttpController(httpRequester),
+		listUsersGraphqlController:              userscontrollers.ListUsersGraphqlControllerGetInstance(httpRequester),
+		getUserGraphqlController:                userscontrollers.GetUserGraphqlControllerGetInstance(httpRequester),
+		createUserGraphqlController:             userscontrollers.CreateUserGraphqlControllerGetInstance(httpRequester),
+		logInUserGraphqlController:              userscontrollers.LogInUserGraphqlControllerGetInstance(httpRequester),
+		updateUserGraphqlController:             userscontrollers.UpdateUserGraphqlControllerGetInstance(httpRequester),
+		deleteUserGraphqlController:             userscontrollers.DeleteUserGraphqlControllerGetInstance(httpRequester),
+		regenerateUserApiTokenGraphqlController: userscontrollers.RegenerateUserApiTokenGraphqlControllerGetInstance(httpRequester),
+		searchTasksGraphqlController:            taskscontrollers.SearchTasksGraphqlControllerGetInstance(httpRequester),
+		getTaskGraphqlController:                taskscontrollers.GetTaskGraphqlControllerGetInstance(httpRequester),
+		createTaskGraphqlController:             taskscontrollers.CreateTaskGraphqlControllerGetInstance(httpRequester),
+		updateTaskGraphqlController:             taskscontrollers.UpdateTaskGraphqlControllerGetInstance(httpRequester),
+		deleteTaskGraphqlController:             taskscontrollers.DeleteTaskGraphqlControllerGetInstance(httpRequester),
 	}
 }
 
@@ -89,18 +89,18 @@ func (c *GraphqlController) Execute() (httpResponder *httpresponder.HttpResponde
 
 	executionResult := getSchema().Exec(
 		context.WithValue(context.Background(), resolversByTypeKey{}, &resolversByType{
-			listUsersApiController:              c.listUsersApiController,
-			getUserApiController:                c.getUserApiController,
-			createUserApiController:             c.createUserApiController,
-			logInUserApiController:              c.logInUserApiController,
-			updateUserApiController:             c.updateUserApiController,
-			deleteUserApiController:             c.deleteUserApiController,
-			regenerateUserApiTokenApiController: c.regenerateUserApiTokenApiController,
-			searchTasksApiController:            c.searchTasksApiController,
-			getTaskApiController:                c.getTaskApiController,
-			createTaskApiController:             c.createTaskApiController,
-			updateTaskApiController:             c.updateTaskApiController,
-			deleteTaskApiController:             c.deleteTaskApiController,
+			listUsersGraphqlController:              c.listUsersGraphqlController,
+			getUserGraphqlController:                c.getUserGraphqlController,
+			createUserGraphqlController:             c.createUserGraphqlController,
+			logInUserGraphqlController:              c.logInUserGraphqlController,
+			updateUserGraphqlController:             c.updateUserGraphqlController,
+			deleteUserGraphqlController:             c.deleteUserGraphqlController,
+			regenerateUserApiTokenGraphqlController: c.regenerateUserApiTokenGraphqlController,
+			searchTasksGraphqlController:            c.searchTasksGraphqlController,
+			getTaskGraphqlController:                c.getTaskGraphqlController,
+			createTaskGraphqlController:             c.createTaskGraphqlController,
+			updateTaskGraphqlController:             c.updateTaskGraphqlController,
+			deleteTaskGraphqlController:             c.deleteTaskGraphqlController,
 		}),
 		query,
 		c.GetHttpRequest().GetPostString(enums.GraphqlEnum.KEY_OPERATION_NAME),

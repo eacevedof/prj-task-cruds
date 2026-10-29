@@ -31,7 +31,7 @@ func GetRoutes() []boot.Route {
 
 		//@auth
 		{Url: "/api/v1/log-in", Allowed: []string{"post"}, Controller: func(h *httprequester.HttpRequester, args map[string]string) *httpresponder.HttpResponder {
-			return userscontrollers.LogInUserControllerGetInstance(h).LogIn()
+			return userscontrollers.LogInUserRestControllerGetInstance(h).LogIn()
 		}},
 
 		//@graphql (schema en src/core/graphql/schema.graphql)

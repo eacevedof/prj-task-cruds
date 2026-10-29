@@ -15,22 +15,22 @@ use crate::modules::shared::domain::enums::graphql_enum::GraphqlEnum;
 use crate::modules::shared::domain::enums::shared_message_enum::SharedMessageEnum;
 use crate::modules::shared::infrastructure::components::http_requester::http_requester::HttpRequester;
 use crate::modules::shared::infrastructure::components::http_responder::http_responder::HttpResponder;
-use crate::modules::shared::infrastructure::controllers::abstract_api_controller::{
-    AbstractApiController, get_json_encoded,
+use crate::modules::shared::infrastructure::controllers::abstract_http_controller::{
+    AbstractHttpController, get_json_encoded,
 };
 use crate::modules::shared::infrastructure::exceptions::interface_exception::get_panic_error;
-use crate::modules::tasks::infrastructure::controllers::create_task_api_controller::CreateTaskApiController;
-use crate::modules::tasks::infrastructure::controllers::delete_task_api_controller::DeleteTaskApiController;
-use crate::modules::tasks::infrastructure::controllers::get_task_api_controller::GetTaskApiController;
-use crate::modules::tasks::infrastructure::controllers::search_tasks_api_controller::SearchTasksApiController;
-use crate::modules::tasks::infrastructure::controllers::update_task_api_controller::UpdateTaskApiController;
-use crate::modules::users::infrastructure::controllers::create_user_api_controller::CreateUserApiController;
-use crate::modules::users::infrastructure::controllers::delete_user_api_controller::DeleteUserApiController;
-use crate::modules::users::infrastructure::controllers::get_user_api_controller::GetUserApiController;
-use crate::modules::users::infrastructure::controllers::list_users_api_controller::ListUsersApiController;
-use crate::modules::users::infrastructure::controllers::log_in_user_api_controller::LogInUserApiController;
-use crate::modules::users::infrastructure::controllers::regenerate_user_api_token_api_controller::RegenerateUserApiTokenApiController;
-use crate::modules::users::infrastructure::controllers::update_user_api_controller::UpdateUserApiController;
+use crate::modules::tasks::infrastructure::controllers::create_task_graphql_controller::CreateTaskGraphqlController;
+use crate::modules::tasks::infrastructure::controllers::delete_task_graphql_controller::DeleteTaskGraphqlController;
+use crate::modules::tasks::infrastructure::controllers::get_task_graphql_controller::GetTaskGraphqlController;
+use crate::modules::tasks::infrastructure::controllers::search_tasks_graphql_controller::SearchTasksGraphqlController;
+use crate::modules::tasks::infrastructure::controllers::update_task_graphql_controller::UpdateTaskGraphqlController;
+use crate::modules::users::infrastructure::controllers::create_user_graphql_controller::CreateUserGraphqlController;
+use crate::modules::users::infrastructure::controllers::delete_user_graphql_controller::DeleteUserGraphqlController;
+use crate::modules::users::infrastructure::controllers::get_user_graphql_controller::GetUserGraphqlController;
+use crate::modules::users::infrastructure::controllers::list_users_graphql_controller::ListUsersGraphqlController;
+use crate::modules::users::infrastructure::controllers::log_in_user_graphql_controller::LogInUserGraphqlController;
+use crate::modules::users::infrastructure::controllers::regenerate_user_api_token_graphql_controller::RegenerateUserApiTokenGraphqlController;
+use crate::modules::users::infrastructure::controllers::update_user_graphql_controller::UpdateUserGraphqlController;
 
 const SCHEMA_GRAPHQL: &str = include_str!("schema.graphql");
 
@@ -44,15 +44,15 @@ static SCHEMA: OnceLock<Schema> = OnceLock::new();
 /// La respuesta es la de GraphQL ({errors?, data}), no el envelope REST: un error de dominio va en errors[].extensions
 /// (ver AbstractGraphqlController) con status 200, como manda GraphQL sobre HTTP.
 pub struct GraphqlController {
-    abstract_api_controller: AbstractApiController,
+    abstract_http_controller: AbstractHttpController,
     http_requester: Arc<HttpRequester>,
 }
 
-extends!(GraphqlController, abstract_api_controller, AbstractApiController);
+extends!(GraphqlController, abstract_http_controller, AbstractHttpController);
 
 impl GraphqlController {
     pub fn get_instance(http_requester: Arc<HttpRequester>) -> Self {
-        Self { abstract_api_controller: AbstractApiController::new(Arc::clone(&http_requester)), http_requester }
+        Self { abstract_http_controller: AbstractHttpController::new(Arc::clone(&http_requester)), http_requester }
     }
 
     pub fn execute(&self) -> HttpResponder {
@@ -89,20 +89,22 @@ impl GraphqlController {
     /// un controller por caso de uso (el constructor de task-php), todos con el HttpRequester de la peticion.
     fn get_resolvers_by_type(&self) -> ResolversByType {
         ResolversByType {
-            list_users_api_controller: ListUsersApiController::get_instance(Arc::clone(&self.http_requester)),
-            get_user_api_controller: GetUserApiController::get_instance(Arc::clone(&self.http_requester)),
-            create_user_api_controller: CreateUserApiController::get_instance(Arc::clone(&self.http_requester)),
-            log_in_user_api_controller: LogInUserApiController::get_instance(Arc::clone(&self.http_requester)),
-            update_user_api_controller: UpdateUserApiController::get_instance(Arc::clone(&self.http_requester)),
-            delete_user_api_controller: DeleteUserApiController::get_instance(Arc::clone(&self.http_requester)),
-            regenerate_user_api_token_api_controller: RegenerateUserApiTokenApiController::get_instance(Arc::clone(
+            list_users_graphql_controller: ListUsersGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            get_user_graphql_controller: GetUserGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            create_user_graphql_controller: CreateUserGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            log_in_user_graphql_controller: LogInUserGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            update_user_graphql_controller: UpdateUserGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            delete_user_graphql_controller: DeleteUserGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            regenerate_user_api_token_graphql_controller: RegenerateUserApiTokenGraphqlController::get_instance(
+                Arc::clone(&self.http_requester),
+            ),
+            search_tasks_graphql_controller: SearchTasksGraphqlController::get_instance(Arc::clone(
                 &self.http_requester,
             )),
-            search_tasks_api_controller: SearchTasksApiController::get_instance(Arc::clone(&self.http_requester)),
-            get_task_api_controller: GetTaskApiController::get_instance(Arc::clone(&self.http_requester)),
-            create_task_api_controller: CreateTaskApiController::get_instance(Arc::clone(&self.http_requester)),
-            update_task_api_controller: UpdateTaskApiController::get_instance(Arc::clone(&self.http_requester)),
-            delete_task_api_controller: DeleteTaskApiController::get_instance(Arc::clone(&self.http_requester)),
+            get_task_graphql_controller: GetTaskGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            create_task_graphql_controller: CreateTaskGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            update_task_graphql_controller: UpdateTaskGraphqlController::get_instance(Arc::clone(&self.http_requester)),
+            delete_task_graphql_controller: DeleteTaskGraphqlController::get_instance(Arc::clone(&self.http_requester)),
         }
     }
 

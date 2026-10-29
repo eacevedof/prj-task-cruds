@@ -3,7 +3,7 @@ use crate::core::graphql::graphql_controller::GraphqlController;
 use crate::modules::open::documentation::infrastructure::controllers::changelog_controller::ChangelogController;
 use crate::modules::open::documentation::infrastructure::controllers::documentation_controller::DocumentationController;
 use crate::modules::shared::infrastructure::controllers::health_controller::HealthController;
-use crate::modules::users::infrastructure::controllers::log_in_user_controller::LogInUserController;
+use crate::modules::users::infrastructure::controllers::log_in_user_rest_controller::LogInUserRestController;
 
 /// rutas de la API (ApiRouter). Url con tags ":nombre" -> args con ese nombre para el controller.
 /// allowed: metodos HTTP en minusculas (HEAD va implicito en GET).
@@ -32,7 +32,7 @@ pub fn get_routes() -> Vec<Route> {
         Route {
             url: "/api/v1/log-in",
             allowed: vec!["post"],
-            controller: |http_requester, _args| LogInUserController::get_instance(http_requester).log_in(),
+            controller: |http_requester, _args| LogInUserRestController::get_instance(http_requester).log_in(),
         },
         //@graphql (schema en src/core/graphql/schema.graphql)
         Route {

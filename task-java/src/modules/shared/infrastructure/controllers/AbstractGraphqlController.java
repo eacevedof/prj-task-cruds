@@ -1,7 +1,6 @@
 package modules.shared.infrastructure.controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import graphql.GraphqlErrorException;
 
@@ -9,45 +8,16 @@ import modules.shared.application.Primitives;
 import modules.shared.domain.enums.ExceptionEnum;
 import modules.shared.domain.enums.GraphqlEnum;
 import modules.shared.domain.enums.SharedMessageEnum;
-import modules.shared.infrastructure.components.httprequester.HttpRequester;
 import modules.shared.infrastructure.exceptions.InterfaceException;
-import modules.shared.infrastructure.traits.LogTrait;
-import modules.shared.infrastructure.traits.MailTrait;
-
-import modules.users.application.authenticateuser.AuthenticateUserDto;
-import modules.users.application.authenticateuser.AuthenticateUserService;
 
 import static core.config.Global.__;
 
 /**
- * Base de los resolvers GraphQL de cada modulo: son controllers (construyen el DTO, llaman al servicio y
- * capturan), pero en vez de un HttpResponder devuelven el mapa del ResultDto o lanzan un GraphqlErrorException.
- * Su mensaje y sus extensions son lo que ve el cliente (GraphqlController le pone path y locations).
+ * Base de los resolvers GraphQL de cada modulo (XxxGraphqlController): son controllers (construyen el DTO, llaman
+ * al servicio y capturan), pero en vez de un HttpResponder devuelven el mapa del ResultDto o lanzan un
+ * GraphqlErrorException. Su mensaje y sus extensions son lo que ve el cliente (GraphqlController le pone path y locations).
  */
-public abstract class AbstractGraphqlController {
-
-    protected final HttpRequester httpRequest;
-    protected final LogTrait logTrait;
-    protected final MailTrait mailTrait;
-
-    protected AbstractGraphqlController() {
-        this.httpRequest = HttpRequester.getInstance();
-        this.logTrait = LogTrait.getInstance();
-        this.mailTrait = MailTrait.getInstance();
-    }
-
-    /**
-     * Se llama DENTRO del try del resolver: el 401 lo mapea su catch como cualquier 4xx.
-     * @throws modules.users.domain.exceptions.UsersException
-     */
-    protected Map<String, Object> getAuthUserOrFail() {
-        return AuthenticateUserService.getInstance().invoke(
-            AuthenticateUserDto.fromPrimitives(Primitives.merge(
-                Primitives.of("apiToken", httpRequest.getBearerToken()),
-                httpRequest.getMetadata()
-            ))
-        ).toAuthPrimitives();
-    }
+public abstract class AbstractGraphqlController extends AbstractHttpController {
 
     /**
      * Excepcion controlada (de dominio o FieldsException), distinguida por su clase: su codigo 4xx va en

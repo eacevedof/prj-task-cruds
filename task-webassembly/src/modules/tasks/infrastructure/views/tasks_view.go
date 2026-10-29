@@ -51,6 +51,7 @@ type tasksElements struct {
 	inputTargetDate           js.Value
 	textareaTaskDescription   js.Value
 	buttonCancelTask          js.Value
+	formFilters               js.Value
 	inputFilterTaskText       js.Value
 	inputFilterTargetDateFrom js.Value
 	inputFilterTargetDateTo   js.Value
@@ -112,6 +113,7 @@ func (v *TasksView) Init() {
 	v.addListener(v.elements.formTask, "keydown", v.onTaskFormKeydown)
 	v.addListener(v.elements.buttonCancelTask, "click", func(js.Value) { v.ResetForm() })
 	v.addListener(v.elements.tbodyTasks, "click", v.onTasksTableClick)
+	v.addListener(v.elements.formFilters, "submit", v.onFiltersSubmit)
 	v.addListener(v.elements.inputFilterTaskText, "input", func(js.Value) { v.onTextFilterInput() })
 	v.addListener(v.elements.inputFilterTargetDateFrom, "change", func(js.Value) {
 		v.dispatchListTasks(enums.TasksPaginationEnum.FIRST_PAGE)
@@ -233,6 +235,7 @@ func (v *TasksView) loadElements() {
 		inputTargetDate:           getElementById("input-target-date"),
 		textareaTaskDescription:   getElementById("textarea-task-description"),
 		buttonCancelTask:          getElementById("button-cancel-task"),
+		formFilters:               getElementById("form-filters"),
 		inputFilterTaskText:       getElementById("input-filter-task-text"),
 		inputFilterTargetDateFrom: getElementById("input-filter-target-date-from"),
 		inputFilterTargetDateTo:   getElementById("input-filter-target-date-to"),
@@ -390,6 +393,18 @@ func (v *TasksView) renderFormTitle() {
 		return
 	}
 	v.elements.h2TaskForm.Set("textContent", v.translator.GetText(enums.TasksTextEnum.FORM_TITLE_CREATE, nil))
+}
+
+// onFiltersSubmit Enter en un filtro o la tool search_tasks de WebMCP (la IA rellena los campos y envia sin pasar
+// por input/change): busca ya, sin esperar al debounce del texto.
+func (v *TasksView) onFiltersSubmit(event js.Value) {
+	event.Call("preventDefault")
+	v.textFilterMutex.Lock()
+	if v.textFilterTimer != nil {
+		v.textFilterTimer.Stop()
+	}
+	v.textFilterMutex.Unlock()
+	v.dispatchListTasks(enums.TasksPaginationEnum.FIRST_PAGE)
 }
 
 func (v *TasksView) onTextFilterInput() {

@@ -8,7 +8,7 @@ import core.graphql.GraphqlController;
 import modules.open.documentation.infrastructure.controllers.ChangelogController;
 import modules.open.documentation.infrastructure.controllers.DocumentationController;
 import modules.shared.infrastructure.controllers.HealthController;
-import modules.users.infrastructure.controllers.LogInUserController;
+import modules.users.infrastructure.controllers.LogInUserRestController;
 
 /**
  * Rutas de la API (ApiRouter). "url" con tags ":nombre" -> argumento con ese nombre para el controller.
@@ -31,7 +31,7 @@ public final class Routes {
             new Route("/api/v1/changelog", args -> ChangelogController.getInstance().show(), List.of("get")),
 
             //@auth
-            new Route("/api/v1/log-in", args -> LogInUserController.getInstance().logIn(), List.of("post")),
+            new Route("/api/v1/log-in", args -> LogInUserRestController.getInstance().logIn(), List.of("post")),
 
             //@graphql (schema en src/core/graphql/schema.graphql)
             new Route("/graphql", args -> GraphqlController.getInstance().execute(), List.of("post"))

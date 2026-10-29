@@ -4,7 +4,7 @@ import { GraphqlController } from "#app/Core/Graphql/GraphqlController.ts";
 import { ChangelogController } from "#app/Modules/Open/Documentation/Infrastructure/Controllers/ChangelogController.ts";
 import { DocumentationController } from "#app/Modules/Open/Documentation/Infrastructure/Controllers/DocumentationController.ts";
 import { HealthController } from "#app/Modules/Shared/Infrastructure/Controllers/HealthController.ts";
-import { LogInUserController } from "#app/Modules/Users/Infrastructure/Controllers/LogInUserController.ts";
+import { LogInUserRestController } from "#app/Modules/Users/Infrastructure/Controllers/LogInUserRestController.ts";
 
 /**
  * Rutas de la API (ApiRouter). "url" con tags ":nombre" -> argumento con ese nombre para el controller.
@@ -22,7 +22,7 @@ export function getRoutes(): Route[] {
         { url: "/api/v1/changelog", controller: () => ChangelogController.getInstance().show(), allowed: ["get"] },
 
         //@auth
-        { url: "/api/v1/log-in", controller: () => LogInUserController.getInstance().logIn(), allowed: ["post"] },
+        { url: "/api/v1/log-in", controller: () => LogInUserRestController.getInstance().logIn(), allowed: ["post"] },
 
         //@graphql (schema en src/Core/Graphql/schema.graphql)
         { url: "/graphql", controller: () => GraphqlController.getInstance().execute(), allowed: ["post"] },

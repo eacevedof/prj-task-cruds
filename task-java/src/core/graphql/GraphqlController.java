@@ -36,23 +36,23 @@ import modules.shared.domain.enums.GraphqlEnum;
 import modules.shared.domain.enums.SharedMessageEnum;
 import modules.shared.infrastructure.components.httpresponder.HttpResponder;
 import modules.shared.infrastructure.components.json.JsonSerializer;
-import modules.shared.infrastructure.controllers.AbstractApiController;
+import modules.shared.infrastructure.controllers.AbstractHttpController;
 
 import modules.users.domain.enums.UsersKeyEnum;
-import modules.users.infrastructure.controllers.CreateUserApiController;
-import modules.users.infrastructure.controllers.DeleteUserApiController;
-import modules.users.infrastructure.controllers.GetUserApiController;
-import modules.users.infrastructure.controllers.ListUsersApiController;
-import modules.users.infrastructure.controllers.LogInUserApiController;
-import modules.users.infrastructure.controllers.RegenerateUserApiTokenApiController;
-import modules.users.infrastructure.controllers.UpdateUserApiController;
+import modules.users.infrastructure.controllers.CreateUserGraphqlController;
+import modules.users.infrastructure.controllers.DeleteUserGraphqlController;
+import modules.users.infrastructure.controllers.GetUserGraphqlController;
+import modules.users.infrastructure.controllers.ListUsersGraphqlController;
+import modules.users.infrastructure.controllers.LogInUserGraphqlController;
+import modules.users.infrastructure.controllers.RegenerateUserApiTokenGraphqlController;
+import modules.users.infrastructure.controllers.UpdateUserGraphqlController;
 
 import modules.tasks.domain.enums.TasksKeyEnum;
-import modules.tasks.infrastructure.controllers.CreateTaskApiController;
-import modules.tasks.infrastructure.controllers.DeleteTaskApiController;
-import modules.tasks.infrastructure.controllers.GetTaskApiController;
-import modules.tasks.infrastructure.controllers.SearchTasksApiController;
-import modules.tasks.infrastructure.controllers.UpdateTaskApiController;
+import modules.tasks.infrastructure.controllers.CreateTaskGraphqlController;
+import modules.tasks.infrastructure.controllers.DeleteTaskGraphqlController;
+import modules.tasks.infrastructure.controllers.GetTaskGraphqlController;
+import modules.tasks.infrastructure.controllers.SearchTasksGraphqlController;
+import modules.tasks.infrastructure.controllers.UpdateTaskGraphqlController;
 
 import static core.config.Global.__;
 
@@ -63,7 +63,7 @@ import static core.config.Global.__;
  * La respuesta es la de GraphQL ({errors?, data}), no el envelope REST: un error de dominio va en
  * errors[].extensions (ver AbstractGraphqlController) con status 200, como manda GraphQL sobre HTTP.
  */
-public final class GraphqlController extends AbstractApiController {
+public final class GraphqlController extends AbstractHttpController {
 
     /**
      * Tipo de schema.graphql => campo => fn(args, parent).
@@ -73,32 +73,32 @@ public final class GraphqlController extends AbstractApiController {
     // el schema se construye una vez por proceso; los resolvers de cada peticion le llegan en el GraphQLContext
     private static GraphQL graphql;
 
-    private final ListUsersApiController listUsersApiController;
-    private final GetUserApiController getUserApiController;
-    private final CreateUserApiController createUserApiController;
-    private final LogInUserApiController logInUserApiController;
-    private final UpdateUserApiController updateUserApiController;
-    private final DeleteUserApiController deleteUserApiController;
-    private final RegenerateUserApiTokenApiController regenerateUserApiTokenApiController;
-    private final SearchTasksApiController searchTasksApiController;
-    private final GetTaskApiController getTaskApiController;
-    private final CreateTaskApiController createTaskApiController;
-    private final UpdateTaskApiController updateTaskApiController;
-    private final DeleteTaskApiController deleteTaskApiController;
+    private final ListUsersGraphqlController listUsersGraphqlController;
+    private final GetUserGraphqlController getUserGraphqlController;
+    private final CreateUserGraphqlController createUserGraphqlController;
+    private final LogInUserGraphqlController logInUserGraphqlController;
+    private final UpdateUserGraphqlController updateUserGraphqlController;
+    private final DeleteUserGraphqlController deleteUserGraphqlController;
+    private final RegenerateUserApiTokenGraphqlController regenerateUserApiTokenGraphqlController;
+    private final SearchTasksGraphqlController searchTasksGraphqlController;
+    private final GetTaskGraphqlController getTaskGraphqlController;
+    private final CreateTaskGraphqlController createTaskGraphqlController;
+    private final UpdateTaskGraphqlController updateTaskGraphqlController;
+    private final DeleteTaskGraphqlController deleteTaskGraphqlController;
 
     public GraphqlController() {
-        this.listUsersApiController = ListUsersApiController.getInstance();
-        this.getUserApiController = GetUserApiController.getInstance();
-        this.createUserApiController = CreateUserApiController.getInstance();
-        this.logInUserApiController = LogInUserApiController.getInstance();
-        this.updateUserApiController = UpdateUserApiController.getInstance();
-        this.deleteUserApiController = DeleteUserApiController.getInstance();
-        this.regenerateUserApiTokenApiController = RegenerateUserApiTokenApiController.getInstance();
-        this.searchTasksApiController = SearchTasksApiController.getInstance();
-        this.getTaskApiController = GetTaskApiController.getInstance();
-        this.createTaskApiController = CreateTaskApiController.getInstance();
-        this.updateTaskApiController = UpdateTaskApiController.getInstance();
-        this.deleteTaskApiController = DeleteTaskApiController.getInstance();
+        this.listUsersGraphqlController = ListUsersGraphqlController.getInstance();
+        this.getUserGraphqlController = GetUserGraphqlController.getInstance();
+        this.createUserGraphqlController = CreateUserGraphqlController.getInstance();
+        this.logInUserGraphqlController = LogInUserGraphqlController.getInstance();
+        this.updateUserGraphqlController = UpdateUserGraphqlController.getInstance();
+        this.deleteUserGraphqlController = DeleteUserGraphqlController.getInstance();
+        this.regenerateUserApiTokenGraphqlController = RegenerateUserApiTokenGraphqlController.getInstance();
+        this.searchTasksGraphqlController = SearchTasksGraphqlController.getInstance();
+        this.getTaskGraphqlController = GetTaskGraphqlController.getInstance();
+        this.createTaskGraphqlController = CreateTaskGraphqlController.getInstance();
+        this.updateTaskGraphqlController = UpdateTaskGraphqlController.getInstance();
+        this.deleteTaskGraphqlController = DeleteTaskGraphqlController.getInstance();
     }
 
     public static GraphqlController getInstance() {
@@ -282,27 +282,27 @@ public final class GraphqlController extends AbstractApiController {
      */
     private Map<String, Map<String, BiFunction<Map<String, Object>, Map<String, Object>, Object>>> getResolversByType() {
         Map<String, BiFunction<Map<String, Object>, Map<String, Object>, Object>> queryResolvers = new LinkedHashMap<>();
-        queryResolvers.put("users", (args, parent) -> listUsersApiController.invoke());
-        queryResolvers.put("user", (args, parent) -> getUserApiController.invoke(args));
-        queryResolvers.put("tasks", (args, parent) -> searchTasksApiController.invoke("", args));
-        queryResolvers.put("task", (args, parent) -> getTaskApiController.invoke(args));
-        queryResolvers.put("userTasks", (args, parent) -> searchTasksApiController.invoke(
+        queryResolvers.put("users", (args, parent) -> listUsersGraphqlController.invoke());
+        queryResolvers.put("user", (args, parent) -> getUserGraphqlController.invoke(args));
+        queryResolvers.put("tasks", (args, parent) -> searchTasksGraphqlController.invoke("", args));
+        queryResolvers.put("task", (args, parent) -> getTaskGraphqlController.invoke(args));
+        queryResolvers.put("userTasks", (args, parent) -> searchTasksGraphqlController.invoke(
             Primitives.getTrimmedString(args.get(TasksKeyEnum.USER_UUID)),
             args
         ));
 
         Map<String, BiFunction<Map<String, Object>, Map<String, Object>, Object>> mutationResolvers = new LinkedHashMap<>();
-        mutationResolvers.put("createUser", (args, parent) -> createUserApiController.invoke(args));
-        mutationResolvers.put("logIn", (args, parent) -> logInUserApiController.invoke(args));
-        mutationResolvers.put("updateUser", (args, parent) -> updateUserApiController.invoke(args));
-        mutationResolvers.put("deleteUser", (args, parent) -> deleteUserApiController.invoke(args));
-        mutationResolvers.put("regenerateApiToken", (args, parent) -> regenerateUserApiTokenApiController.invoke(args));
-        mutationResolvers.put("createTask", (args, parent) -> createTaskApiController.invoke(args));
-        mutationResolvers.put("updateTask", (args, parent) -> updateTaskApiController.invoke(args));
-        mutationResolvers.put("deleteTask", (args, parent) -> deleteTaskApiController.invoke(args));
+        mutationResolvers.put("createUser", (args, parent) -> createUserGraphqlController.invoke(args));
+        mutationResolvers.put("logIn", (args, parent) -> logInUserGraphqlController.invoke(args));
+        mutationResolvers.put("updateUser", (args, parent) -> updateUserGraphqlController.invoke(args));
+        mutationResolvers.put("deleteUser", (args, parent) -> deleteUserGraphqlController.invoke(args));
+        mutationResolvers.put("regenerateApiToken", (args, parent) -> regenerateUserApiTokenGraphqlController.invoke(args));
+        mutationResolvers.put("createTask", (args, parent) -> createTaskGraphqlController.invoke(args));
+        mutationResolvers.put("updateTask", (args, parent) -> updateTaskGraphqlController.invoke(args));
+        mutationResolvers.put("deleteTask", (args, parent) -> deleteTaskGraphqlController.invoke(args));
 
         Map<String, BiFunction<Map<String, Object>, Map<String, Object>, Object>> userResolvers = new LinkedHashMap<>();
-        userResolvers.put("tasks", (args, user) -> searchTasksApiController.invoke(
+        userResolvers.put("tasks", (args, user) -> searchTasksGraphqlController.invoke(
             Primitives.getTrimmedString(user.get(UsersKeyEnum.USER_UUID)),
             args
         ));
