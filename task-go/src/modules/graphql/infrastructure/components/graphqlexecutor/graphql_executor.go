@@ -53,6 +53,7 @@ func (e *GraphqlExecutor) Execute(
 		graphqlRequestDto.GetOperationName(),
 		graphqlRequestDto.GetVariables(),
 	)
+	fillMissingLocations(executionResult.Errors, graphqlRequestDto.GetQuery(), graphqlRequestDto.GetOperationName())
 	graphqlErrors := []any{}
 	for _, queryError := range executionResult.Errors {
 		graphqlErrors = append(graphqlErrors, queryError)
