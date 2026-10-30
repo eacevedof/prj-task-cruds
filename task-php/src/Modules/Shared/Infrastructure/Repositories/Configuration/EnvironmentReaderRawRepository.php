@@ -16,7 +16,8 @@ use App\Core\Boot\ENV;
  */
 final class EnvironmentReaderRawRepository
 {
-    // version publicada en /api/v1: al subirla, anotar el cambio en changelog.md
+    // version publicada en /api/v1: es la del CONTRATO (la copian las replicas). Al subirla, anotar el cambio en
+    // changelog.md
     private const string APP_VERSION = "2.0.1";
     private const string APP_VERSION_UPDATE = "2026-10-29";
 
@@ -39,6 +40,11 @@ final class EnvironmentReaderRawRepository
     public function getAppVersion(): string
     {
         return self::APP_VERSION;
+    }
+
+    public function getAppVersionUpdate(): string
+    {
+        return self::APP_VERSION_UPDATE;
     }
 
     public function getIdContext(): string
@@ -90,11 +96,6 @@ final class EnvironmentReaderRawRepository
     {
         //antes (bool) del string: "false" contaba como debug activo
         return filter_var($this->get(AppEnvKeyEnum::APP_DEBUG), FILTER_VALIDATE_BOOLEAN);
-    }
-
-    public function getAppVersionUpdate(): string
-    {
-        return self::APP_VERSION_UPDATE;
     }
 
     public function getDbAlias1(): string
