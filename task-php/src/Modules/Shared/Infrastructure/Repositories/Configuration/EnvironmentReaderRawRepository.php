@@ -18,8 +18,8 @@ final class EnvironmentReaderRawRepository
 {
     // version publicada en /api/v1: es la del CONTRATO (la copian las replicas). Al subirla, anotar el cambio en
     // changelog.md
-    private const string APP_VERSION = "2.0.1";
-    private const string APP_VERSION_UPDATE = "2026-10-29";
+    private const string APP_VERSION = "3.0.0";
+    private const string APP_VERSION_UPDATE = "2026-11-04";
 
     private array $envVars;
     private static ?self $instance = null;

@@ -25,7 +25,7 @@ abstract class TasksKeyEnum
     public const string ID = "id";
     public const string USER_ID = "user_id";
 
-    // busqueda paginada (GraphQL: argumentos de tasks/userTasks y tipo TaskPage)
+    // busqueda paginada (GraphQL: argumentos de tasks/User.tasks y tipo TaskPage)
     public const string FILTER = "filter";
     public const string TASK_TEXT = "task_text";
     public const string TARGET_DATE_FROM = "target_date_from";

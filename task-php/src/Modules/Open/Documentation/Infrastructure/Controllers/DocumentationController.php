@@ -20,7 +20,7 @@ final class DocumentationController
 {
     use LogTrait;
 
-    public function show(): HttpResponder
+    public function invoke(): HttpResponder
     {
         try {
             $environmentReaderRawRepository = EnvironmentReaderRawRepository::getInstance();

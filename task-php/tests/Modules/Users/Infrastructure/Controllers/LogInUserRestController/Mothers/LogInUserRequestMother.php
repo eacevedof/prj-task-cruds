@@ -15,7 +15,7 @@ final class LogInUserRequestMother
     }
 
     /**
-     * @return array<string, string> argumentos de LogInUserRestController::logIn() (ninguno: todo va en el body)
+     * @return array<string, string> argumentos de LogInUserRestController::invoke() (ninguno: todo va en el body)
      */
     public function getRequestByTestCase(
         LogInUserTestCaseEnum $useCase

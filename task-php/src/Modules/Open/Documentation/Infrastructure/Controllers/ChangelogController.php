@@ -20,7 +20,7 @@ final class ChangelogController
 {
     use LogTrait;
 
-    public function show(): HttpResponder
+    public function invoke(): HttpResponder
     {
         try {
             return HttpResponder::html(

@@ -59,6 +59,6 @@ final class LogInUserRestControllerTest extends AbstractTestCase
     private function getHttpResponseByTestCase(LogInUserTestCaseEnum $useCase): HttpResponder
     {
         $routeArgs = LogInUserRequestMother::getInstance()->getRequestByTestCase($useCase);
-        return LogInUserRestControllerMother::getControllerInstance()->logIn(...$routeArgs);
+        return LogInUserRestControllerMother::getControllerInstance()->invoke(...$routeArgs);
     }
 }

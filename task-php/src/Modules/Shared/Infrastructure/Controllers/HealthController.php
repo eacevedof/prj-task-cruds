@@ -13,7 +13,7 @@ use App\Modules\Shared\Infrastructure\Components\HttpResponder\HttpResponder;
  */
 final class HealthController extends AbstractRestController
 {
-    public function index(): HttpResponder
+    public function invoke(): HttpResponder
     {
         return $this->respondOk([
             HealthKeyEnum::APP => HealthKeyEnum::APP_NAME,

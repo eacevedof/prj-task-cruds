@@ -20,7 +20,7 @@ final class DocumentationControllerTest extends AbstractTestCase
 
     public function testOkAsSuccessByDocumentationWithoutToken(): void
     {
-        $httpResponse = DocumentationControllerMother::getControllerInstance()->show();
+        $httpResponse = DocumentationControllerMother::getControllerInstance()->invoke();
         $this->assertPublishedHtmlPage(
             $httpResponse,
             DocumentationTestCaseEnum::OK_AS_SUCCESS_BY_DOCUMENTATION_WITHOUT_TOKEN
@@ -34,7 +34,7 @@ final class DocumentationControllerTest extends AbstractTestCase
 
     public function testOkAsSuccessByChangelogWithoutToken(): void
     {
-        $httpResponse = DocumentationControllerMother::getChangelogControllerInstance()->show();
+        $httpResponse = DocumentationControllerMother::getChangelogControllerInstance()->invoke();
 
         $this->assertPublishedHtmlPage(
             $httpResponse,

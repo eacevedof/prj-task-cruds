@@ -17,7 +17,7 @@ use App\Modules\Users\Domain\Exceptions\UsersException;
  */
 final class LogInUserRestController extends AbstractRestController
 {
-    public function logIn(): HttpResponder
+    public function invoke(): HttpResponder
     {
         try {
             $logInUserResultDto = LogInUserService::getInstance()->__invoke(
