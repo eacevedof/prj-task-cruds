@@ -18,10 +18,10 @@ func ChangelogControllerGetInstance(httpRequester *httprequester.HttpRequester) 
 	return &ChangelogController{LogTrait: traits.NewLogTrait(httpRequester)}
 }
 
-func (c *ChangelogController) Show() (httpResponder *httpresponder.HttpResponder) {
+func (c *ChangelogController) Invoke() (httpResponder *httpresponder.HttpResponder) {
 	defer func() {
 		if recovered := recover(); recovered != nil {
-			httpResponder = getHtmlUnexpectedError(c.LogTrait, recovered, "ChangelogController.Show")
+			httpResponder = getHtmlUnexpectedError(c.LogTrait, recovered, "ChangelogController.Invoke")
 		}
 	}()
 

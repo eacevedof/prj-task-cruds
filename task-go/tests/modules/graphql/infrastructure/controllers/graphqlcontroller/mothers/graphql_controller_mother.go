@@ -2,10 +2,10 @@ package mothers
 
 import (
 	"task-go/src/core/routes"
-	"task-go/src/modules/graphql/infrastructure/controllers/graphqlcontroller"
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
 )
 
-func GetControllerInstance(httpRequester *httprequester.HttpRequester) *graphqlcontroller.GraphqlController {
-	return graphqlcontroller.GraphqlControllerGetInstance(httpRequester, routes.GetGraphqlSchemaRegistry())
+func GetControllerInstance(httpRequester *httprequester.HttpRequester) *graphqlcontrollers.ExecuteGraphQlQueryController {
+	return graphqlcontrollers.ExecuteGraphQlQueryControllerGetInstance(httpRequester, routes.GetGraphQlSchemaProvidersRegistry())
 }

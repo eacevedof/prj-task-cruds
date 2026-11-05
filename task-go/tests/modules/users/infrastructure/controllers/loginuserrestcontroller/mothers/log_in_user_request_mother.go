@@ -14,7 +14,7 @@ func LogInUserRequestMotherGetInstance() *LogInUserRequestMother {
 	return &LogInUserRequestMother{}
 }
 
-// GetRequestByTestCase el HttpRequester de la peticion (LogInUserRestController.LogIn() no tiene argumentos: todo va en
+// GetRequestByTestCase el HttpRequester de la peticion (LogInUserRestController.Invoke() no tiene argumentos: todo va en
 // el body).
 func (m *LogInUserRequestMother) GetRequestByTestCase(useCase LogInUserTestCaseEnum) *httprequester.HttpRequester {
 	users := repositories.UsersRawRepositoryMock

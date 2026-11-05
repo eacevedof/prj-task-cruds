@@ -16,7 +16,7 @@ export class LogInUserRestController extends AbstractRestController {
         return new LogInUserRestController();
     }
 
-    logIn(): HttpResponder {
+    invoke(): HttpResponder {
         try {
             const logInUserResultDto = LogInUserService.getInstance().invoke(
                 LogInUserDto.fromPrimitives({
@@ -31,7 +31,7 @@ export class LogInUserRestController extends AbstractRestController {
             if (e instanceof UsersException) {
                 return this.respondDomainError(e);
             }
-            return this.respondUnexpectedError(getThrowable(e), "LogInUserRestController::logIn");
+            return this.respondUnexpectedError(getThrowable(e), "LogInUserRestController::invoke");
         }
     }
 }

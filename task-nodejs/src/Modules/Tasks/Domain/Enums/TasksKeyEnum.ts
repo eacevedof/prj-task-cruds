@@ -19,7 +19,7 @@ export const TasksKeyEnum = Object.freeze({
     ID: "id",
     USER_ID: "user_id",
 
-    // busqueda paginada (GraphQL: argumentos de tasks/userTasks y tipo TaskPage)
+    // busqueda paginada (GraphQL: argumentos de tasks/User.tasks y tipo TaskPage)
     FILTER: "filter",
     TASK_TEXT: "task_text",
     TARGET_DATE_FROM: "target_date_from",

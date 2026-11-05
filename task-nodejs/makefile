@@ -63,7 +63,7 @@ console: ## comando de consola · make console c="help"  |  make console c='user
 migrate: ## migraciones .sql pendientes a mano (database/migrations) · make migrate
 	docker exec -w /app $(APP) node cmd/console/main.ts run-migrations
 
-test: ## tests contra su propia BD (database/task_cruds_test-<test>.sqlite) · make test  |  make test f="Graphql"
+test: ## tests contra su propia BD (database/task_cruds_test-<test>.sqlite) · make test  |  make test f="GraphQl"
 	docker exec -w /app $(APP) node --test $(if $(f),--test-name-pattern="$(f)",) "tests/**/*Test.ts"
 
 typecheck: ## tsc --noEmit (TypeScript estricto) · make typecheck

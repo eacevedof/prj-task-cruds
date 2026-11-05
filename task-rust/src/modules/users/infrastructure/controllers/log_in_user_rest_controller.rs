@@ -23,7 +23,7 @@ impl LogInUserRestController {
         Self { abstract_rest_controller: AbstractRestController::new(http_requester) }
     }
 
-    pub fn log_in(&self) -> HttpResponder {
+    pub fn invoke(&self) -> HttpResponder {
         let log_in_user_result =
             LogInUserService::get_instance().invoke(LogInUserDto::from_primitives(&merge_primitives(&[
                 &self.get_http_request().get_metadata(),
@@ -36,7 +36,7 @@ impl LogInUserRestController {
             Ok(log_in_user_result_dto) => self.respond_ok(log_in_user_result_dto.to_array()),
             Err(error) => match error.downcast_ref::<UsersException>() {
                 Some(users_exception) => self.respond_domain_error(users_exception),
-                None => self.respond_unexpected_error(&*error, "LogInUserRestController.LogIn"),
+                None => self.respond_unexpected_error(&*error, "LogInUserRestController.Invoke"),
             },
         }
     }

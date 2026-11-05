@@ -22,7 +22,7 @@ public final class ChangelogController {
         return new ChangelogController();
     }
 
-    public HttpResponder show() {
+    public HttpResponder invoke() {
         try {
             return HttpResponder.html(
                 ChangelogView.getInstance().getHtml(
@@ -33,7 +33,7 @@ public final class ChangelogController {
             );
         }
         catch (Exception e) {
-            logTrait.logException(e, "ChangelogController::show");
+            logTrait.logException(e, "ChangelogController::invoke");
             return HttpResponder.html(
                 "<h1>" + __(SharedMessageEnum.AN_UNEXPECTED_ERROR_HAS_OCCURRED) + "</h1>",
                 ExceptionEnum.CODE_INTERNAL_SERVER_ERROR

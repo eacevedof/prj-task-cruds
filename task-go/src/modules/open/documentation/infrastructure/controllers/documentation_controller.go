@@ -21,11 +21,11 @@ func DocumentationControllerGetInstance(httpRequester *httprequester.HttpRequest
 	return &DocumentationController{LogTrait: traits.NewLogTrait(httpRequester)}
 }
 
-func (c *DocumentationController) Show() (httpResponder *httpresponder.HttpResponder) {
+func (c *DocumentationController) Invoke() (httpResponder *httpresponder.HttpResponder) {
 	// el render no devuelve error: lo unico que puede fallar es un panic, y se responde como el catch de task-php
 	defer func() {
 		if recovered := recover(); recovered != nil {
-			httpResponder = getHtmlUnexpectedError(c.LogTrait, recovered, "DocumentationController.Show")
+			httpResponder = getHtmlUnexpectedError(c.LogTrait, recovered, "DocumentationController.Invoke")
 		}
 	}()
 

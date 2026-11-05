@@ -3,9 +3,12 @@ package controllers
 import (
 	"errors"
 
-	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
+	"task-go/src/core/config"
+	graphqlexceptions "task-go/src/modules/graphql/domain/exceptions"
 	"task-go/src/modules/shared/application"
+	sharedenums "task-go/src/modules/shared/domain/enums"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
+	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	sharedexceptions "task-go/src/modules/shared/infrastructure/exceptions"
 	"task-go/src/modules/users/application/updateuser"
 	"task-go/src/modules/users/domain/entities"
@@ -13,48 +16,51 @@ import (
 	"task-go/src/modules/users/domain/exceptions"
 )
 
-// UpdateUserGraphqlController mutation updateUser (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
-type UpdateUserGraphqlController struct {
-	graphqlcontrollers.AbstractGraphqlController
+// UpdateUserGraphQlController mutation updateUser (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
+type UpdateUserGraphQlController struct {
+	sharedcontrollers.AbstractHttpController
 }
 
-func UpdateUserGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *UpdateUserGraphqlController {
-	return &UpdateUserGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
+func UpdateUserGraphQlControllerGetInstance(httpRequester *httprequester.HttpRequester) *UpdateUserGraphQlController {
+	return &UpdateUserGraphQlController{AbstractHttpController: sharedcontrollers.NewAbstractHttpController(httpRequester)}
 }
 
-func (c *UpdateUserGraphqlController) Invoke(args map[string]any) (*entities.UserPrimitives, error) {
+func (c *UpdateUserGraphQlController) Invoke(gqlPayload map[string]any) (*entities.UserPrimitives, error) {
 	authUserPrimitives, err := c.GetAuthUserOrFail()
 	if err != nil {
-		return nil, c.getGraphqlError(err, "UpdateUserGraphqlController.Invoke")
+		return nil, c.getGraphQlError(err, "UpdateUserGraphQlController.Invoke")
 	}
 	updateUserResultDto, err := updateuser.UpdateUserServiceGetInstance().Invoke(
 		updateuser.UpdateUserDtoFromPrimitives(application.MergePrimitives(
 			c.GetHttpRequest().GetMetadata(),
 			authUserPrimitives,
 			map[string]any{
-				"userUuid":  args[enums.UsersKeyEnum.USER_UUID],
-				"userName":  args[enums.UsersKeyEnum.USER_NAME],
-				"userEmail": args[enums.UsersKeyEnum.USER_EMAIL],
+				"userUuid":  gqlPayload[enums.UsersKeyEnum.USER_UUID],
+				"userName":  gqlPayload[enums.UsersKeyEnum.USER_NAME],
+				"userEmail": gqlPayload[enums.UsersKeyEnum.USER_EMAIL],
 			},
 		)),
 	)
 	if err != nil {
-		return nil, c.getGraphqlError(err, "UpdateUserGraphqlController.Invoke")
+		return nil, c.getGraphQlError(err, "UpdateUserGraphQlController.Invoke")
 	}
 	user := updateUserResultDto.ToArray()
 	return &user, nil
 }
 
-// getGraphqlError los catch de task-php: FieldsException y UsersException son de dominio; lo demas, inesperado.
-func (c *UpdateUserGraphqlController) getGraphqlError(err error, logTitle string) error {
+// getGraphQlError los dos catch de task-php: FieldsException y UsersException -> ClientAwareExceptionForWebonyx (su
+// codigo y su mensaje al cliente); lo demas -> log + mail + InternalServerError (500 con el mensaje generico).
+func (c *UpdateUserGraphQlController) getGraphQlError(err error, logTitle string) error {
 	var fieldsException *sharedexceptions.FieldsException
 	var usersException *exceptions.UsersException
 	switch {
 	case errors.As(err, &fieldsException):
-		return c.GetGraphqlDomainError(fieldsException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(fieldsException)
 	case errors.As(err, &usersException):
-		return c.GetGraphqlDomainError(usersException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(usersException)
 	default:
-		return c.GetGraphqlUnexpectedError(err, logTitle)
+		c.LogException(err, logTitle)
+		c.SendMailOnThrowable(err, logTitle)
+		return graphqlexceptions.InternalServerError(config.Tr(sharedenums.SharedMessageEnum.AN_UNEXPECTED_ERROR_HAS_OCCURRED))
 	}
 }

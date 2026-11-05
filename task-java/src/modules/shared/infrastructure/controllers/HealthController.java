@@ -15,7 +15,7 @@ public final class HealthController extends AbstractRestController {
         return new HealthController();
     }
 
-    public HttpResponder index() {
+    public HttpResponder invoke() {
         return respondOk(Primitives.of(
             HealthKeyEnum.APP, HealthKeyEnum.APP_NAME,
             HealthKeyEnum.JAVA, System.getProperty("java.version"),

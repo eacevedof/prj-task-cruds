@@ -20,7 +20,7 @@ func TestMain(m *testing.M) {
 }
 
 func TestOkAsSuccessByDocumentationWithoutToken(t *testing.T) {
-	httpResponse := mothers.GetControllerInstance().Show()
+	httpResponse := mothers.GetControllerInstance().Invoke()
 
 	assertPublishedHtmlPage(t, httpResponse, mothers.OK_AS_SUCCESS_BY_DOCUMENTATION_WITHOUT_TOKEN)
 	tests.AssertStringContainsString(t, configuration.GetInstance().GetAppVersion(), httpResponse.GetBody())
@@ -28,7 +28,7 @@ func TestOkAsSuccessByDocumentationWithoutToken(t *testing.T) {
 }
 
 func TestOkAsSuccessByChangelogWithoutToken(t *testing.T) {
-	httpResponse := mothers.GetChangelogControllerInstance().Show()
+	httpResponse := mothers.GetChangelogControllerInstance().Invoke()
 
 	assertPublishedHtmlPage(t, httpResponse, mothers.OK_AS_SUCCESS_BY_CHANGELOG_WITHOUT_TOKEN)
 	tests.AssertStringContainsString(t, `id="`+configuration.GetInstance().GetAppVersion()+`"`, httpResponse.GetBody())

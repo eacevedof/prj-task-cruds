@@ -22,7 +22,7 @@ func LogInUserRestControllerGetInstance(httpRequester *httprequester.HttpRequest
 	return &LogInUserRestController{AbstractRestController: sharedcontrollers.NewAbstractRestController(httpRequester)}
 }
 
-func (c *LogInUserRestController) LogIn() *httpresponder.HttpResponder {
+func (c *LogInUserRestController) Invoke() *httpresponder.HttpResponder {
 	logInUserResultDto, err := loginuser.LogInUserServiceGetInstance().Invoke(
 		loginuser.LogInUserDtoFromPrimitives(application.MergePrimitives(
 			c.GetHttpRequest().GetMetadata(),
@@ -40,5 +40,5 @@ func (c *LogInUserRestController) LogIn() *httpresponder.HttpResponder {
 	if errors.As(err, &usersException) {
 		return c.RespondDomainError(usersException)
 	}
-	return c.RespondUnexpectedError(err, "LogInUserRestController.LogIn")
+	return c.RespondUnexpectedError(err, "LogInUserRestController.Invoke")
 }

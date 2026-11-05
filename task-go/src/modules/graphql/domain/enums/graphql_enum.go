@@ -1,7 +1,7 @@
 package enums
 
-// GraphqlEnum claves del protocolo GraphQL sobre HTTP (body de la peticion y errores de la respuesta).
-var GraphqlEnum = struct {
+// GraphQlEnum claves del protocolo GraphQL sobre HTTP (body de la peticion y errores de la respuesta).
+var GraphQlEnum = struct {
 	KEY_QUERY          string
 	KEY_VARIABLES      string
 	KEY_OPERATION_NAME string
@@ -9,10 +9,9 @@ var GraphqlEnum = struct {
 	KEY_DATA           string
 	KEY_MESSAGE        string
 
-	// tipos del schema que tienen resolvers propios
+	// tipos raiz del protocolo; los de negocio (User…) los declara el provider del modulo que los define
 	TYPE_QUERY    string
 	TYPE_MUTATION string
-	TYPE_USER     string
 
 	EXTENSION_CODE   string
 	EXTENSION_ERRORS string
@@ -28,7 +27,6 @@ var GraphqlEnum = struct {
 
 	TYPE_QUERY:    "Query",
 	TYPE_MUTATION: "Mutation",
-	TYPE_USER:     "User",
 
 	EXTENSION_CODE:   "code",
 	EXTENSION_ERRORS: "errors",

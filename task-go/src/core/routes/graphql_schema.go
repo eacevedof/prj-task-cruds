@@ -3,22 +3,24 @@ package routes
 import (
 	"sync"
 
-	"task-go/src/modules/graphql/infrastructure/schema"
+	graphqlproviders "task-go/src/modules/graphql/infrastructure/providers"
 	tasksproviders "task-go/src/modules/tasks/infrastructure/providers"
 	usersproviders "task-go/src/modules/users/infrastructure/providers"
 )
 
-// graphqlSchemaRegistry el graphql_schema.php de task-php: el registro de los modulos en /graphql, que se monta la
-// primera vez que llega una peticion a /graphql. Vive en core y se inyecta en el registro porque el modulo Graphql no
-// puede importar core (ciclo de imports: los XxxGraphqlController ya importan core/config a traves de su base).
-// Cada modulo nuevo anade aqui su XxxGraphqlSchemaProvider, despues de los modulos cuyos tipos extiende.
-var graphqlSchemaRegistry = sync.OnceValue(func() *schema.GraphqlSchemaRegistry {
-	return schema.GraphqlSchemaRegistryGetInstance([]schema.InterfaceGraphqlSchemaProvider{
-		usersproviders.UsersGraphqlSchemaProviderGetInstance(),
-		tasksproviders.TasksGraphqlSchemaProviderGetInstance(),
+// graphqlSchemaProvidersRegistry el GraphQlSchemaProvidersRegistry::getAllModulesProviders() de task-php: los
+// providers de /graphql, que se montan la primera vez que llega una peticion a /graphql. En Go la lista vive en core y
+// se inyecta en el registro porque el modulo graphql no puede importar los providers de users y tasks (ciclo de
+// imports: ellos importan graphql/infrastructure/providers por InterfaceGraphQlSchemaProvider).
+// El orden importa: cada modulo nuevo anade aqui su XxxGraphQlSchemaProvider, despues de los modulos cuyos tipos
+// extiende.
+var graphqlSchemaProvidersRegistry = sync.OnceValue(func() *graphqlproviders.GraphQlSchemaProvidersRegistry {
+	return graphqlproviders.GraphQlSchemaProvidersRegistryGetInstance([]graphqlproviders.InterfaceGraphQlSchemaProvider{
+		usersproviders.UsersGraphQlSchemaProviderGetInstance(),
+		tasksproviders.TasksGraphQlSchemaProviderGetInstance(),
 	})
 })
 
-func GetGraphqlSchemaRegistry() *schema.GraphqlSchemaRegistry {
-	return graphqlSchemaRegistry()
+func GetGraphQlSchemaProvidersRegistry() *graphqlproviders.GraphQlSchemaProvidersRegistry {
+	return graphqlSchemaProvidersRegistry()
 }

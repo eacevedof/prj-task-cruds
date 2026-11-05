@@ -3,9 +3,12 @@ package controllers
 import (
 	"errors"
 
-	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
+	"task-go/src/core/config"
+	graphqlexceptions "task-go/src/modules/graphql/domain/exceptions"
 	"task-go/src/modules/shared/application"
+	sharedenums "task-go/src/modules/shared/domain/enums"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
+	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	sharedexceptions "task-go/src/modules/shared/infrastructure/exceptions"
 	"task-go/src/modules/tasks/application/createtask"
 	"task-go/src/modules/tasks/domain/entities"
@@ -14,55 +17,57 @@ import (
 	usersexceptions "task-go/src/modules/users/domain/exceptions"
 )
 
-// CreateTaskGraphqlController mutation createTask (src/modules/tasks/infrastructure/providers/tasks.graphql): el dueno es el usuario del token.
+// CreateTaskGraphQlController mutation createTask (src/modules/tasks/infrastructure/providers/tasks.graphql): el dueno es el usuario del token.
 // El 401 de la autenticacion llega como UsersException.
-type CreateTaskGraphqlController struct {
-	graphqlcontrollers.AbstractGraphqlController
+type CreateTaskGraphQlController struct {
+	sharedcontrollers.AbstractHttpController
 }
 
-func CreateTaskGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *CreateTaskGraphqlController {
-	return &CreateTaskGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
+func CreateTaskGraphQlControllerGetInstance(httpRequester *httprequester.HttpRequester) *CreateTaskGraphQlController {
+	return &CreateTaskGraphQlController{AbstractHttpController: sharedcontrollers.NewAbstractHttpController(httpRequester)}
 }
 
-func (c *CreateTaskGraphqlController) Invoke(args map[string]any) (*entities.TaskPrimitives, error) {
+func (c *CreateTaskGraphQlController) Invoke(gqlPayload map[string]any) (*entities.TaskPrimitives, error) {
 	authUserPrimitives, err := c.GetAuthUserOrFail()
 	if err != nil {
-		return nil, c.getGraphqlError(err, "CreateTaskGraphqlController.Invoke")
+		return nil, c.getGraphQlError(err, "CreateTaskGraphQlController.Invoke")
 	}
 	createTaskResultDto, err := createtask.CreateTaskServiceGetInstance().Invoke(
 		createtask.CreateTaskDtoFromPrimitives(application.MergePrimitives(
 			c.GetHttpRequest().GetMetadata(),
 			authUserPrimitives,
 			map[string]any{
-				"taskTitle":       args[enums.TasksKeyEnum.TASK_TITLE],
-				"taskStatus":      args[enums.TasksKeyEnum.TASK_STATUS],
-				"taskType":        args[enums.TasksKeyEnum.TASK_TYPE],
-				"targetDate":      args[enums.TasksKeyEnum.TARGET_DATE],
-				"taskDescription": args[enums.TasksKeyEnum.TASK_DESCRIPTION],
+				"taskTitle":       gqlPayload[enums.TasksKeyEnum.TASK_TITLE],
+				"taskStatus":      gqlPayload[enums.TasksKeyEnum.TASK_STATUS],
+				"taskType":        gqlPayload[enums.TasksKeyEnum.TASK_TYPE],
+				"targetDate":      gqlPayload[enums.TasksKeyEnum.TARGET_DATE],
+				"taskDescription": gqlPayload[enums.TasksKeyEnum.TASK_DESCRIPTION],
 			},
 		)),
 	)
 	if err != nil {
-		return nil, c.getGraphqlError(err, "CreateTaskGraphqlController.Invoke")
+		return nil, c.getGraphQlError(err, "CreateTaskGraphQlController.Invoke")
 	}
 	task := createTaskResultDto.ToArray()
 	return &task, nil
 }
 
-// getGraphqlError los catch de task-php: FieldsException, UsersException y TasksException son de dominio; lo demas,
-// inesperado.
-func (c *CreateTaskGraphqlController) getGraphqlError(err error, logTitle string) error {
+// getGraphQlError los dos catch de task-php: FieldsException, UsersException y TasksException -> ClientAwareExceptionForWebonyx (su
+// codigo y su mensaje al cliente); lo demas -> log + mail + InternalServerError (500 con el mensaje generico).
+func (c *CreateTaskGraphQlController) getGraphQlError(err error, logTitle string) error {
 	var fieldsException *sharedexceptions.FieldsException
 	var usersException *usersexceptions.UsersException
 	var tasksException *exceptions.TasksException
 	switch {
 	case errors.As(err, &fieldsException):
-		return c.GetGraphqlDomainError(fieldsException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(fieldsException)
 	case errors.As(err, &usersException):
-		return c.GetGraphqlDomainError(usersException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(usersException)
 	case errors.As(err, &tasksException):
-		return c.GetGraphqlDomainError(tasksException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(tasksException)
 	default:
-		return c.GetGraphqlUnexpectedError(err, logTitle)
+		c.LogException(err, logTitle)
+		c.SendMailOnThrowable(err, logTitle)
+		return graphqlexceptions.InternalServerError(config.Tr(sharedenums.SharedMessageEnum.AN_UNEXPECTED_ERROR_HAS_OCCURRED))
 	}
 }

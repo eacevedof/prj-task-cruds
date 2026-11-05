@@ -2,61 +2,67 @@ package providers
 
 import (
 	"task-go/src/modules/graphql/domain/enums"
-	"task-go/src/modules/graphql/infrastructure/schema"
+	graphqlproviders "task-go/src/modules/graphql/infrastructure/providers"
 	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
-	tasksenums "task-go/src/modules/tasks/domain/enums"
 	"task-go/src/modules/tasks/infrastructure/controllers"
 	usersenums "task-go/src/modules/users/domain/enums"
+	usersproviders "task-go/src/modules/users/infrastructure/providers"
 )
 
-// TasksGraphqlSchemaProvider parte de tasks en /graphql: tasks.graphql (extiende Query, Mutation y User de users) y
-// sus resolvers, incluido User.tasks, que cuelga de User pero es de tasks. Va despues de UsersGraphqlSchemaProvider en
+// TasksGraphQlSchemaProvider parte de tasks en /graphql: tasks.graphql (extiende Query, Mutation y User de users) y
+// sus resolvers, incluido User.tasks, que cuelga de User pero es de tasks. Va despues de UsersGraphQlSchemaProvider en
 // el registro.
-type TasksGraphqlSchemaProvider struct{}
+type TasksGraphQlSchemaProvider struct{}
 
-func TasksGraphqlSchemaProviderGetInstance() *TasksGraphqlSchemaProvider {
-	return &TasksGraphqlSchemaProvider{}
+func TasksGraphQlSchemaProviderGetInstance() *TasksGraphQlSchemaProvider {
+	return &TasksGraphQlSchemaProvider{}
 }
 
-func (p *TasksGraphqlSchemaProvider) GetSdl() string {
-	return schema.GetFileContent("modules/tasks/infrastructure/providers/tasks.graphql")
+func (p *TasksGraphQlSchemaProvider) GetGraphQlFileContent() string {
+	return graphqlproviders.GetFileContent("modules/tasks/infrastructure/providers/tasks.graphql")
 }
 
-func (p *TasksGraphqlSchemaProvider) GetResolversByType() []schema.GraphqlTypeResolvers {
-	return []schema.GraphqlTypeResolvers{
-		{TypeName: enums.GraphqlEnum.TYPE_QUERY, FieldResolvers: []schema.GraphqlFieldResolver{
-			{FieldName: "tasks", Resolver: func(h *httprequester.HttpRequester, args map[string]any, _ map[string]any) (any, error) {
-				return controllers.SearchTasksGraphqlControllerGetInstance(h).Invoke(args)
-			}},
-			{FieldName: "task", Resolver: func(h *httprequester.HttpRequester, args map[string]any, _ map[string]any) (any, error) {
-				return controllers.GetTaskGraphqlControllerGetInstance(h).Invoke(args)
-			}},
-			{FieldName: "userTasks", Resolver: func(h *httprequester.HttpRequester, args map[string]any, _ map[string]any) (any, error) {
-				return controllers.SearchTasksByUserGraphqlControllerGetInstance(h).Invoke(
-					application.ToString(args[tasksenums.TasksKeyEnum.USER_UUID]),
-					args,
-				)
-			}},
-		}},
-		{TypeName: enums.GraphqlEnum.TYPE_MUTATION, FieldResolvers: []schema.GraphqlFieldResolver{
-			{FieldName: "createTask", Resolver: func(h *httprequester.HttpRequester, args map[string]any, _ map[string]any) (any, error) {
-				return controllers.CreateTaskGraphqlControllerGetInstance(h).Invoke(args)
-			}},
-			{FieldName: "updateTask", Resolver: func(h *httprequester.HttpRequester, args map[string]any, _ map[string]any) (any, error) {
-				return controllers.UpdateTaskGraphqlControllerGetInstance(h).Invoke(args)
-			}},
-			{FieldName: "deleteTask", Resolver: func(h *httprequester.HttpRequester, args map[string]any, _ map[string]any) (any, error) {
-				return controllers.DeleteTaskGraphqlControllerGetInstance(h).Invoke(args)
-			}},
-		}},
-		{TypeName: enums.GraphqlEnum.TYPE_USER, FieldResolvers: []schema.GraphqlFieldResolver{
-			{FieldName: "tasks", Resolver: func(h *httprequester.HttpRequester, args map[string]any, user map[string]any) (any, error) {
-				return controllers.SearchTasksByUserGraphqlControllerGetInstance(h).Invoke(
+func (p *TasksGraphQlSchemaProvider) GetControllerResolvers() []graphqlproviders.GraphQlTypeResolvers {
+	return []graphqlproviders.GraphQlTypeResolvers{
+		{TypeName: enums.GraphQlEnum.TYPE_QUERY, FieldResolvers: p.getQueryControllers()},
+
+		{TypeName: enums.GraphQlEnum.TYPE_MUTATION, FieldResolvers: p.getMutationControllers()},
+
+		// Las tareas de un usuario.
+		// User.tasks: solo ejemplo de extender un tipo de otro modulo, no lo consume ningun front (ver tasks.graphql)
+		{TypeName: usersproviders.TYPE_USER, FieldResolvers: []graphqlproviders.GraphQlFieldResolver{
+			{FieldName: "tasks", Resolver: func(h *httprequester.HttpRequester, gqlPayload map[string]any, user map[string]any) (any, error) {
+				return controllers.SearchTasksByUserGraphQlControllerGetInstance(h).Invoke(
 					application.ToString(user[usersenums.UsersKeyEnum.USER_UUID]),
-					args,
+					gqlPayload,
 				)
 			}},
+		}},
+	}
+}
+
+func (p *TasksGraphQlSchemaProvider) getQueryControllers() []graphqlproviders.GraphQlFieldResolver {
+	return []graphqlproviders.GraphQlFieldResolver{
+		{FieldName: "tasks", Resolver: func(h *httprequester.HttpRequester, gqlPayload map[string]any, _ map[string]any) (any, error) {
+			return controllers.SearchTasksGraphQlControllerGetInstance(h).Invoke(gqlPayload)
+		}},
+		{FieldName: "task", Resolver: func(h *httprequester.HttpRequester, gqlPayload map[string]any, _ map[string]any) (any, error) {
+			return controllers.GetTaskGraphQlControllerGetInstance(h).Invoke(gqlPayload)
+		}},
+	}
+}
+
+func (p *TasksGraphQlSchemaProvider) getMutationControllers() []graphqlproviders.GraphQlFieldResolver {
+	return []graphqlproviders.GraphQlFieldResolver{
+		{FieldName: "createTask", Resolver: func(h *httprequester.HttpRequester, gqlPayload map[string]any, _ map[string]any) (any, error) {
+			return controllers.CreateTaskGraphQlControllerGetInstance(h).Invoke(gqlPayload)
+		}},
+		{FieldName: "updateTask", Resolver: func(h *httprequester.HttpRequester, gqlPayload map[string]any, _ map[string]any) (any, error) {
+			return controllers.UpdateTaskGraphQlControllerGetInstance(h).Invoke(gqlPayload)
+		}},
+		{FieldName: "deleteTask", Resolver: func(h *httprequester.HttpRequester, gqlPayload map[string]any, _ map[string]any) (any, error) {
+			return controllers.DeleteTaskGraphQlControllerGetInstance(h).Invoke(gqlPayload)
 		}},
 	}
 }

@@ -92,6 +92,10 @@ public abstract class AbstractTestCase {
         Assertions.assertTrue(text.startsWith(prefix), "expected \"" + text + "\" to start with \"" + prefix + "\"");
     }
 
+    protected void fail(String message) {
+        Assertions.fail(message);
+    }
+
     private boolean isEmpty(Object actual) {
         if (actual == null || "".equals(actual) || Boolean.FALSE.equals(actual)) return true;
         if (actual instanceof Number number) return number.longValue() == 0 && number.doubleValue() == 0;

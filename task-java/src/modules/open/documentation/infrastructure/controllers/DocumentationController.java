@@ -22,7 +22,7 @@ public final class DocumentationController {
         return new DocumentationController();
     }
 
-    public HttpResponder show() {
+    public HttpResponder invoke() {
         try {
             EnvironmentReaderRawRepository environmentReaderRawRepository = EnvironmentReaderRawRepository.getInstance();
             return HttpResponder.html(
@@ -36,7 +36,7 @@ public final class DocumentationController {
             );
         }
         catch (Exception e) {
-            logTrait.logException(e, "DocumentationController::show");
+            logTrait.logException(e, "DocumentationController::invoke");
             return HttpResponder.html(
                 "<h1>" + __(SharedMessageEnum.AN_UNEXPECTED_ERROR_HAS_OCCURRED) + "</h1>",
                 ExceptionEnum.CODE_INTERNAL_SERVER_ERROR

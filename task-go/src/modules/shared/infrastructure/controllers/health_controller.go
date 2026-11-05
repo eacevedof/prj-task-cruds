@@ -18,7 +18,7 @@ func HealthControllerGetInstance(httpRequester *httprequester.HttpRequester) *He
 	return &HealthController{AbstractRestController: NewAbstractRestController(httpRequester)}
 }
 
-func (c *HealthController) Index() *httpresponder.HttpResponder {
+func (c *HealthController) Invoke() *httpresponder.HttpResponder {
 	return c.RespondOk(map[string]any{
 		enums.HealthKeyEnum.APP:         enums.HealthKeyEnum.APP_NAME,
 		enums.HealthKeyEnum.GO:          runtime.Version(),

@@ -9,7 +9,8 @@ import { AuthenticateUserService } from "#app/Modules/Users/Application/Authenti
 /**
  * Base de todo lo que entra por HTTP: la peticion (HttpRequester), log + mail y la autenticacion por Bearer.
  * Cada protocolo pone encima su forma de responder y de mapear errores: AbstractRestController (envelope JSON con
- * status HTTP) y, en el modulo Graphql, AbstractGraphqlController (objeto o GraphQLError) y el endpoint /graphql.
+ * status HTTP) y, en GraphQL, los XxxGraphQlController de cada modulo (objeto o GraphQlException) y el endpoint
+ * /graphql (ExecuteGraphQlQueryController).
  */
 export abstract class AbstractHttpController {
 

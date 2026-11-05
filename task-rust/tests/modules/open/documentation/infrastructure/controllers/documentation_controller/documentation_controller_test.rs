@@ -21,7 +21,7 @@ const UNREPLACED_PLACEHOLDER: &str = "{{";
 #[test]
 fn ok_as_success_by_documentation_without_token() {
     run_without_db();
-    let http_response = get_controller_instance().show();
+    let http_response = get_controller_instance().invoke();
 
     assert_published_html_page(&http_response, OK_AS_SUCCESS_BY_DOCUMENTATION_WITHOUT_TOKEN);
     assert_string_contains_string(
@@ -34,7 +34,7 @@ fn ok_as_success_by_documentation_without_token() {
 #[test]
 fn ok_as_success_by_changelog_without_token() {
     run_without_db();
-    let http_response = get_changelog_controller_instance().show();
+    let http_response = get_changelog_controller_instance().invoke();
 
     assert_published_html_page(&http_response, OK_AS_SUCCESS_BY_CHANGELOG_WITHOUT_TOKEN);
     assert_string_contains_string(

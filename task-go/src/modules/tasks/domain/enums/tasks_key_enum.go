@@ -19,7 +19,7 @@ var TasksKeyEnum = struct {
 	ID      string
 	USER_ID string
 
-	// busqueda paginada (GraphQL: argumentos de tasks/userTasks y tipo TaskPage)
+	// busqueda paginada (GraphQL: argumentos de tasks/User.tasks y tipo TaskPage)
 	FILTER           string
 	TASK_TEXT        string
 	TARGET_DATE_FROM string

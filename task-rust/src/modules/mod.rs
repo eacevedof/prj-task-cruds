@@ -1,5 +1,5 @@
 pub mod devops;
-pub mod graphql;
+pub mod graph_ql;
 pub mod mailer;
 pub mod open;
 pub mod shared;

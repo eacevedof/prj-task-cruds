@@ -114,6 +114,10 @@ export abstract class AbstractTestCase {
         assert.ok(text.startsWith(prefix), `expected ${JSON.stringify(text)} to start with ${JSON.stringify(prefix)}`);
     }
 
+    protected fail(message: string): never {
+        assert.fail(message);
+    }
+
     #isEmpty(actual: unknown): boolean {
         if (actual == null || actual === "" || actual === 0 || actual === false) return true;
         if (Array.isArray(actual)) return !actual.length;

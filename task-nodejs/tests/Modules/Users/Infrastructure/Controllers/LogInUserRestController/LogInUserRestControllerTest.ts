@@ -55,7 +55,7 @@ class LogInUserRestControllerTest extends AbstractTestCase {
 
     #getHttpResponseByTestCase(useCase: LogInUserTestCase): HttpResponder {
         LogInUserRequestMother.getInstance().getRequestByTestCase(useCase);
-        return LogInUserRestControllerMother.getControllerInstance().logIn();
+        return LogInUserRestControllerMother.getControllerInstance().invoke();
     }
 }
 

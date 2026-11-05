@@ -60,5 +60,5 @@ fn assert_unauthorized_with_generic_message(use_case: LogInUserTestCaseEnum) {
 fn get_http_response_by_test_case(use_case: LogInUserTestCaseEnum) -> HttpResponder {
     run_with_test_db("log-in");
     let http_requester = LogInUserRequestMother::get_instance().get_request_by_test_case(use_case);
-    get_controller_instance(http_requester).log_in()
+    get_controller_instance(http_requester).invoke()
 }

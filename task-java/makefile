@@ -63,7 +63,7 @@ console: ## comando de consola · make console c="help"  |  make console c='user
 migrate: ## migraciones .sql pendientes a mano (database/migrations) · make migrate
 	docker exec -w /app $(APP) bin/console run-migrations
 
-test: ## tests contra su propia BD (database/task_cruds_test-<test>.sqlite) · make test  |  make test f="GraphqlControllerTest"  |  make test f="GraphqlControllerTest#testOkAsSuccessByUsersQuery"
+test: ## tests contra su propia BD (database/task_cruds_test-<test>.sqlite) · make test  |  make test f="GraphQlControllerTest"  |  make test f="GraphQlControllerTest#testOkAsSuccessByUsersQuery"
 	docker exec -w /app $(APP) mvn -B test $(if $(f),-Dtest="$(f)",)
 
 health: ## health-check del front controller · make health

@@ -16,7 +16,7 @@ impl LogInUserRequestMother {
         Self
     }
 
-    /// el HttpRequester de la peticion (LogInUserRestController::log_in() no tiene argumentos: todo va en el body).
+    /// el HttpRequester de la peticion (LogInUserRestController::invoke() no tiene argumentos: todo va en el body).
     pub fn get_request_by_test_case(&self, use_case: LogInUserTestCaseEnum) -> Arc<HttpRequester> {
         use LogInUserTestCaseEnum::*;
         match use_case {

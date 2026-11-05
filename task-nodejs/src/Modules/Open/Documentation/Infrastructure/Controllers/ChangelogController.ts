@@ -20,7 +20,7 @@ export class ChangelogController {
         return new ChangelogController();
     }
 
-    show(): HttpResponder {
+    invoke(): HttpResponder {
         try {
             return HttpResponder.html(
                 ChangelogView.getInstance().getHtml(
@@ -31,7 +31,7 @@ export class ChangelogController {
             );
         }
         catch (e) {
-            this.#logTrait.logException(getThrowable(e), "ChangelogController::show");
+            this.#logTrait.logException(getThrowable(e), "ChangelogController::invoke");
             return HttpResponder.html(
                 `<h1>${__(SharedMessageEnum.AN_UNEXPECTED_ERROR_HAS_OCCURRED)}</h1>`,
                 ExceptionEnum.CODE_INTERNAL_SERVER_ERROR

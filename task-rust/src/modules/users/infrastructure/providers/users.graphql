@@ -1,36 +1,61 @@
-# Parte de users del schema de /graphql (la registra UsersGraphqlSchemaProvider). Define las raices Query y
+# Parte de users del schema de /graphql (la registra UsersGraphQlSchemaProvider). Define las raices Query y
 # Mutation: los demas modulos las extienden con "extend type".
+# Los comentarios con # no llegan al cliente; los textos entre "..." si (son la descripcion en la introspeccion).
 
+# Query: raiz de LECTURA. Cada campo es un punto de entrada de la API y no tiene objeto padre del que leer, asi
+# que todos llevan resolver propio en UsersGraphQlSchemaProvider (si falta uno, failIfRootFieldWithoutResolver
+# rompe al montar el schema). Tasks le anade tasks y task con "extend type Query".
 type Query {
+    # [User!]!: la lista nunca es null ni trae nulls dentro; como cada token solo ve su propio usuario
+    # (ListUsersService), tiene como mucho un elemento
     users: [User!]!
+    # nullable: un user_uuid ajeno o inexistente no es un fallo del schema, sale en errors[] con code 404
     user(user_uuid: ID!): User
 }
 
+# Mutation: raiz de ESCRITURA. Igual que Query, cada campo exige resolver propio; ademas, GraphQL ejecuta los
+# campos de una mutation en serie (los de Query pueden ir en paralelo), por eso las escrituras van aqui.
+# Las que crean o cambian el usuario devuelven User: el cliente elige en la misma peticion que campos quiere de
+# vuelta (incluido User.tasks), sin una segunda lectura. Tasks le anade createTask, updateTask y deleteTask.
 type Mutation {
+    # alta abierta: no pide Bearer
     "user_name: login unico, 3-50 de letras, digitos, punto, guion bajo y guion. password: 8-72"
     createUser(user_name: String!, user_email: String!, password: String!): User
+    # es mutation y no query aunque "solo" autentique: escribe un api_token nuevo en BD
     "devuelve el usuario con un api_token nuevo: el anterior deja de valer"
     logIn(user_name: String!, password: String!): User
+    # reemplazo completo: user_name y user_email son obligatorios aunque no cambien
     updateUser(user_uuid: ID!, user_name: String!, user_email: String!): User
+    # no devuelve User: tras borrar ya no hay usuario que resolver
     deleteUser(user_uuid: ID!): DeleteUserResult
+    # no devuelve User: solo interesa el token nuevo, que en User es nullable y aqui es obligatorio
     regenerateApiToken(user_uuid: ID!): ApiTokenResult
 }
 
+# User: tipo de SALIDA comun a lectura (users, user) y a escritura (createUser, logIn, updateUser). Sus campos
+# no tienen resolver: el por defecto los lee del array del ResultDto, de ahi que se llamen igual que sus claves.
+# Tasks le anade el campo tasks con "extend type User" y ese si lleva resolver (UsersGraphQlSchemaProvider::TYPE_USER
+# en TasksGraphQlSchemaProvider), porque las tasks no vienen en el array del usuario. Es solo ejemplo (ver tasks.graphql).
+# La password no aparece: lo que no esta en el schema no se puede pedir, aunque viniera en el array.
 type User {
+    # ID se serializa como string; es el identificador publico, el id numerico no sale
     user_uuid: ID!
     user_name: String!
     user_email: String!
     created_at: String!
     updated_at: String!
+    # nullable a proposito: en BD solo se guarda su hash, asi que en users, user y updateUser llega null
     "solo en createUser y logIn: el token en claro se devuelve una unica vez"
     api_token: String
 }
 
+# Resultado de deleteUser: el uuid borrado y las filas afectadas (solo escritura)
 type DeleteUserResult {
     user_uuid: ID!
     affected: Int!
 }
 
+# Resultado de regenerateApiToken: aqui el token es obligatorio, a diferencia de User.api_token (solo escritura)
 type ApiTokenResult {
     user_uuid: ID!
     api_token: String!

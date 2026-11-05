@@ -21,7 +21,7 @@ runWithoutDb();
 class DocumentationControllerTest extends AbstractTestCase {
 
     testOkAsSuccessByDocumentationWithoutToken(): void {
-        const httpResponse = DocumentationControllerMother.getControllerInstance().show();
+        const httpResponse = DocumentationControllerMother.getControllerInstance().invoke();
         this.#assertPublishedHtmlPage(
             httpResponse,
             DocumentationTestCaseEnum.OK_AS_SUCCESS_BY_DOCUMENTATION_WITHOUT_TOKEN
@@ -34,7 +34,7 @@ class DocumentationControllerTest extends AbstractTestCase {
     }
 
     testOkAsSuccessByChangelogWithoutToken(): void {
-        const httpResponse = DocumentationControllerMother.getChangelogControllerInstance().show();
+        const httpResponse = DocumentationControllerMother.getChangelogControllerInstance().invoke();
 
         this.#assertPublishedHtmlPage(
             httpResponse,

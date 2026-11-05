@@ -22,7 +22,7 @@ public final class TasksKeyEnum {
     public static final String ID = "id";
     public static final String USER_ID = "user_id";
 
-    // busqueda paginada (GraphQL: argumentos de tasks/userTasks y tipo TaskPage)
+    // busqueda paginada (GraphQL: argumentos de tasks/User.tasks y tipo TaskPage)
     public static final String FILTER = "filter";
     public static final String TASK_TEXT = "task_text";
     public static final String TARGET_DATE_FROM = "target_date_from";

@@ -20,7 +20,7 @@ export class DocumentationController {
         return new DocumentationController();
     }
 
-    show(): HttpResponder {
+    invoke(): HttpResponder {
         try {
             const environmentReaderRawRepository = EnvironmentReaderRawRepository.getInstance();
             return HttpResponder.html(
@@ -34,7 +34,7 @@ export class DocumentationController {
             );
         }
         catch (e) {
-            this.#logTrait.logException(getThrowable(e), "DocumentationController::show");
+            this.#logTrait.logException(getThrowable(e), "DocumentationController::invoke");
             return HttpResponder.html(
                 `<h1>${__(SharedMessageEnum.AN_UNEXPECTED_ERROR_HAS_OCCURRED)}</h1>`,
                 ExceptionEnum.CODE_INTERNAL_SERVER_ERROR

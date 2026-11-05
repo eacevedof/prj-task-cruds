@@ -3,9 +3,12 @@ package controllers
 import (
 	"errors"
 
-	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
+	"task-go/src/core/config"
+	graphqlexceptions "task-go/src/modules/graphql/domain/exceptions"
 	"task-go/src/modules/shared/application"
+	sharedenums "task-go/src/modules/shared/domain/enums"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
+	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	sharedexceptions "task-go/src/modules/shared/infrastructure/exceptions"
 	"task-go/src/modules/tasks/application/searchtasks"
 	"task-go/src/modules/tasks/domain/enums"
@@ -13,24 +16,25 @@ import (
 	usersexceptions "task-go/src/modules/users/domain/exceptions"
 )
 
-// SearchTasksByUserGraphqlController query userTasks y campo User.tasks (src/modules/tasks/infrastructure/providers/tasks.graphql):
-// las tasks de un usuario, paginadas y con filtros. El uuid llega aparte porque en User.tasks sale del User padre, no
-// de los args. Un usuario que no es el autenticado responde 404. El 401 de la autenticacion llega como UsersException.
-type SearchTasksByUserGraphqlController struct {
-	graphqlcontrollers.AbstractGraphqlController
+// SearchTasksByUserGraphQlController campo User.tasks (src/modules/tasks/infrastructure/providers/tasks.graphql): las
+// tasks de un usuario, paginadas y con filtros. Solo ejemplo, no lo consume ningun front. El uuid llega aparte porque
+// sale del User padre, no del payload. Un usuario que no es el autenticado responde 404. El 401 de la autenticacion
+// llega como UsersException.
+type SearchTasksByUserGraphQlController struct {
+	sharedcontrollers.AbstractHttpController
 }
 
-func SearchTasksByUserGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *SearchTasksByUserGraphqlController {
-	return &SearchTasksByUserGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
+func SearchTasksByUserGraphQlControllerGetInstance(httpRequester *httprequester.HttpRequester) *SearchTasksByUserGraphQlController {
+	return &SearchTasksByUserGraphQlController{AbstractHttpController: sharedcontrollers.NewAbstractHttpController(httpRequester)}
 }
 
-// Invoke args {filter?: {task_text?, task_status?, task_type?, target_date_from?, target_date_to?}, page?, page_size?}
-func (c *SearchTasksByUserGraphqlController) Invoke(userUuid string, args map[string]any) (*searchtasks.SearchTasksResultPrimitives, error) {
+// Invoke gqlPayload {filter?: {task_text?, task_status?, task_type?, target_date_from?, target_date_to?}, page?, page_size?}
+func (c *SearchTasksByUserGraphQlController) Invoke(userUuid string, gqlPayload map[string]any) (*searchtasks.SearchTasksResultPrimitives, error) {
 	authUserPrimitives, err := c.GetAuthUserOrFail()
 	if err != nil {
-		return nil, c.getGraphqlError(err, "SearchTasksByUserGraphqlController.Invoke")
+		return nil, c.getGraphQlError(err, "SearchTasksByUserGraphQlController.Invoke")
 	}
-	filter, _ := args[enums.TasksKeyEnum.FILTER].(map[string]any)
+	filter, _ := gqlPayload[enums.TasksKeyEnum.FILTER].(map[string]any)
 	searchTasksResultDto, err := searchtasks.SearchTasksServiceGetInstance().Invoke(
 		searchtasks.SearchTasksDtoFromPrimitives(application.MergePrimitives(
 			c.GetHttpRequest().GetMetadata(),
@@ -42,32 +46,34 @@ func (c *SearchTasksByUserGraphqlController) Invoke(userUuid string, args map[st
 				"taskType":       filter[enums.TasksKeyEnum.TASK_TYPE],
 				"targetDateFrom": filter[enums.TasksKeyEnum.TARGET_DATE_FROM],
 				"targetDateTo":   filter[enums.TasksKeyEnum.TARGET_DATE_TO],
-				"page":           args[enums.TasksKeyEnum.PAGE],
-				"pageSize":       args[enums.TasksKeyEnum.PAGE_SIZE],
+				"page":           gqlPayload[enums.TasksKeyEnum.PAGE],
+				"pageSize":       gqlPayload[enums.TasksKeyEnum.PAGE_SIZE],
 			},
 		)),
 	)
 	if err != nil {
-		return nil, c.getGraphqlError(err, "SearchTasksByUserGraphqlController.Invoke")
+		return nil, c.getGraphQlError(err, "SearchTasksByUserGraphQlController.Invoke")
 	}
 	taskPage := searchTasksResultDto.ToArray()
 	return &taskPage, nil
 }
 
-// getGraphqlError los catch de task-php: FieldsException, UsersException y TasksException son de dominio; lo demas,
-// inesperado.
-func (c *SearchTasksByUserGraphqlController) getGraphqlError(err error, logTitle string) error {
+// getGraphQlError los dos catch de task-php: FieldsException, UsersException y TasksException -> ClientAwareExceptionForWebonyx (su
+// codigo y su mensaje al cliente); lo demas -> log + mail + InternalServerError (500 con el mensaje generico).
+func (c *SearchTasksByUserGraphQlController) getGraphQlError(err error, logTitle string) error {
 	var fieldsException *sharedexceptions.FieldsException
 	var usersException *usersexceptions.UsersException
 	var tasksException *exceptions.TasksException
 	switch {
 	case errors.As(err, &fieldsException):
-		return c.GetGraphqlDomainError(fieldsException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(fieldsException)
 	case errors.As(err, &usersException):
-		return c.GetGraphqlDomainError(usersException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(usersException)
 	case errors.As(err, &tasksException):
-		return c.GetGraphqlDomainError(tasksException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(tasksException)
 	default:
-		return c.GetGraphqlUnexpectedError(err, logTitle)
+		c.LogException(err, logTitle)
+		c.SendMailOnThrowable(err, logTitle)
+		return graphqlexceptions.InternalServerError(config.Tr(sharedenums.SharedMessageEnum.AN_UNEXPECTED_ERROR_HAS_OCCURRED))
 	}
 }

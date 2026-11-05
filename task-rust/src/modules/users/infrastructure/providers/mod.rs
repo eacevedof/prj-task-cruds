@@ -1,1 +1,1 @@
-pub mod users_graphql_schema_provider;
+pub mod users_graph_ql_schema_provider;

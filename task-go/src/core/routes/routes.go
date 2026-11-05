@@ -2,7 +2,7 @@ package routes
 
 import (
 	"task-go/src/core/boot"
-	"task-go/src/modules/graphql/infrastructure/controllers/graphqlcontroller"
+	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
 	documentationcontrollers "task-go/src/modules/open/documentation/infrastructure/controllers"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
 	"task-go/src/modules/shared/infrastructure/components/httpresponder"
@@ -14,30 +14,30 @@ import (
 // Allowed: metodos HTTP en minusculas (HEAD va implicito en GET).
 // Solo login (REST) y GraphQL: el resto de operaciones van por /graphql.
 // Auth: /graphql exige "Authorization: Bearer <api_token>" salvo createUser y logIn. No lo decide el router: cada
-// resolver autentica con GetAuthUserOrFail() (AbstractGraphqlController).
+// resolver autentica con GetAuthUserOrFail() (AbstractHttpController).
 func GetRoutes() []boot.Route {
 	return []boot.Route{
 		{Url: "/health", Allowed: []string{"get"}, Controller: func(h *httprequester.HttpRequester, args map[string]string) *httpresponder.HttpResponder {
-			return sharedcontrollers.HealthControllerGetInstance(h).Index()
+			return sharedcontrollers.HealthControllerGetInstance(h).Invoke()
 		}},
 
 		//@documentation (publica; fuente: los .md de src/modules/open/documentation/infrastructure/views)
 		{Url: "/api/v1", Allowed: []string{"get"}, Controller: func(h *httprequester.HttpRequester, args map[string]string) *httpresponder.HttpResponder {
-			return documentationcontrollers.DocumentationControllerGetInstance(h).Show()
+			return documentationcontrollers.DocumentationControllerGetInstance(h).Invoke()
 		}},
 		{Url: "/api/v1/changelog", Allowed: []string{"get"}, Controller: func(h *httprequester.HttpRequester, args map[string]string) *httpresponder.HttpResponder {
-			return documentationcontrollers.ChangelogControllerGetInstance(h).Show()
+			return documentationcontrollers.ChangelogControllerGetInstance(h).Invoke()
 		}},
 
 		//@auth
 		{Url: "/api/v1/log-in", Allowed: []string{"post"}, Controller: func(h *httprequester.HttpRequester, args map[string]string) *httpresponder.HttpResponder {
-			return userscontrollers.LogInUserRestControllerGetInstance(h).LogIn()
+			return userscontrollers.LogInUserRestControllerGetInstance(h).Invoke()
 		}},
 
-		//@graphql (schema: src/modules/graphql/infrastructure/schema/schema.graphql + infrastructure/providers/<modulo>.graphql
-		// de cada modulo, en el orden de graphql_schema.go)
+		//@graphql ExecuteGraphQlQueryController (cada modulo registra su XxxGraphQlSchemaProvider en graphql_schema.go;
+		// schema: src/modules/graphql/infrastructure/providers/schema.graphql + infrastructure/providers/<modulo>.graphql)
 		{Url: "/graphql", Allowed: []string{"post"}, Controller: func(h *httprequester.HttpRequester, args map[string]string) *httpresponder.HttpResponder {
-			return graphqlcontroller.GraphqlControllerGetInstance(h, GetGraphqlSchemaRegistry()).Execute()
+			return graphqlcontrollers.ExecuteGraphQlQueryControllerGetInstance(h, GetGraphQlSchemaProvidersRegistry()).Invoke()
 		}},
 	}
 }

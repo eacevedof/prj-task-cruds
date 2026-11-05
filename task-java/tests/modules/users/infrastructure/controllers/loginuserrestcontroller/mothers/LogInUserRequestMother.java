@@ -14,7 +14,7 @@ public final class LogInUserRequestMother {
     }
 
     /**
-     * @return argumentos de LogInUserRestController.logIn() (ninguno: todo va en el body)
+     * @return argumentos de LogInUserRestController.invoke() (ninguno: todo va en el body)
      */
     public Map<String, String> getRequestByTestCase(String useCase) {
         return switch (useCase) {

@@ -12,7 +12,7 @@ export class LogInUserRequestMother {
     }
 
     /**
-     * @returns argumentos de LogInUserRestController.logIn() (ninguno: todo va en el body)
+     * @returns argumentos de LogInUserRestController.invoke() (ninguno: todo va en el body)
      */
     getRequestByTestCase(useCase: LogInUserTestCase): Record<string, string> {
         switch (useCase) {

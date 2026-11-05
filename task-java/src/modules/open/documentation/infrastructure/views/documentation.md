@@ -29,15 +29,15 @@ the ones that give you the token: sign-up and log-in.
 | 8 | tasks | mutation | `createTask(task_title, ...)` | yes | Creates a task of yours (see 5.2) |
 | 9 | tasks | query | `tasks(filter, page, page_size)` | yes | Your tasks, paginated and filterable (see 1.2) |
 | 10 | tasks | query | `task(task_uuid)` | yes | One task |
-| 11 | tasks | query | `userTasks(user_uuid, filter, page, page_size)` | yes | Your user's tasks, paginated and filterable |
-| 12 | tasks | mutation | `updateTask(task_uuid, task_title, ...)` | yes | Full replacement of the task (see 5.3) |
-| 13 | tasks | mutation | `deleteTask(task_uuid)` | yes | Deletes the task (see 5.4) |
+| 11 | tasks | mutation | `updateTask(task_uuid, task_title, ...)` | yes | Full replacement of the task (see 5.3) |
+| 12 | tasks | mutation | `deleteTask(task_uuid)` | yes | Deletes the task (see 5.4) |
 
-Also, the `User` type has the field `tasks(filter, page, page_size)`: user and tasks in a single query.
+Also, the `User` type has the field `tasks(filter, page, page_size)`: user and tasks in a single query. It is an
+example of a module extending another module's type; to list your tasks, use `tasks`.
 
 ### 1.2 Task lists: pagination and filters
 
-`tasks`, `userTasks` and `User.tasks` return a page (`TaskPage`), always from newest to oldest (`task_id` descending).
+`tasks` and `User.tasks` return a page (`TaskPage`), always from newest to oldest (`task_id` descending).
 
 | # | Argument | Type | What it does |
 |---|---|---|---|

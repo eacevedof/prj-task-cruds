@@ -53,5 +53,5 @@ func assertUnauthorizedWithGenericMessage(t *testing.T, useCase mothers.LogInUse
 
 func getHttpResponseByTestCase(useCase mothers.LogInUserTestCaseEnum) *httpresponder.HttpResponder {
 	httpRequester := mothers.LogInUserRequestMotherGetInstance().GetRequestByTestCase(useCase)
-	return mothers.GetControllerInstance(httpRequester).LogIn()
+	return mothers.GetControllerInstance(httpRequester).Invoke()
 }

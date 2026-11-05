@@ -1,8 +1,8 @@
 # task-rust: replica 1:1 de task-php (el maestro) en Rust. Mismo contrato GraphQL (los mismos .graphql: el schema.graphql
-# de modules/graphql y el <modulo>.graphql de users y tasks), mismas migraciones y mismos casos de test.
+# de modules/graph_ql y el <modulo>.graphql de users y tasks), mismas migraciones y mismos casos de test.
 [package]
 name = "task-rust"
-version = "2.0.1"
+version = "3.0.0"
 edition = "2024"
 publish = false
 # binarios y tests declarados abajo: cmd/ como en task-go y los tests con las carpetas de task-php/tests
@@ -24,8 +24,12 @@ path = "cmd/console/main.rs"
 
 # un binario por test de task-php: cada uno con su propia BD (database/task_cruds_test-<nombre>.sqlite)
 [[test]]
-name = "graphql_controller_test"
-path = "tests/modules/graphql/infrastructure/controllers/graphql_controller/graphql_controller_test.rs"
+name = "graph_ql_controller_test"
+path = "tests/modules/graph_ql/infrastructure/controllers/graph_ql_controller/graph_ql_controller_test.rs"
+
+[[test]]
+name = "search_tasks_by_user_graph_ql_controller_test"
+path = "tests/modules/tasks/infrastructure/controllers/search_tasks_by_user_graph_ql_controller/search_tasks_by_user_graph_ql_controller_test.rs"
 
 [[test]]
 name = "log_in_user_rest_controller_test"

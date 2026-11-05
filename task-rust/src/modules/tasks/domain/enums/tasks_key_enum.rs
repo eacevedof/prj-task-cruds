@@ -19,7 +19,7 @@ impl TasksKeyEnum {
     pub const ID: &'static str = "id";
     pub const USER_ID: &'static str = "user_id";
 
-    // busqueda paginada (GraphQL: argumentos de tasks/userTasks y tipo TaskPage)
+    // busqueda paginada (GraphQL: argumentos de tasks/User.tasks y tipo TaskPage)
     pub const FILTER: &'static str = "filter";
     pub const TASK_TEXT: &'static str = "task_text";
     pub const TARGET_DATE_FROM: &'static str = "target_date_from";

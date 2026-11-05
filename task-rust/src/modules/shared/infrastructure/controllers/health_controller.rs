@@ -19,7 +19,7 @@ impl HealthController {
         Self { abstract_rest_controller: AbstractRestController::new(http_requester) }
     }
 
-    pub fn index(&self) -> HttpResponder {
+    pub fn invoke(&self) -> HttpResponder {
         self.respond_ok(json!({
             HealthKeyEnum::APP: HealthKeyEnum::APP_NAME,
             HealthKeyEnum::RUST: env!("RUSTC_VERSION"),

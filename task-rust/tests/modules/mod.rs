@@ -1,2 +1,2 @@
-pub mod graphql;
+pub mod graph_ql;
 pub mod shared;

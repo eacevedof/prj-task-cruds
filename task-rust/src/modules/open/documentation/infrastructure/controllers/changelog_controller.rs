@@ -23,7 +23,7 @@ impl ChangelogController {
         Self { log_trait: LogTrait::new(Some(http_requester)) }
     }
 
-    pub fn show(&self) -> HttpResponder {
+    pub fn invoke(&self) -> HttpResponder {
         let rendered = panic::catch_unwind(AssertUnwindSafe(|| {
             ChangelogView::get_instance().get_html(&DocumentationViewDto::from_primitives(&get_primitives(json!({
                 "appBaseUrl": EnvironmentReaderRawRepository::get_instance().get_base_url(),
@@ -32,7 +32,7 @@ impl ChangelogController {
         match rendered {
             Ok(html) => HttpResponder::html(html, ExceptionEnum::CODE_OK),
             Err(panic_payload) => {
-                get_html_unexpected_error(&self.log_trait, &*panic_payload, "ChangelogController.Show")
+                get_html_unexpected_error(&self.log_trait, &*panic_payload, "ChangelogController.Invoke")
             }
         }
     }

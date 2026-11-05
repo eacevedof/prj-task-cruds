@@ -1,14 +1,14 @@
-# Parte de tasks del schema de /graphql (la registra TasksGraphqlSchemaProvider): extiende Query, Mutation y
+# Parte de tasks del schema de /graphql (la registra TasksGraphQlSchemaProvider): extiende Query, Mutation y
 # User de users.graphql.
 # task_status / task_type van como String: los valores permitidos (TaskStatusEnum / TaskTypeEnum) los valida
 # el dominio, asi no se repiten aqui.
-# Listados de tasks (tasks, userTasks, User.tasks): paginados y filtrables, la mas reciente primero (id desc).
+# Listados de tasks (tasks, User.tasks): paginados y filtrables, la mas reciente primero (id desc).
 # page empieza en 1; page_size entre 1 y 100 (20 por defecto).
 
+# tasks: el listado de la UI. No pide user_uuid: el usuario sale del token y cada token solo ve las suyas.
 extend type Query {
     tasks(filter: TasksFilter, page: Int = 1, page_size: Int = 20): TaskPage
     task(task_uuid: ID!): Task
-    userTasks(user_uuid: ID!, filter: TasksFilter, page: Int = 1, page_size: Int = 20): TaskPage
 }
 
 extend type Mutation {
@@ -30,6 +30,12 @@ extend type Mutation {
     deleteTask(task_uuid: ID!): DeleteTaskResult
 }
 
+# User.tasks: SOLO EJEMPLO, no lo consume ningun front (task-js y task-webassembly listan con Query.tasks). Se
+# conserva porque muestra como un modulo anade un campo a un tipo de otro (extend type + resolver bajo
+# UsersGraphQlSchemaProvider::TYPE_USER) sin que Users sepa nada de Tasks.
+# Serviria si un cliente necesitara el usuario y sus tasks en una sola peticion (una cabecera de perfil con
+# "tienes N pendientes"), o si llegara un rol que vea otros usuarios (admin: users { user_name tasks { total_items } }).
+# Ojo en ese caso: una lectura de tasks por cada usuario de la lista (N+1).
 extend type User {
     tasks(filter: TasksFilter, page: Int = 1, page_size: Int = 20): TaskPage
 }

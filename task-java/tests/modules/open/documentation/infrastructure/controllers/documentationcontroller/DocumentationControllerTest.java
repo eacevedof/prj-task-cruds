@@ -26,7 +26,7 @@ class DocumentationControllerTest extends AbstractTestCase {
 
     @Test
     void testOkAsSuccessByDocumentationWithoutToken() {
-        HttpResponder httpResponse = DocumentationControllerMother.getControllerInstance().show();
+        HttpResponder httpResponse = DocumentationControllerMother.getControllerInstance().invoke();
         assertPublishedHtmlPage(
             httpResponse,
             DocumentationTestCaseEnum.OK_AS_SUCCESS_BY_DOCUMENTATION_WITHOUT_TOKEN
@@ -40,7 +40,7 @@ class DocumentationControllerTest extends AbstractTestCase {
 
     @Test
     void testOkAsSuccessByChangelogWithoutToken() {
-        HttpResponder httpResponse = DocumentationControllerMother.getChangelogControllerInstance().show();
+        HttpResponder httpResponse = DocumentationControllerMother.getChangelogControllerInstance().invoke();
 
         assertPublishedHtmlPage(
             httpResponse,

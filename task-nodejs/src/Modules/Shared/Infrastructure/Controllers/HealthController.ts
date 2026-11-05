@@ -11,7 +11,7 @@ export class HealthController extends AbstractRestController {
         return new HealthController();
     }
 
-    index(): HttpResponder {
+    invoke(): HttpResponder {
         return this.respondOk({
             [HealthKeyEnum.APP]: HealthKeyEnum.APP_NAME,
             [HealthKeyEnum.NODE]: process.version,

@@ -3,27 +3,30 @@ package controllers
 import (
 	"errors"
 
-	graphqlcontrollers "task-go/src/modules/graphql/infrastructure/controllers"
+	"task-go/src/core/config"
+	graphqlexceptions "task-go/src/modules/graphql/domain/exceptions"
 	"task-go/src/modules/shared/application"
+	sharedenums "task-go/src/modules/shared/domain/enums"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
+	sharedcontrollers "task-go/src/modules/shared/infrastructure/controllers"
 	"task-go/src/modules/users/application/listusers"
 	"task-go/src/modules/users/domain/entities"
 	"task-go/src/modules/users/domain/exceptions"
 )
 
-// ListUsersGraphqlController query users (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
-type ListUsersGraphqlController struct {
-	graphqlcontrollers.AbstractGraphqlController
+// ListUsersGraphQlController query users (src/modules/users/infrastructure/providers/users.graphql). Exige Bearer.
+type ListUsersGraphQlController struct {
+	sharedcontrollers.AbstractHttpController
 }
 
-func ListUsersGraphqlControllerGetInstance(httpRequester *httprequester.HttpRequester) *ListUsersGraphqlController {
-	return &ListUsersGraphqlController{AbstractGraphqlController: graphqlcontrollers.NewAbstractGraphqlController(httpRequester)}
+func ListUsersGraphQlControllerGetInstance(httpRequester *httprequester.HttpRequester) *ListUsersGraphQlController {
+	return &ListUsersGraphQlController{AbstractHttpController: sharedcontrollers.NewAbstractHttpController(httpRequester)}
 }
 
-func (c *ListUsersGraphqlController) Invoke() ([]entities.UserPrimitives, error) {
+func (c *ListUsersGraphQlController) Invoke() ([]entities.UserPrimitives, error) {
 	authUserPrimitives, err := c.GetAuthUserOrFail()
 	if err != nil {
-		return nil, c.getGraphqlError(err, "ListUsersGraphqlController.Invoke")
+		return nil, c.getGraphQlError(err, "ListUsersGraphQlController.Invoke")
 	}
 	listUsersResultDto, err := listusers.ListUsersServiceGetInstance().Invoke(
 		listusers.ListUsersDtoFromPrimitives(application.MergePrimitives(
@@ -32,16 +35,19 @@ func (c *ListUsersGraphqlController) Invoke() ([]entities.UserPrimitives, error)
 		)),
 	)
 	if err != nil {
-		return nil, c.getGraphqlError(err, "ListUsersGraphqlController.Invoke")
+		return nil, c.getGraphQlError(err, "ListUsersGraphQlController.Invoke")
 	}
 	return listUsersResultDto.ToArray(), nil
 }
 
-// getGraphqlError los catch de task-php: UsersException es de dominio; lo demas, inesperado.
-func (c *ListUsersGraphqlController) getGraphqlError(err error, logTitle string) error {
+// getGraphQlError los dos catch de task-php: UsersException -> ClientAwareExceptionForWebonyx (su
+// codigo y su mensaje al cliente); lo demas -> log + mail + InternalServerError (500 con el mensaje generico).
+func (c *ListUsersGraphQlController) getGraphQlError(err error, logTitle string) error {
 	var usersException *exceptions.UsersException
 	if errors.As(err, &usersException) {
-		return c.GetGraphqlDomainError(usersException)
+		return graphqlexceptions.ClientAwareExceptionForWebonyx(usersException)
 	}
-	return c.GetGraphqlUnexpectedError(err, logTitle)
+	c.LogException(err, logTitle)
+	c.SendMailOnThrowable(err, logTitle)
+	return graphqlexceptions.InternalServerError(config.Tr(sharedenums.SharedMessageEnum.AN_UNEXPECTED_ERROR_HAS_OCCURRED))
 }

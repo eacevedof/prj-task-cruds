@@ -27,7 +27,7 @@ impl DocumentationController {
     }
 
     /// el render no devuelve error: lo unico que puede fallar es un panic, y se responde como el catch de task-php
-    pub fn show(&self) -> HttpResponder {
+    pub fn invoke(&self) -> HttpResponder {
         let rendered = panic::catch_unwind(AssertUnwindSafe(|| {
             let environment_reader_raw_repository = EnvironmentReaderRawRepository::get_instance();
             DocumentationView::get_instance().get_html(&DocumentationViewDto::from_primitives(&get_primitives(json!({
@@ -39,7 +39,7 @@ impl DocumentationController {
         match rendered {
             Ok(html) => HttpResponder::html(html, ExceptionEnum::CODE_OK),
             Err(panic_payload) => {
-                get_html_unexpected_error(&self.log_trait, &*panic_payload, "DocumentationController.Show")
+                get_html_unexpected_error(&self.log_trait, &*panic_payload, "DocumentationController.Invoke")
             }
         }
     }

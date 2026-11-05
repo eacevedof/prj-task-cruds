@@ -1,7 +1,7 @@
 package enums
 
-// GraphqlMessageEnum msgid del modulo Graphql.
-var GraphqlMessageEnum = struct {
+// GraphQlMessageEnum msgid del modulo GraphQl.
+var GraphQlMessageEnum = struct {
 	GRAPHQL_QUERY_IS_REQUIRED                  string
 	GRAPHQL_FIELDS_X_X_ALREADY_HAVE_RESOLVER_X string
 	GRAPHQL_FIELDS_X_X_HAVE_NO_RESOLVER        string

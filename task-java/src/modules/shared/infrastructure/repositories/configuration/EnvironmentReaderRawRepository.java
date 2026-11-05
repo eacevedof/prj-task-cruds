@@ -18,8 +18,8 @@ public final class EnvironmentReaderRawRepository {
 
     // version publicada en /api/v1: es la del CONTRATO (la misma que task-php). Al subirla, anotar el cambio en
     // changelog.md
-    private static final String APP_VERSION = "2.0.1";
-    private static final String APP_VERSION_UPDATE = "2026-10-29";
+    private static final String APP_VERSION = "3.0.0";
+    private static final String APP_VERSION_UPDATE = "2026-11-04";
 
     private static final EnvironmentReaderRawRepository INSTANCE = new EnvironmentReaderRawRepository();
 

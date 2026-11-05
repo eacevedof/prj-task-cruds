@@ -12,7 +12,8 @@ use crate::modules::users::application::authenticate_user::authenticate_user_ser
 
 /// base de todo lo que entra por HTTP: la peticion (HttpRequester), log + mail y la autenticacion por Bearer.
 /// Cada protocolo pone encima su forma de responder y de mapear errores: AbstractRestController (envelope JSON con
-/// status HTTP) y, en el modulo graphql, AbstractGraphqlController (ResultDto o GraphqlError) y el endpoint /graphql.
+/// status HTTP) y, en GraphQL, los XxxGraphQlController de cada modulo (ResultDto o GraphQlException) y el endpoint
+/// /graphql (ExecuteGraphQlQueryController).
 #[derive(Debug, Clone)]
 pub struct AbstractHttpController {
     pub log_trait: LogTrait,

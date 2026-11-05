@@ -3,40 +3,40 @@ package repositories
 import (
 	"encoding/json"
 
-	"task-go/src/modules/shared/application"
 	"task-go/src/modules/graphql/domain/enums"
+	"task-go/src/modules/shared/application"
 	"task-go/src/modules/shared/infrastructure/components/httpresponder"
 )
 
-// GraphqlResponseRepositoryMock lectura de una respuesta GraphQL:
+// GraphQlResponseRepositoryMock lectura de una respuesta GraphQL:
 // {"data": {...}, "errors": [{"message", "extensions": {"code", "errors"}}]}
-type GraphqlResponseRepositoryMock struct {
+type GraphQlResponseRepositoryMock struct {
 	responseArray map[string]any
 }
 
-func GraphqlResponseRepositoryMockFromHttpResponse(httpResponse *httpresponder.HttpResponder) *GraphqlResponseRepositoryMock {
+func GraphQlResponseRepositoryMockFromHttpResponse(httpResponse *httpresponder.HttpResponder) *GraphQlResponseRepositoryMock {
 	responseArray := map[string]any{}
 	_ = json.Unmarshal([]byte(httpResponse.GetBody()), &responseArray)
-	return &GraphqlResponseRepositoryMock{responseArray: responseArray}
+	return &GraphQlResponseRepositoryMock{responseArray: responseArray}
 }
 
-func (m *GraphqlResponseRepositoryMock) GetData() map[string]any {
+func (m *GraphQlResponseRepositoryMock) GetData() map[string]any {
 	data, _ := m.responseArray["data"].(map[string]any)
 	return data
 }
 
-func (m *GraphqlResponseRepositoryMock) GetErrors() []any {
-	errors, _ := m.responseArray[enums.GraphqlEnum.KEY_ERRORS].([]any)
+func (m *GraphQlResponseRepositoryMock) GetErrors() []any {
+	errors, _ := m.responseArray[enums.GraphQlEnum.KEY_ERRORS].([]any)
 	return errors
 }
 
 // GetFirstErrorCode codigo HTTP equivalente REST del primer error (0 si es un error de GraphQL, sin extensions).
-func (m *GraphqlResponseRepositoryMock) GetFirstErrorCode() int {
-	return application.ToInt(m.getFirstErrorExtensions()[enums.GraphqlEnum.EXTENSION_CODE])
+func (m *GraphQlResponseRepositoryMock) GetFirstErrorCode() int {
+	return application.ToInt(m.getFirstErrorExtensions()[enums.GraphQlEnum.EXTENSION_CODE])
 }
 
-func (m *GraphqlResponseRepositoryMock) GetFirstErrorDetails() []string {
-	details, _ := m.getFirstErrorExtensions()[enums.GraphqlEnum.EXTENSION_ERRORS].([]any)
+func (m *GraphQlResponseRepositoryMock) GetFirstErrorDetails() []string {
+	details, _ := m.getFirstErrorExtensions()[enums.GraphQlEnum.EXTENSION_ERRORS].([]any)
 	var errorDetails []string
 	for _, detail := range details {
 		errorDetails = append(errorDetails, application.ToString(detail))
@@ -56,7 +56,7 @@ func GetColumn(list any, key string) []any {
 	return column
 }
 
-func (m *GraphqlResponseRepositoryMock) getFirstErrorExtensions() map[string]any {
+func (m *GraphQlResponseRepositoryMock) getFirstErrorExtensions() map[string]any {
 	errors := m.GetErrors()
 	if len(errors) == 0 {
 		return map[string]any{}

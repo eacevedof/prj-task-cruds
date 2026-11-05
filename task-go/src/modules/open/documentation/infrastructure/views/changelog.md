@@ -2,6 +2,16 @@
 
 ⬅️ [back to the documentation]({{appBaseUrl}}/api/v1)
 
+## 3.0.0
+- Date: 2026-11-04
+
+**Breaking changes:**
+- The `userTasks(user_uuid, ...)` query is removed: each token only sees its own tasks, so it returned the same as `tasks`. Use `tasks(filter, page, page_size)`.
+- `User.tasks` remains, as an example of a module extending another module's type.
+
+**Internal (the contract does not change otherwise):**
+- The GraphQL module is reorganized: one use case (`ExecuteGraphQlQuery`) that builds the schema from what each module registers. Resolvers keep their arguments, responses and error codes.
+
 ## 2.0.1
 - Date: 2026-10-29
 

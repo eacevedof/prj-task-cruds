@@ -21,7 +21,7 @@ public final class LogInUserRestController extends AbstractRestController {
         return new LogInUserRestController();
     }
 
-    public HttpResponder logIn() {
+    public HttpResponder invoke() {
         try {
             LogInUserDto logInUserDto = LogInUserDto.fromPrimitives(Primitives.merge(
                 httpRequest.getMetadata(),
@@ -36,7 +36,7 @@ public final class LogInUserRestController extends AbstractRestController {
             return respondDomainError(ex);
         }
         catch (Exception ex) {
-            return respondUnexpectedError(ex, "LogInUserRestController::logIn");
+            return respondUnexpectedError(ex, "LogInUserRestController::invoke");
         }
     }
 }
