@@ -4,42 +4,49 @@ declare(strict_types=1);
 namespace App\Modules\GraphQl\Infrastructure\Providers;
 
 use App\Modules\GraphQl\Infrastructure\Exceptions\GraphQlSchemaException;
-use App\Modules\Tasks\Infrastructure\Providers\TasksGraphQlSchemaProvider;
-use App\Modules\Users\Infrastructure\Providers\UsersGraphQlSchemaProvider;
 
 /**
- * Une lo que registran los modulos en getAllModulesProviders(): la cabecera comun (schema.graphql) mas el
- * SDL de cada proveedor, y la tabla tipo.campo => resolver. Es a /graphql lo que routes.php al ApiRouter.
+ * Une lo que le registran los modulos: la cabecera comun (schema.graphql) mas el SDL de cada proveedor, y la tabla
+ * tipo.campo => resolver. Es a /graphql lo que el EventBus a los eventos: no conoce a ningun modulo, es Core quien
+ * le registra los providers al arrancar (src/Core/config/graphql_schema_providers.php, como event_bus.php).
  */
 final class GraphQlSchemaProvidersRegistry
 {
-    /** @var InterfaceGraphQlSchemaProvider[] */
-    private array $schemaProvidersInstances;
+    /** @var class-string<InterfaceGraphQlSchemaProvider>[] */
+    private array $schemaProvidersClasses = [];
+    private static ?self $instance = null;
 
     private function __construct()
     {
-        $this->schemaProvidersInstances = array_map(
-            fn(string $providerClass): InterfaceGraphQlSchemaProvider => $providerClass::getInstance(),
-            $this->getAllModulesProviders()
-        );
     }
 
     public static function getInstance(): self
     {
-        return new self();
+        if (self::$instance) return self::$instance;
+        self::$instance = new self();
+        return self::$instance;
     }
 
     /**
-     * El orden importa: primero los que definen un tipo, despues los que lo extienden.
-     * Cada modulo tiene su propio provider
-     * @return string[]
+     * El orden importa: primero los que definen un tipo, despues los que lo extienden. Solo guarda las clases: cada
+     * provider se instancia cuando llega una peticion a /graphql.
+     *
+     * @param class-string<InterfaceGraphQlSchemaProvider>[] $schemaProvidersClasses
      */
-    private function getAllModulesProviders(): array
+    public function registerSchemaProviders(array $schemaProvidersClasses): void
     {
-        return [
-            UsersGraphQlSchemaProvider::class,
-            TasksGraphQlSchemaProvider::class,
-        ];
+        $this->schemaProvidersClasses = [...$this->schemaProvidersClasses, ...$schemaProvidersClasses];
+    }
+
+    /**
+     * @return InterfaceGraphQlSchemaProvider[]
+     */
+    private function getSchemaProvidersInstances(): array
+    {
+        return array_map(
+            fn(string $schemaProviderClass): InterfaceGraphQlSchemaProvider => $schemaProviderClass::getInstance(),
+            $this->schemaProvidersClasses
+        );
     }
 
     /**
@@ -53,7 +60,7 @@ final class GraphQlSchemaProvidersRegistry
         $allSchemas = array_map(
             fn (InterfaceGraphQlSchemaProvider $schemaProviderInstance): string =>
                 $schemaProviderInstance->getGraphQlFileContent(),
-            $this->schemaProvidersInstances
+            $this->getSchemaProvidersInstances()
         );
         return implode("\n", [
             (string) file_get_contents(__DIR__."/schema.graphql"),
@@ -91,7 +98,7 @@ final class GraphQlSchemaProvidersRegistry
     public function getAllMergedResolversByType(): array
     {
         $resolversByType = [];
-        foreach ($this->schemaProvidersInstances as $schemaProviderInstance) {
+        foreach ($this->getSchemaProvidersInstances() as $schemaProviderInstance) {
             foreach ($schemaProviderInstance->getControllerResolvers() as $typeName => $controllerResolvers) {
                 if ($repeatedFields = array_intersect_key($controllerResolvers, $resolversByType[$typeName] ?? [])) {
                     GraphQlSchemaException::fieldsAlreadyHaveResolver(

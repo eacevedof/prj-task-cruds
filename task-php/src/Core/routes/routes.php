@@ -13,7 +13,7 @@ return [
 
     /**
      * @uses App\Modules\GraphQl\Infrastructure\Controllers\ExecuteGraphQlQueryController
-     * @graphql (cada modulo registra su XxxGraphQlSchemaProvider en GraphQlSchemaProvidersRegistry::getAllModulesProviders())
+     * @graphql (cada modulo registra su XxxGraphQlSchemaProvider en src/Core/config/graphql_schema_providers.php)
      */
     [
         "url" => "/graphql",

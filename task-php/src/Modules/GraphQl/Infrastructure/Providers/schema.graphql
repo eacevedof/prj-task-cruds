@@ -1,7 +1,7 @@
 # POST /graphql -- unica API de la app junto al login REST (src/Core/routes/routes.php). Claves en snake_case.
 # Cabecera comun del schema: cada modulo trae su parte (Users/Infrastructure/Providers/users.graphql define Query y
 # Mutation; Tasks/Infrastructure/Providers/tasks.graphql las extiende) y GraphQlSchemaProvidersRegistry las une en el orden de
-# GraphQlSchemaProvidersRegistry::getAllModulesProviders().
+# src/Core/config/graphql_schema_providers.php.
 # Un error de dominio llega en errors[] con extensions.code = el codigo HTTP equivalente y
 # extensions.errors = el detalle por campo.
 # Auth: "Authorization: Bearer <api_token>" en todo salvo createUser (alta abierta) y logIn. Cada token solo ve y

@@ -25,6 +25,7 @@ foreach (["APP_SQLITE_PATH" => $pathSqliteTest, "APP_ENV" => "test", "APP_EMAIL_
 appboot_loadenv();
 include_once BootPathsEnum::PATH_VENDOR."/theframework/bootstrap.php";
 include_once BootPathsEnum::PATH_SRC."/Core/config/event_bus.php";
+include_once BootPathsEnum::PATH_SRC."/Core/config/graphql_schema_providers.php";
 
 if (is_file($pathSqliteTest)) {
     unlink($pathSqliteTest);

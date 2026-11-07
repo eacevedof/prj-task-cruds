@@ -18,7 +18,7 @@ final class GraphQlSchemaException extends Exception
     /**
      * Dos providers registran resolver para el mismo tipo.campo: el segundo pisaria al primero sin avisar.
      * La lanza GraphQlSchemaProvidersRegistry::getAllMergedResolversByType() al unir los providers en el orden de
-     * getAllModulesProviders().
+     * src/Core/config/graphql_schema_providers.php.
      *
      * Ejemplo: TasksGraphQlSchemaProvider anade por error "user" en Query, que ya es de Users
      *   $typeName            "Query"

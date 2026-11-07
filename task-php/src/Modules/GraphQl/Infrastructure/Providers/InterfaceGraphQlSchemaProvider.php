@@ -5,7 +5,7 @@ namespace App\Modules\GraphQl\Infrastructure\Providers;
 
 /**
  * Lo que un modulo aporta a /graphql: su parte del schema y quien resuelve cada campo. Cada modulo tiene el suyo en
- * Infrastructure/Providers y se registra en GraphQlSchemaProvidersRegistry::getAllModulesProviders().
+ * Infrastructure/Providers y se registra en src/Core/config/graphql_schema_providers.php.
  */
 interface InterfaceGraphQlSchemaProvider
 {

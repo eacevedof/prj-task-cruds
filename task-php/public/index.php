@@ -13,6 +13,7 @@ appboot_loadenv();
 
 include_once dirname(__DIR__)."/vendor/theframework/bootstrap.php";
 include_once BootPathsEnum::PATH_SRC."/Core/config/event_bus.php";
+include_once BootPathsEnum::PATH_SRC."/Core/config/graphql_schema_providers.php";
 
 try {
     IndexMain::getInstance()->exec();
