@@ -13,21 +13,26 @@ import (
 // schemaPath la cabecera comun, relativa a src/ (el schema se lee de disco: deuda conocida).
 const schemaPath = "modules/graphql/infrastructure/providers/schema.graphql"
 
-// GraphQlSchemaProvidersRegistry une lo que registran los modulos: la cabecera comun (schema.graphql) mas el SDL de
-// cada proveedor, y la tabla tipo.campo => resolver. Es a /graphql lo que routes.go al router.
-// En task-php la lista de providers vive aqui (getAllModulesProviders()); en Go se la inyecta core
-// (src/core/routes/graphql_schema.go): este paquete no puede importar los providers de users y tasks, que importan
-// este mismo paquete por InterfaceGraphQlSchemaProvider y GraphQlTypeResolvers (ciclo de imports).
+// GraphQlSchemaProvidersRegistry une lo que le registran los modulos: la cabecera comun (schema.graphql) mas el SDL
+// de cada proveedor, y la tabla tipo.campo => resolver. No conoce a ningun modulo: es core quien le registra los
+// providers al arrancar (src/core/routes/graphql_schema_providers.go, el graphql_schema_providers.php de task-php).
 type GraphQlSchemaProvidersRegistry struct {
 	schemaProvidersInstances []InterfaceGraphQlSchemaProvider
 }
 
-// GraphQlSchemaProvidersRegistryGetInstance el orden importa: primero los que definen un tipo, despues los que lo
-// extienden.
-func GraphQlSchemaProvidersRegistryGetInstance(
+var graphqlSchemaProvidersRegistry = &GraphQlSchemaProvidersRegistry{}
+
+func GraphQlSchemaProvidersRegistryGetInstance() *GraphQlSchemaProvidersRegistry {
+	return graphqlSchemaProvidersRegistry
+}
+
+// RegisterSchemaProviders el orden importa: primero los que definen un tipo, despues los que lo extienden. Se llama
+// al arrancar, antes de servir peticiones. task-php guarda las clases y las instancia en cada peticion; aqui los
+// providers son structs vacios y se guardan ya instanciados.
+func (r *GraphQlSchemaProvidersRegistry) RegisterSchemaProviders(
 	schemaProvidersInstances []InterfaceGraphQlSchemaProvider,
-) *GraphQlSchemaProvidersRegistry {
-	return &GraphQlSchemaProvidersRegistry{schemaProvidersInstances: schemaProvidersInstances}
+) {
+	r.schemaProvidersInstances = append(r.schemaProvidersInstances, schemaProvidersInstances...)
 }
 
 // GetGraphQlSchemaAsString en el orden del registro: el modulo que define un tipo va antes que los que lo extienden.

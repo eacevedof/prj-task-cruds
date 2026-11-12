@@ -9,6 +9,7 @@ import (
 
 	"task-go/src/core/boot"
 	"task-go/src/core/config"
+	"task-go/src/core/routes"
 	"task-go/src/modules/shared/infrastructure/factories"
 	"task-go/tests/modules/shared/infrastructure/repositories"
 )
@@ -54,5 +55,9 @@ func loadTestEnv(pathSqliteTest string) error {
 			return err
 		}
 	}
-	return config.AppbootLoadenv()
+	if err := config.AppbootLoadenv(); err != nil {
+		return err
+	}
+	routes.LoadGraphQlSchemaProviders()
+	return nil
 }

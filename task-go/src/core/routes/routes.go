@@ -34,10 +34,10 @@ func GetRoutes() []boot.Route {
 			return userscontrollers.LogInUserRestControllerGetInstance(h).Invoke()
 		}},
 
-		//@graphql ExecuteGraphQlQueryController (cada modulo registra su XxxGraphQlSchemaProvider en graphql_schema.go;
+		//@graphql ExecuteGraphQlQueryController (cada modulo registra su XxxGraphQlSchemaProvider en graphql_schema_providers.go;
 		// schema: src/modules/graphql/infrastructure/providers/schema.graphql + infrastructure/providers/<modulo>.graphql)
 		{Url: "/graphql", Allowed: []string{"post"}, Controller: func(h *httprequester.HttpRequester, args map[string]string) *httpresponder.HttpResponder {
-			return graphqlcontrollers.ExecuteGraphQlQueryControllerGetInstance(h, GetGraphQlSchemaProvidersRegistry()).Invoke()
+			return graphqlcontrollers.ExecuteGraphQlQueryControllerGetInstance(h).Invoke()
 		}},
 	}
 }

@@ -18,6 +18,7 @@ func main() {
 	if err := config.AppbootLoadenv(); err != nil {
 		log.Fatal(err)
 	}
+	routes.LoadGraphQlSchemaProviders()
 
 	server := &http.Server{
 		Addr:              *listenAddress,

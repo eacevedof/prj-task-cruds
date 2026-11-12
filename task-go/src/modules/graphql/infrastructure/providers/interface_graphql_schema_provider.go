@@ -3,7 +3,7 @@ package providers
 import "task-go/src/modules/shared/infrastructure/components/httprequester"
 
 // InterfaceGraphQlSchemaProvider lo que un modulo aporta a /graphql: su parte del schema y quien resuelve cada campo.
-// Cada modulo tiene el suyo en infrastructure/providers y se registra en src/core/routes/graphql_schema.go.
+// Cada modulo tiene el suyo en infrastructure/providers y se registra en src/core/routes/graphql_schema_providers.go.
 type InterfaceGraphQlSchemaProvider interface {
 	// GetGraphQlFileContent SDL del modulo (su <modulo>.graphql): define tipos o extiende los de otro modulo con
 	// "extend type".

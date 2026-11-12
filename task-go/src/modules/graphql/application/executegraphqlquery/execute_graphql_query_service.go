@@ -32,12 +32,8 @@ type ExecuteGraphQlQueryService struct {
 	graphqlSchemaRegistry *providers.GraphQlSchemaProvidersRegistry
 }
 
-// ExecuteGraphQlQueryServiceGetInstance graphqlSchemaRegistry lo monta core con la lista de providers (ver
-// GraphQlSchemaProvidersRegistry).
-func ExecuteGraphQlQueryServiceGetInstance(
-	graphqlSchemaRegistry *providers.GraphQlSchemaProvidersRegistry,
-) *ExecuteGraphQlQueryService {
-	return &ExecuteGraphQlQueryService{graphqlSchemaRegistry: graphqlSchemaRegistry}
+func ExecuteGraphQlQueryServiceGetInstance() *ExecuteGraphQlQueryService {
+	return &ExecuteGraphQlQueryService{graphqlSchemaRegistry: providers.GraphQlSchemaProvidersRegistryGetInstance()}
 }
 
 // Invoke los errores de GraphQL (sintaxis, validacion, dominio de un resolver) van en el resultado, no se devuelven.

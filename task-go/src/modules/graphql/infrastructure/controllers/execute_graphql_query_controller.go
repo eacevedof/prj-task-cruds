@@ -7,7 +7,6 @@ import (
 	"task-go/src/core/config"
 	"task-go/src/modules/graphql/application/executegraphqlquery"
 	"task-go/src/modules/graphql/domain/enums"
-	"task-go/src/modules/graphql/infrastructure/providers"
 	sharedenums "task-go/src/modules/shared/domain/enums"
 	"task-go/src/modules/shared/infrastructure/components/httprequester"
 	"task-go/src/modules/shared/infrastructure/components/httpresponder"
@@ -17,7 +16,7 @@ import (
 // ExecuteGraphQlQueryController POST /graphql  body: {query, variables?, operationName?}
 // header: Authorization: Bearer <api_token> (cada resolver autentica; sin token solo responden createUser y logIn).
 // Solo traduce HTTP <-> dto: el schema y los resolvers los registra cada modulo (un XxxGraphQlSchemaProvider por
-// modulo, en el orden de src/core/routes/graphql_schema.go) y ExecuteGraphQlQueryService los ejecuta.
+// modulo, en el orden de src/core/routes/graphql_schema_providers.go) y ExecuteGraphQlQueryService los ejecuta.
 // La respuesta es la de GraphQL ({data, errors}), no el envelope REST: un error de dominio va en errors[].extensions
 // (ver GraphQlException) con status 200, como manda GraphQL sobre HTTP.
 type ExecuteGraphQlQueryController struct {
@@ -25,15 +24,12 @@ type ExecuteGraphQlQueryController struct {
 	executeGraphQlQueryService *executegraphqlquery.ExecuteGraphQlQueryService
 }
 
-// ExecuteGraphQlQueryControllerGetInstance graphqlSchemaRegistry lo monta core con la lista de providers (ver
-// GraphQlSchemaProvidersRegistry: el modulo graphql no puede importar los providers de users y tasks).
 func ExecuteGraphQlQueryControllerGetInstance(
 	httpRequester *httprequester.HttpRequester,
-	graphqlSchemaRegistry *providers.GraphQlSchemaProvidersRegistry,
 ) *ExecuteGraphQlQueryController {
 	return &ExecuteGraphQlQueryController{
 		AbstractHttpController:     sharedcontrollers.NewAbstractHttpController(httpRequester),
-		executeGraphQlQueryService: executegraphqlquery.ExecuteGraphQlQueryServiceGetInstance(graphqlSchemaRegistry),
+		executeGraphQlQueryService: executegraphqlquery.ExecuteGraphQlQueryServiceGetInstance(),
 	}
 }
 

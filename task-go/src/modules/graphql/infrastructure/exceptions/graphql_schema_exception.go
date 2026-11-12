@@ -28,7 +28,7 @@ func (e *GraphQlSchemaException) GetCode() int {
 
 // FieldsAlreadyHaveResolver dos providers registran resolver para el mismo tipo.campo: el segundo pisaria al primero
 // sin avisar. La devuelve GraphQlSchemaProvidersRegistry.GetAllMergedResolversByType() al unir los providers en el
-// orden del registro (src/core/routes/graphql_schema.go).
+// orden del registro (src/core/routes/graphql_schema_providers.go).
 //
 // Ejemplo: TasksGraphQlSchemaProvider anade por error "user" en Query, que ya es de Users
 //
