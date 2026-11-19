@@ -1,11 +1,14 @@
 #docker/app/Dockerfile
 # node alpine: ejecuta la API y la consola en TypeScript sin compilar (Node 24 quita los tipos al cargar el .ts).
 # SQLite es el node:sqlite del propio Node: sin dependencias nativas.
-FROM node:24.22.1-alpine
+FROM node:24.22.3-alpine
 
 # apk upgrade: los parches de seguridad de alpine que la imagen aun no trae.
 # El sendmail de busybox (/usr/sbin/sendmail) ya viene en alpine: APP_SENDMAIL_PATH lo apunta a Mailpit.
 RUN apk upgrade --no-cache
+
+# npm: el que trae la imagen lleva brace-expansion y undici con CVEs HIGH (trivy, 2026-11-18); se actualiza a la ultima.
+RUN npm install -g npm@latest --no-audit --no-fund
 
 WORKDIR /app
 

@@ -21,7 +21,7 @@ Usuario de prueba: `tasker` / `Demo.1234`.
 | 5 | task-rust | [:9500/health](http://localhost:9500/health) | [:9500/api/v1](http://localhost:9500/api/v1) | [:9500/api/v1/changelog](http://localhost:9500/api/v1/changelog) | [:9525](http://localhost:9525) |
 | 6 | task-nodejs | [:9600/health](http://localhost:9600/health) | [:9600/api/v1](http://localhost:9600/api/v1) | [:9600/api/v1/changelog](http://localhost:9600/api/v1/changelog) | [:9625](http://localhost:9625) |
 | 7 | task-java | [:9700/health](http://localhost:9700/health) | [:9700/api/v1](http://localhost:9700/api/v1) | [:9700/api/v1/changelog](http://localhost:9700/api/v1/changelog) | [:9725](http://localhost:9725) |
-| 8 | task-python | pendiente | | | |
+| 8 | task-python | [:9800/health](http://localhost:9800/health) | [:9800/api/v1](http://localhost:9800/api/v1) | [:9800/api/v1/changelog](http://localhost:9800/api/v1/changelog) | [:9825](http://localhost:9825) |
 
 En todos los backs, además (solo `POST`, no se abren en el navegador):
 

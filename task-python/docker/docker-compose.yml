@@ -1,0 +1,38 @@
+# docker/docker-compose.yml -- stack local minimo: la API en Python (alpine) + Mailpit. Sin contenedor de BD: SQLite.
+# Sin nginx: la propia API sirve public/ (PublicFilesServer). Lanzar desde task-python/ con el makefile (make up).
+# Variables opcionales en docker/.env (ver .env.example).
+name: task-python
+
+services:
+  task-python-app:
+    container_name: cont-task-python-app
+    image: task-python-app
+    build:
+      context: ..
+      dockerfile: docker/app/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${HTTP_PORT:-9800}:8080
+    volumes:
+      - ../:/app
+    networks:
+      - task-python-net
+
+  # buzon local: recoge los emails que envia la app (sendmail -> smtp mailpit:1025) y los muestra en
+  # http://localhost:9825. No los entrega a nadie: en local ningun email sale a internet.
+  task-python-mailpit:
+    container_name: cont-task-python-mailpit
+    image: axllent/mailpit:v1.34.0
+    environment:
+      TZ: ${TIME_ZONE:-UTC}
+    ports:
+      - ${MAILPIT_PORT:-9825}:8025
+    networks:
+      - task-python-net
+
+networks:
+  task-python-net:

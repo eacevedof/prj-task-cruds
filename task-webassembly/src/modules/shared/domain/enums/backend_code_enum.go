@@ -7,6 +7,7 @@ var BackendCodeEnum = struct {
 	RUST   string
 	NODEJS string
 	JAVA   string
+	PYTHON string
 
 	DEFAULT string
 }{
@@ -15,6 +16,7 @@ var BackendCodeEnum = struct {
 	RUST:   "rust",
 	NODEJS: "nodejs",
 	JAVA:   "java",
+	PYTHON: "python",
 
 	DEFAULT: "php",
 }

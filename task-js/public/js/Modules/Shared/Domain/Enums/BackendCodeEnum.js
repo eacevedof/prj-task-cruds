@@ -7,6 +7,7 @@ export const BackendCodeEnum = Object.freeze({
     RUST: "rust",
     NODEJS: "nodejs",
     JAVA: "java",
+    PYTHON: "python",
 
     DEFAULT: "php",
 });

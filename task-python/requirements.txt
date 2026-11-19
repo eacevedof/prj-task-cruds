@@ -1,0 +1,3 @@
+# dependencias de runtime: solo dos (SQLite, HTTP, tests y logs son la libreria estandar)
+graphql-core==3.3.2
+bcrypt==5.0.0
