@@ -28,7 +28,19 @@ En todos los backs, además (solo `POST`, no se abren en el navegador):
 9. `POST http://localhost:<puerto>/graphql`: la API (users y tasks), con `Authorization: Bearer <api_token>`.
 10. `POST http://localhost:<puerto>/api/v1/log-in`: login con `user_name` + `password`; devuelve el `api_token`.
 
-## 3 - arranque
+## 3 - probar task-python en local
+
+Requisitos: Docker (con Compose) y `make` (en Windows, Git Bash o WSL). Nada de Python en el host: todo va en contenedores.
+
+1. `git clone git@github.com:eacevedof/prj-task-cruds.git` (o `https://github.com/eacevedof/prj-task-cruds.git`) y `cd prj-task-cruds`.
+2. API Python: `cd task-python && make start` → <http://localhost:9800/health> (Mailpit en :9825). En Linux con docker bajo sudo: `make start DOCKER="sudo docker"`.
+3. Front: `cd ../task-js && make start` → <http://localhost:9200>; arriba a la derecha, elige el logo de **Python**. Usuario de prueba: `tasker` / `Demo.1234`.
+4. Tests de la API: `cd task-python && make test` (54 casos) · vulnerabilidades de dependencias: `make audit`.
+5. Todo de una vez desde la raíz: `make up` (los 6 backs y los 2 fronts), `make up b="python" f="js"` (solo esos), `make up-python`, `make health`, `make ps`, `make down`. `make help` lista los targets.
+6. Parar: `make down` en la raíz o en cada carpeta.
+
+
+## 4 - arranque
 
 Cada proyecto se levanta desde su carpeta con `make start` la primera vez y `make up` después (`make help` lista
 el resto). Los fronts leen las URLs de los backs de su `docker/.env` (`API_BASE_URL_<BACK>`).
